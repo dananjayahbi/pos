@@ -1,23 +1,31 @@
 """
-URL configuration for config project.
+URL configuration for LankaCommerce Cloud.
+
+Root URL configuration with organized sections for admin, API, and health checks.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path  # noqa: F401
 
 urlpatterns = [
+    # ──────────────────────────────────────────────
+    # Admin
+    # ──────────────────────────────────────────────
     path("admin/", admin.site.urls),
+
+    # ──────────────────────────────────────────────
+    # API v1 (to be added with DRF)
+    # ──────────────────────────────────────────────
+    # path("api/v1/auth/", include("apps.authentication.urls")),
+    # path("api/v1/tenants/", include("apps.tenants.urls")),
+    # path("api/v1/inventory/", include("apps.inventory.urls")),
+    # path("api/v1/pos/", include("apps.pos.urls")),
+
+    # ──────────────────────────────────────────────
+    # Health Checks
+    # ──────────────────────────────────────────────
+    # path("health/", include("health_check.urls")),
 ]
