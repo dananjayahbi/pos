@@ -31,10 +31,7 @@ class ApiClient {
   /**
    * Core request method — all HTTP methods delegate here.
    */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {},
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const config: RequestInit = {
@@ -65,10 +62,7 @@ class ApiClient {
    * Attach JWT bearer token if available.
    */
   private getAuthHeaders(): HeadersInit {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
@@ -77,8 +71,7 @@ class ApiClient {
    * Attach tenant context from subdomain.
    */
   private getTenantHeaders(): HeadersInit {
-    const hostname =
-      typeof window !== "undefined" ? window.location.hostname : "";
+    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
     const tenant = hostname.split(".")[0];
 
     return tenant ? { "X-Tenant": tenant } : {};

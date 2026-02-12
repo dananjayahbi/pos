@@ -54,6 +54,8 @@ lerna-debug.log*
 
 # Keep example env files (safe to commit)
 !.env.example
+!.env.local.example
+!.env.development
 
 #############################
 # IDEs / Editors

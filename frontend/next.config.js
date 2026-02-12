@@ -10,11 +10,6 @@ const nextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // ── ESLint ────────────────────────────────────────────────────
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-
   // ── Images ────────────────────────────────────────────────────
   images: {
     formats: ["image/avif", "image/webp"],
@@ -52,12 +47,11 @@ const nextConfig = {
     ],
   },
 
-  // ── Experimental Features ─────────────────────────────────────
-  experimental: {
-    typedRoutes: true,
-    instrumentationHook: true,
-    serverComponentsExternalPackages: ["bcryptjs", "sharp"],
-  },
+  // ── Server External Packages (moved from experimental) ───────
+  serverExternalPackages: ["bcryptjs", "sharp"],
+
+  // ── Typed Routes (moved from experimental) ────────────────────
+  typedRoutes: true,
 };
 
 export default nextConfig;
