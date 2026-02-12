@@ -87,5 +87,6 @@ Thumbs.db
 #############################
 # Media (dev only)
 #############################
-media/
+backend/media/*
+!backend/media/.gitkeep
 /Document-Series/
