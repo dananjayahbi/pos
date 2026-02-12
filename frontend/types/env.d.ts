@@ -8,7 +8,7 @@
 declare namespace NodeJS {
   interface ProcessEnv {
     // ── Next.js ──────────────────────────────────────────────
-    readonly NODE_ENV: 'development' | 'production' | 'test';
+    readonly NODE_ENV: "development" | "production" | "test";
 
     // ── Public Variables (available in browser) ──────────────
     /** Backend API base URL. */

@@ -14,8 +14,11 @@ type Nullable<T> = T | null;
 type Optional<T> = T | undefined;
 
 /** Extract the return type of an async function. */
-type AsyncReturnType<T extends (...args: unknown[]) => Promise<unknown>> =
-  T extends (...args: unknown[]) => Promise<infer R> ? R : never;
+type AsyncReturnType<T extends (...args: unknown[]) => Promise<unknown>> = T extends (
+  ...args: unknown[]
+) => Promise<infer R>
+  ? R
+  : never;
 
 // ── Common Aliases ─────────────────────────────────────────────
 
