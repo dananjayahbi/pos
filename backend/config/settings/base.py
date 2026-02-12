@@ -83,10 +83,28 @@ THIRD_PARTY_APPS: list[str] = [
 ]
 
 LOCAL_APPS: list[str] = [
-    # "apps.core",                       # Core utilities (Phase 3)
-    # "apps.users",                      # User management (Phase 3)
-    # "apps.tenants",                    # Tenant models (Phase 2)
-    # "apps.inventory",                  # Inventory module (Phase 4)
+    # Core Framework
+    "apps.core",                         # Core utilities (Phase 3)
+    "apps.tenants",                      # Tenant models (Phase 2)
+    "apps.users",                        # User management (Phase 3)
+
+    # Business Modules - Phase 4
+    "apps.products",                     # Product catalog
+    "apps.inventory",                    # Stock & warehouse
+    "apps.vendors",                      # Supplier management
+
+    # Business Modules - Phase 5
+    "apps.sales",                        # Orders, invoicing, POS
+    "apps.customers",                    # Customer CRM
+
+    # Advanced Modules - Phase 6
+    "apps.hr",                           # Human resources
+    "apps.accounting",                   # Accounting & finance
+    "apps.reports",                      # Reports & analytics
+
+    # Platform Apps
+    "apps.webstore",                     # E-commerce storefront
+    "apps.integrations",                 # Third-party integrations
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -266,8 +284,12 @@ DATABASES: dict = {}
 # AUTHENTICATION  (Task 24)
 # ════════════════════════════════════════════════════════════════════════
 
-# Custom user model — will be set in Phase 3 when users app is created
-# AUTH_USER_MODEL = "users.User"
+# Custom user model — must be set before first migration (Phase 3)
+# AUTH_USER_MODEL = "users.User"  # Uncomment when User model is created
+
+# Multi-tenancy models — configured for django-tenants (Phase 2)
+TENANT_MODEL = "tenants.Tenant"
+TENANT_DOMAIN_MODEL = "tenants.Domain"
 
 # Authentication backends — will be extended for JWT, social auth
 # AUTHENTICATION_BACKENDS = [
