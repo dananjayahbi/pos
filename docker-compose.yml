@@ -1,0 +1,166 @@
+# =============================================================================
+# LankaCommerce Cloud - Development Docker Compose
+# =============================================================================
+# Usage: docker compose up -d
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Backend - Django API Server
+  # ---------------------------------------------------------------------------
+  backend:
+    image: python:3.12-slim
+    container_name: lcc_backend
+    command: >
+      bash -c "pip install -r requirements/development.txt &&
+               python manage.py runserver 0.0.0.0:8000"
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgres://lcc_user:lcc_password@db:5432/lcc_dev
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=django-insecure-dev-secret-key-change-in-production
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - lcc_network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Database - PostgreSQL
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: lcc_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=lcc_dev
+      - POSTGRES_USER=lcc_user
+      - POSTGRES_PASSWORD=lcc_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lcc_user -d lcc_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lcc_network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Redis - Cache & Message Broker
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: lcc_redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    networks:
+      - lcc_network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Celery Worker - Background Task Processing
+  # ---------------------------------------------------------------------------
+  celery:
+    image: python:3.12-slim
+    container_name: lcc_celery
+    command: >
+      bash -c "pip install -r requirements/development.txt &&
+               celery -A config worker -l info"
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgres://lcc_user:lcc_password@db:5432/lcc_dev
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=django-insecure-dev-secret-key-change-in-production
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - lcc_network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Celery Beat - Task Scheduler
+  # ---------------------------------------------------------------------------
+  celery-beat:
+    image: python:3.12-slim
+    container_name: lcc_celery_beat
+    command: >
+      bash -c "pip install -r requirements/development.txt &&
+               celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgres://lcc_user:lcc_password@db:5432/lcc_dev
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=django-insecure-dev-secret-key-change-in-production
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - lcc_network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Frontend - Next.js Development Server
+  # ---------------------------------------------------------------------------
+  frontend:
+    image: node:20-alpine
+    container_name: lcc_frontend
+    command: sh -c "npm install && npm run dev"
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - WATCHPACK_POLLING=true
+    networks:
+      - lcc_network
+    restart: unless-stopped
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  node_modules:
+    driver: local
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  lcc_network:
+    driver: bridge

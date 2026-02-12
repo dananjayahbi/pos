@@ -1,0 +1,129 @@
+{
+  // ─── Editor Settings ────────────────────────────────────────────────
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.trimAutoWhitespace": true,
+  "editor.rulers": [88, 120],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.eol": "\n",
+
+  // ─── Python Settings ────────────────────────────────────────────────
+  "python.defaultInterpreterPath": "./backend/.venv/bin/python",
+  "python.linting.enabled": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  // ─── TypeScript / JavaScript Settings ───────────────────────────────
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.preferences.quoteStyle": "single",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+    "editor.formatOnSave": true
+  },
+
+  // ─── JSON / YAML / Markdown Settings ────────────────────────────────
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "files.trimTrailingWhitespace": false
+  },
+
+  // ─── ESLint Settings ────────────────────────────────────────────────
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": ["./frontend"],
+
+  // ─── File Associations ──────────────────────────────────────────────
+  "files.associations": {
+    "*.env.*": "dotenv",
+    "*.env": "dotenv",
+    "Dockerfile*": "dockerfile"
+  },
+
+  // ─── File Exclusions ───────────────────────────────────────────────
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true
+  },
+
+  // ─── Search Exclusions ──────────────────────────────────────────────
+  "search.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/htmlcov": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true
+  },
+
+  // ─── Terminal Settings ──────────────────────────────────────────────
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+
+  // ─── Tailwind CSS Settings ──────────────────────────────────────────
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+
+  // ─── Docker Settings ───────────────────────────────────────────────
+  "docker.defaultRegistryPath": "",
+
+  // ─── Emmet Settings ─────────────────────────────────────────────────
+  "emmet.includeLanguages": {
+    "typescriptreact": "html",
+    "javascriptreact": "html"
+  }
+}
