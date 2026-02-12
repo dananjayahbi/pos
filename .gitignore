@@ -1,0 +1,91 @@
+# LankaCommerce Cloud (LCC) - Root .gitignore
+# Monorepo: backend (Python/Django) + frontend (Node/Next.js)
+
+#############################
+# Python
+#############################
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+.env/  # (python venv folder named .env)
+
+# Packaging / builds
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing / coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage/
+htmlcov/
+
+#############################
+# Node.js / Next.js
+#############################
+node_modules/
+.next/
+out/
+dist/
+.turbo/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+
+#############################
+# Environment / secrets
+#############################
+.env
+.env.*
+.env.*.local
+
+# Keep example env files (safe to commit)
+!.env.example
+
+#############################
+# IDEs / Editors
+#############################
+.idea/
+
+# VS Code: ignore workspace state, keep shared settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Vim
+*.swp
+*.swo
+
+#############################
+# OS / temp files
+#############################
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+
+#############################
+# Databases
+#############################
+*.sqlite3
+*.db
+
+#############################
+# Media (dev only)
+#############################
+media/
+
+/Document-Series/

@@ -1,0 +1,39 @@
+# LankaCommerce Cloud (LCC) - Root EditorConfig
+# https://editorconfig.org/
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# Python (PEP 8 / Black)
+[*.py]
+indent_size = 4
+max_line_length = 88
+
+# JavaScript / TypeScript (Prettier defaults)
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+max_line_length = 100
+
+# JSON / YAML
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# Markdown: allow trailing whitespace for line breaks
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Makefile requires tabs
+[Makefile]
+indent_style = tab
+
+# Shell scripts
+[*.sh]
+end_of_line = lf

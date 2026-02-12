@@ -1,0 +1,49 @@
+# LankaCommerce Cloud (LCC) - Root .gitattributes
+
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Source files
+*.py  text diff=python
+*.js  text
+*.jsx text
+*.ts  text
+*.tsx text
+
+# Data / config
+*.json text
+*.md   text diff=markdown
+*.html text diff=html
+*.css  text
+*.scss text
+*.yml  text
+*.yaml text
+
+# Scripts (enforce platform-friendly EOL)
+*.sh   text eol=lf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# Images
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+
+# SVG is XML/text
+*.svg  text
+
+# Fonts
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+
+# Documents
+*.pdf binary
+
+# Lock files: avoid huge/noisy diffs
+package-lock.json text -diff
+pnpm-lock.yaml    text -diff
+poetry.lock       text -diff
