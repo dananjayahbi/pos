@@ -41,7 +41,8 @@
       "@/types/*": ["./types/*"],
       "@/styles/*": ["./styles/*"],
       "@/stores/*": ["./stores/*"],
-      "@/services/*": ["./services/*"]
+      "@/services/*": ["./services/*"],
+      "@/constants/*": ["./constants/*"]
     },
 
     /* ── Next.js Plugin ─────────────────────────────────────── */
