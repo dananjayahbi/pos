@@ -62,6 +62,7 @@ lerna-debug.log*
 
 # VS Code: ignore workspace state, keep shared settings
 .vscode/*
+!.vscode/.gitkeep
 !.vscode/settings.json
 !.vscode/extensions.json
 
