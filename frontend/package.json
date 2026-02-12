@@ -1,9 +1,32 @@
 {
-  "name": "lankacommerce-frontend",
-  "version": "0.0.1",
+  "name": "@lankacommerce/frontend",
+  "version": "0.1.0",
   "private": true,
-  "description": "LankaCommerce Cloud Frontend (Placeholder) - This file will be replaced during Next.js project initialization in SubPhase-03.",
-  "scripts": {},
+  "type": "module",
+  "description": "LankaCommerce Cloud - Multi-tenant ERP Frontend",
+  "author": "LankaCommerce Team",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest --coverage",
+    "clean": "rimraf .next out",
+    "analyze": "cross-env ANALYZE=true next build"
+  },
   "dependencies": {},
   "devDependencies": {}
 }
