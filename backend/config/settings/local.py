@@ -96,3 +96,14 @@ EMAIL_SUBJECT_PREFIX = "[LCC Dev] "
 # ════════════════════════════════════════════════════════════════════════
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+# ════════════════════════════════════════════════════════════════════════
+# CHANNEL LAYERS (development — in-memory, no Redis required)
+# ════════════════════════════════════════════════════════════════════════
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

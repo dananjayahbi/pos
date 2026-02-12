@@ -115,6 +115,19 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", REDIS_URL)
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", REDIS_URL)
 
 
+# ── Channel Layers (Redis-backed) ────────────────────────────────────
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.environ.get("REDIS_URL", REDIS_URL)],
+            "capacity": 1500,
+            "expiry": 10,
+        },
+    },
+}
+
+
 # ════════════════════════════════════════════════════════════════════════
 # EMAIL  (Production SMTP)
 # ════════════════════════════════════════════════════════════════════════

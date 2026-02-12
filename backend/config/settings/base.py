@@ -73,6 +73,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS: list[str] = [
     # "django_tenants",                  # Multi-tenancy (Phase 2)
+    "channels",                          # Django Channels (WebSocket)
     "rest_framework",                    # Django REST Framework
     "django_filters",                    # Query filtering
     "rest_framework_simplejwt",          # JWT authentication
@@ -256,6 +257,23 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Asia/Colombo"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+
+# ════════════════════════════════════════════════════════════════════════
+# CHANNEL LAYERS  (Task 70)
+# ════════════════════════════════════════════════════════════════════════
+# Redis-backed channel layer for WebSocket message routing.
+# Each environment file may override with different backends.
+# Redis database allocation: 0=Celery, 1=Cache, 2=Channels, 15=Testing
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [env("REDIS_URL", default="redis://redis:6379/2")],
+        },
+    },
+}
 
 
 # ════════════════════════════════════════════════════════════════════════
