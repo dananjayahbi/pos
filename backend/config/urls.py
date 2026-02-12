@@ -27,5 +27,5 @@ urlpatterns = [
     # ──────────────────────────────────────────────
     # Health Checks
     # ──────────────────────────────────────────────
-    # path("health/", include("health_check.urls")),
+    path("health/", include("apps.core.urls")),
 ]
