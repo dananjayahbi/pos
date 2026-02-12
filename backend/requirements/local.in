@@ -1,0 +1,17 @@
+# Extend base requirements
+-r base.in
+
+# Development Server
+django-extensions>=3.2
+Werkzeug>=3.0
+
+# Debugging
+django-debug-toolbar>=4.2
+ipdb>=0.13
+
+# Code Quality
+ruff>=0.1.0
+pre-commit>=3.5
+
+# Enhanced Shell
+ipython>=8.0

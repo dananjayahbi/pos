@@ -12,7 +12,7 @@
   "files.eol": "\n",
 
   // ─── Python Settings ────────────────────────────────────────────────
-  "python.defaultInterpreterPath": "./backend/.venv/bin/python",
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/Scripts/python.exe",
   "python.linting.enabled": true,
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,

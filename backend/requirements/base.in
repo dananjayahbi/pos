@@ -1,0 +1,23 @@
+# Django Core
+Django>=5.0,<6.0
+djangorestframework>=3.14
+
+# Multi-Tenancy
+django-tenants>=3.6
+
+# Database
+psycopg[binary]>=3.1
+dj-database-url>=2.1
+
+# Authentication
+djangorestframework-simplejwt>=5.3
+django-cors-headers>=4.3
+
+# Task Queue
+celery>=5.3
+redis>=5.0
+
+# Utilities
+python-decouple>=3.8
+django-filter>=23.5
+Pillow>=10.0
