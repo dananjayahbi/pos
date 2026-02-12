@@ -1,0 +1,9 @@
+{
+  "name": "lankacommerce-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "description": "LankaCommerce Cloud Frontend (Placeholder) - This file will be replaced during Next.js project initialization in SubPhase-03.",
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {}
+}

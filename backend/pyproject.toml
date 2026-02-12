@@ -1,0 +1,101 @@
+# =============================================================================
+# LankaCommerce Cloud - Backend Python Project Configuration
+# =============================================================================
+# This file follows PEP 518 and PEP 621 specifications for modern Python
+# project configuration. It replaces the legacy setup.py / setup.cfg approach.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Build System
+# -----------------------------------------------------------------------------
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# -----------------------------------------------------------------------------
+# Project Metadata
+# -----------------------------------------------------------------------------
+[project]
+name = "lankacommerce-backend"
+version = "0.1.0"
+description = "LankaCommerce Cloud Backend"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+authors = [{ name = "LCC Team" }]
+
+[project.urls]
+Homepage = "https://github.com/lankacommerce/pos"
+Documentation = "https://github.com/lankacommerce/pos/tree/main/docs"
+Repository = "https://github.com/lankacommerce/pos"
+Issues = "https://github.com/lankacommerce/pos/issues"
+
+# -----------------------------------------------------------------------------
+# Tool Configuration: Black (Code Formatter)
+# -----------------------------------------------------------------------------
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | migrations
+  | __pycache__
+)/
+'''
+
+# -----------------------------------------------------------------------------
+# Tool Configuration: isort (Import Sorter)
+# -----------------------------------------------------------------------------
+[tool.isort]
+profile = "black"
+line_length = 88
+known_django = ["django"]
+known_first_party = ["apps", "config", "core"]
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "DJANGO",
+    "THIRDPARTY",
+    "FIRSTPARTY",
+    "LOCALFOLDER",
+]
+
+# -----------------------------------------------------------------------------
+# Tool Configuration: pytest (Testing)
+# -----------------------------------------------------------------------------
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.testing"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+# -----------------------------------------------------------------------------
+# Tool Configuration: mypy (Type Checking)
+# -----------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+ignore_missing_imports = true
+strict = false
+
+# -----------------------------------------------------------------------------
+# Tool Configuration: Coverage (Test Coverage)
+# -----------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["apps", "core"]
+omit = ["*/migrations/*", "*/tests/*"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+]
