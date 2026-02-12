@@ -89,3 +89,10 @@ EMAIL_SUBJECT_PREFIX = "[LCC Dev] "
 # EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_HOST = "mailhog"
 # EMAIL_PORT = 1025
+
+
+# ════════════════════════════════════════════════════════════════════════
+# CORS (development — allow all origins)
+# ════════════════════════════════════════════════════════════════════════
+
+CORS_ALLOW_ALL_ORIGINS = True
