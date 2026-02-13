@@ -135,6 +135,35 @@ Install the **ESLint** extension in VS Code for inline feedback.
 
 ---
 
+## Formatting
+
+This project uses [Prettier](https://prettier.io/) for code formatting, integrated with ESLint.
+
+### Commands
+
+```bash
+# Format all files
+pnpm format
+
+# Check formatting (CI)
+pnpm format:check
+```
+
+### Configuration
+
+Prettier is configured in `.prettierrc`:
+- **Semicolons:** required
+- **Quotes:** single (JS), double (JSX)
+- **Tab width:** 2 spaces
+- **Trailing commas:** ES5
+- **Print width:** 80 characters
+
+### IDE Setup
+
+Install the **Prettier** extension in VS Code and enable **Format on Save**.
+
+---
+
 ## Architecture
 
 ### App Router
