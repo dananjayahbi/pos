@@ -13,7 +13,11 @@ ipdb>=0.13
 # Code Quality
 black>=24.0.0
 isort>=5.13.0
-ruff>=0.1.0
+flake8>=7.0.0
+flake8-bugbear>=24.0.0
+flake8-comprehensions>=3.14.0
+flake8-simplify>=0.21.0
+ruff>=0.5.0
 pre-commit>=3.5
 
 # Enhanced Shell

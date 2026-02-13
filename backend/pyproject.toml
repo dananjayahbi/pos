@@ -115,6 +115,75 @@ lines_between_types = 1
 lines_after_imports = 2
 
 # -----------------------------------------------------------------------------
+# Tool Configuration: Ruff (Fast Python Linter)
+# -----------------------------------------------------------------------------
+[tool.ruff]
+# Target Python version
+target-version = "py312"
+
+# Line length (must match Black)
+line-length = 88
+
+# Fix auto-fixable issues
+fix = true
+
+# Show fixes in output
+show-fixes = true
+
+# Exclude directories
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "build",
+    "dist",
+    "*.egg-info",
+    "migrations",
+    ".idea",
+    ".vscode",
+]
+
+[tool.ruff.lint]
+# Select linting rules
+select = [
+    "F",    # Pyflakes - Error detection
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "I",    # isort - Import sorting
+    "B",    # flake8-bugbear - Bug detection
+    "C4",   # flake8-comprehensions - Comprehension improvements
+    "UP",   # pyupgrade - Upgrade syntax
+    "SIM",  # flake8-simplify - Simplifications
+    "PLC",  # Pylint conventions
+    "PLE",  # Pylint errors
+    "PLR",  # Pylint refactor
+    "PLW",  # Pylint warnings
+]
+
+# Ignore rules that conflict with Black or are too strict
+ignore = [
+    "E501",     # Line too long (Black handles this)
+    "PLR0913",  # Too many arguments
+    "PLR0915",  # Too many statements
+    "PLR2004",  # Magic value comparison
+]
+
+# Per-file ignores
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+
+# Allow certain confusables
+[tool.ruff.lint.flake8-bugbear]
+
+[tool.ruff.lint.isort]
+# Known first party packages (mirror isort config)
+known-first-party = ["apps", "config", "core", "utils"]
+
+# -----------------------------------------------------------------------------
 # Tool Configuration: pytest (Testing)
 # -----------------------------------------------------------------------------
 [tool.pytest.ini_options]

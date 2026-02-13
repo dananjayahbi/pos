@@ -155,9 +155,19 @@ coverage: ## Run backend tests with coverage report
 
 lint: lint-backend lint-frontend ## Run all linters
 
-lint-backend: ## Run Python linters (ruff, mypy)
+lint-backend: ## Run Python linters (flake8, ruff, mypy)
+	$(BACKEND_EXEC) flake8 .
 	$(BACKEND_EXEC) ruff check .
 	$(BACKEND_EXEC) mypy .
+
+lint-stats: ## Show flake8 linting statistics
+	$(BACKEND_EXEC) flake8 --statistics .
+
+ruff: ## Run Ruff linter check
+	$(BACKEND_EXEC) ruff check .
+
+ruff-fix: ## Run Ruff with auto-fix
+	$(BACKEND_EXEC) ruff check --fix .
 
 lint-frontend: ## Run frontend linters (ESLint)
 	$(FRONTEND_EXEC) npm run lint
@@ -251,6 +261,6 @@ prod-logs: ## View production container logs
         dev dev-start dev-stop shell shell-backend shell-frontend dbshell db-reset manage \
         migrate makemigrations createsuperuser collectstatic \
         test test-backend test-frontend coverage \
-        lint lint-backend lint-frontend format format-check fmt sort-imports sort-imports-check lint-fix \
+        lint lint-backend lint-frontend lint-stats ruff ruff-fix format format-check fmt sort-imports sort-imports-check lint-fix \
         clean docker-clean docker-prune seed backup restore \
         prod-up prod-down prod-build prod-logs up-build

@@ -200,6 +200,34 @@ make lint-fix
 - First party: apps, config, core, utils
 - Skips: migrations, venv, cache directories
 
+### Linting (flake8 & Ruff)
+
+We use two complementary linters:
+- **flake8**: Traditional linter with plugins (bugbear, comprehensions, simplify)
+- **Ruff**: Fast, modern Rust-based linter (preferred for auto-fixing)
+
+**Quick Commands:**
+
+```bash
+# Run all linters
+make lint
+
+# Auto-fix issues with Ruff
+make ruff-fix
+
+# Full lint, format, and sort
+make lint-fix
+
+# Show flake8 statistics
+make lint-stats
+```
+
+**Configuration:**
+- `.flake8`: flake8 configuration (max-line-length 88, max-complexity 10)
+- `pyproject.toml` → `[tool.ruff]`: Ruff configuration (F, E, W, I, B, C4, UP, SIM, PL rules)
+
+**Ignored Rules:** E501 (line length — Black handles this), E203 (Black whitespace style)
+
 ---
 
 ## Architecture
