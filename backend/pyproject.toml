@@ -81,7 +81,7 @@ extend-exclude = '''
 profile = "black"
 line_length = 88
 known_django = ["django"]
-known_first_party = ["apps", "config", "core"]
+known_first_party = ["apps", "config", "core", "utils"]
 sections = [
     "FUTURE",
     "STDLIB",
@@ -90,6 +90,29 @@ sections = [
     "FIRSTPARTY",
     "LOCALFOLDER",
 ]
+
+# Skip directories
+skip = [
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "build",
+    "dist",
+    "migrations",
+]
+
+skip_glob = [
+    "**/migrations/*",
+    "**/venv/*",
+]
+
+# Blank line configuration
+lines_between_types = 1
+lines_after_imports = 2
 
 # -----------------------------------------------------------------------------
 # Tool Configuration: pytest (Testing)

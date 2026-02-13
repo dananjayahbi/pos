@@ -12,15 +12,15 @@ The backend powers all server-side logic for LankaCommerce Cloud, including mult
 
 ### Technology Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Python | 3.12+ | Programming language |
-| Django | 5.x | Web framework |
-| Django REST Framework | 3.15+ | REST API framework |
-| PostgreSQL | 15+ | Database |
-| Redis | 7+ | Cache and message broker |
-| Celery | 5.x | Async task queue |
-| django-tenants | 3.x | Multi-tenancy |
+| Technology            | Version | Purpose                  |
+| --------------------- | ------- | ------------------------ |
+| Python                | 3.12+   | Programming language     |
+| Django                | 5.x     | Web framework            |
+| Django REST Framework | 3.15+   | REST API framework       |
+| PostgreSQL            | 15+     | Database                 |
+| Redis                 | 7+      | Cache and message broker |
+| Celery                | 5.x     | Async task queue         |
+| django-tenants        | 3.x     | Multi-tenancy            |
 
 ---
 
@@ -106,33 +106,33 @@ The API will be available at **http://localhost:8000/**.
 
 ### Django
 
-| Command | Description |
-|---------|-------------|
-| `python manage.py runserver` | Start the development server |
-| `python manage.py migrate` | Apply database migrations |
-| `python manage.py makemigrations` | Create new migrations |
-| `python manage.py createsuperuser` | Create an admin user |
-| `python manage.py shell` | Open the Django shell |
-| `python manage.py collectstatic` | Collect static files |
+| Command                            | Description                  |
+| ---------------------------------- | ---------------------------- |
+| `python manage.py runserver`       | Start the development server |
+| `python manage.py migrate`         | Apply database migrations    |
+| `python manage.py makemigrations`  | Create new migrations        |
+| `python manage.py createsuperuser` | Create an admin user         |
+| `python manage.py shell`           | Open the Django shell        |
+| `python manage.py collectstatic`   | Collect static files         |
 
 ### Testing
 
-| Command | Description |
-|---------|-------------|
-| `pytest` | Run the full test suite |
-| `pytest --cov` | Run tests with coverage report |
-| `pytest -x` | Stop on first failure |
-| `pytest -k "test_name"` | Run a specific test |
+| Command                 | Description                    |
+| ----------------------- | ------------------------------ |
+| `pytest`                | Run the full test suite        |
+| `pytest --cov`          | Run tests with coverage report |
+| `pytest -x`             | Stop on first failure          |
+| `pytest -k "test_name"` | Run a specific test            |
 
 ### Code Quality
 
-| Command | Description |
-|---------|-------------|
-| `black .` | Format code |
+| Command                  | Description           |
+| ------------------------ | --------------------- |
+| `black .`                | Format code           |
 | `black --check --diff .` | Check formatting (CI) |
-| `isort .` | Sort imports |
-| `flake8` | Lint code |
-| `mypy .` | Type-check code |
+| `isort .`                | Sort imports          |
+| `flake8`                 | Lint code             |
+| `mypy .`                 | Type-check code       |
 
 ### Code Formatting (Black)
 
@@ -176,6 +176,29 @@ black path/to/file.py
 - CI will reject unformatted code
 - Do not reformat Django migrations (auto-excluded)
 - Pre-commit hooks will be set up separately
+
+### Import Sorting (isort)
+
+This project uses [isort](https://pycqa.github.io/isort/) for import sorting, configured for Black compatibility.
+
+**Quick Commands:**
+
+```bash
+# Sort all imports
+make sort-imports
+
+# Check sorting (CI)
+make sort-imports-check
+
+# Format + sort + lint fix in one command
+make lint-fix
+```
+
+**Configuration** (`pyproject.toml`):
+- Profile: black (compatible with Black formatting)
+- Sections: FUTURE → STDLIB → DJANGO → THIRDPARTY → FIRSTPARTY → LOCALFOLDER
+- First party: apps, config, core, utils
+- Skips: migrations, venv, cache directories
 
 ---
 
