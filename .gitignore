@@ -58,6 +58,11 @@ lerna-debug.log*
 !.env.development
 
 #############################
+# Docker local overrides
+#############################
+docker-compose.override.yml
+
+#############################
 # IDEs / Editors
 #############################
 .idea/

@@ -1,166 +1,248 @@
-# =============================================================================
-# LankaCommerce Cloud - Development Docker Compose
-# =============================================================================
+# ==================================================
+# LankaCommerce Cloud - Docker Compose Configuration
+# ==================================================
+# Purpose: Development environment orchestration
 # Usage: docker compose up -d
-# =============================================================================
+# ==================================================
 
 services:
-  # ---------------------------------------------------------------------------
-  # Backend - Django API Server
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
+  # Backend - Django REST API
+  # -------------------------------------------------
   backend:
-    image: python:3.12-slim
-    container_name: lcc_backend
-    command: >
-      bash -c "pip install -r requirements/development.txt &&
-               python manage.py runserver 0.0.0.0:8000"
-    working_dir: /app
-    volumes:
-      - ./backend:/app
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile.dev
+    container_name: lcc-backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - backend-static:/app/staticfiles
+      - backend-media:/app/mediafiles
     environment:
-      - DEBUG=True
-      - DATABASE_URL=postgres://lcc_user:lcc_password@db:5432/lcc_dev
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=django-insecure-dev-secret-key-change-in-production
-      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - DEBUG=true
+      - DJANGO_SETTINGS_MODULE=config.settings.local
+    env_file:
+      - .env
+    networks:
+      - lcc-network
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
-    networks:
-      - lcc_network
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
+  # Frontend - Next.js Application
+  # -------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend/Dockerfile.dev
+    container_name: lcc-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - WATCHPACK_POLLING=true
+    env_file:
+      - .env
+    networks:
+      - lcc-network
+    depends_on:
+      backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  # -------------------------------------------------
   # Database - PostgreSQL
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
   db:
     image: postgres:15-alpine
-    container_name: lcc_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    container_name: lcc-postgres
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     environment:
-      - POSTGRES_DB=lcc_dev
-      - POSTGRES_USER=lcc_user
-      - POSTGRES_PASSWORD=lcc_password
+      - POSTGRES_DB=lankacommerce
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password}
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - lcc-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lcc_user -d lcc_dev"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lankacommerce"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - lcc_network
+      start_period: 10s
     restart: unless-stopped
 
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
   # Redis - Cache & Message Broker
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
   redis:
     image: redis:7-alpine
-    container_name: lcc_redis
-    volumes:
-      - redis_data:/data
+    container_name: lcc-redis
     ports:
       - "6379:6379"
-    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
     networks:
-      - lcc_network
+      - lcc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     restart: unless-stopped
 
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
   # Celery Worker - Background Task Processing
-  # ---------------------------------------------------------------------------
-  celery:
-    image: python:3.12-slim
-    container_name: lcc_celery
-    command: >
-      bash -c "pip install -r requirements/development.txt &&
-               celery -A config worker -l info"
-    working_dir: /app
+  # -------------------------------------------------
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile.dev
+    container_name: lcc-celery-worker
     volumes:
       - ./backend:/app
+      - ./docker/scripts:/scripts:ro
+    command: /scripts/celery-worker.sh
     environment:
-      - DEBUG=True
-      - DATABASE_URL=postgres://lcc_user:lcc_password@db:5432/lcc_dev
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=django-insecure-dev-secret-key-change-in-production
-      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - CELERY_APP=config.celery:app
+      - CELERY_CONCURRENCY=2
+      - CELERY_QUEUES=default,high_priority,low_priority
+      - CELERY_LOG_LEVEL=info
+    env_file:
+      - .env
+    networks:
+      - lcc-network
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      backend:
         condition: service_started
-    networks:
-      - lcc_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "celery",
+          "-A",
+          "config.celery",
+          "inspect",
+          "ping",
+          "--timeout",
+          "5",
+        ]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
   # Celery Beat - Task Scheduler
-  # ---------------------------------------------------------------------------
+  # -------------------------------------------------
   celery-beat:
-    image: python:3.12-slim
-    container_name: lcc_celery_beat
-    command: >
-      bash -c "pip install -r requirements/development.txt &&
-               celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
-    working_dir: /app
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile.dev
+    container_name: lcc-celery-beat
     volumes:
       - ./backend:/app
+      - ./docker/scripts:/scripts:ro
+    command: /scripts/celery-beat.sh
     environment:
-      - DEBUG=True
-      - DATABASE_URL=postgres://lcc_user:lcc_password@db:5432/lcc_dev
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=django-insecure-dev-secret-key-change-in-production
-      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - CELERY_APP=config.celery:app
+      - CELERY_BEAT_SCHEDULER=django_celery_beat.schedulers:DatabaseScheduler
+      - CELERY_LOG_LEVEL=info
+    env_file:
+      - .env
+    networks:
+      - lcc-network
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
-    networks:
-      - lcc_network
+        condition: service_healthy
     restart: unless-stopped
 
-  # ---------------------------------------------------------------------------
-  # Frontend - Next.js Development Server
-  # ---------------------------------------------------------------------------
-  frontend:
-    image: node:20-alpine
-    container_name: lcc_frontend
-    command: sh -c "npm install && npm run dev"
-    working_dir: /app
-    volumes:
-      - ./frontend:/app
-      - node_modules:/app/node_modules
+  # -------------------------------------------------
+  # Flower - Celery Monitoring
+  # -------------------------------------------------
+  flower:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile.dev
+    container_name: lcc-flower
     ports:
-      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - ./backend:/app
+      - ./docker/scripts:/scripts:ro
+    command: /scripts/flower.sh
     environment:
-      - NODE_ENV=development
-      - NEXT_TELEMETRY_DISABLED=1
-      - WATCHPACK_POLLING=true
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - FLOWER_PORT=5555
+      - FLOWER_BASIC_AUTH=admin:admin
+    env_file:
+      - .env
     networks:
-      - lcc_network
+      - lcc-network
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
-# =============================================================================
-# Volumes
-# =============================================================================
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  node_modules:
-    driver: local
-
-# =============================================================================
+# -------------------------------------------------
 # Networks
-# =============================================================================
+# -------------------------------------------------
 networks:
-  lcc_network:
+  lcc-network:
     driver: bridge
+    name: lankacommerce-network
+
+# -------------------------------------------------
+# Volumes
+# -------------------------------------------------
+volumes:
+  postgres-data:
+    name: lcc-postgres-data
+    driver: local
+  redis-data:
+    name: lcc-redis-data
+    driver: local
+  backend-static:
+    name: lcc-backend-static
+    driver: local
+  backend-media:
+    name: lcc-backend-media
+    driver: local
