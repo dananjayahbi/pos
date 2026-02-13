@@ -104,6 +104,37 @@ frontend/
 
 ---
 
+## Linting
+
+This project uses [ESLint](https://eslint.org/) for code quality with Next.js, TypeScript, React, and import ordering rules.
+
+### Commands
+
+```bash
+# Run lint check
+pnpm lint
+
+# Fix auto-fixable issues
+pnpm lint:fix
+
+# Strict mode (fails on warnings — use in CI)
+pnpm lint:strict
+```
+
+### Configuration
+
+ESLint is configured in `.eslintrc.json`:
+- **Next.js core-web-vitals** — Performance and best practices
+- **TypeScript** — Type-safe code rules (`@typescript-eslint`)
+- **React & React Hooks** — Component and hooks best practices
+- **Import ordering** — Consistent import organization
+
+### IDE Setup
+
+Install the **ESLint** extension in VS Code for inline feedback.
+
+---
+
 ## Architecture
 
 ### App Router
