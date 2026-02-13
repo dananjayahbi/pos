@@ -197,6 +197,22 @@ lint-fix: ## Format, sort imports, and fix lint issues
 	$(BACKEND_EXEC) ruff format .
 	$(BACKEND_EXEC) ruff check --fix .
 
+typecheck: ## Run mypy type check
+	@echo "Running mypy type check..."
+	$(BACKEND_EXEC) mypy .
+	@echo "Type check complete!"
+
+typecheck-report: ## Generate mypy HTML report
+	@echo "Generating mypy report..."
+	$(BACKEND_EXEC) mypy . --html-report mypy-report
+	@echo "Report generated in mypy-report/"
+
+quality: format sort-imports lint typecheck ## Run all quality checks
+	@echo "All quality checks passed!"
+
+quality-fix: lint-fix typecheck ## Format, fix lint, and type check
+	@echo "Quality fixes applied!"
+
 # =============================================================================
 # Utility Commands
 # =============================================================================
@@ -262,5 +278,6 @@ prod-logs: ## View production container logs
         migrate makemigrations createsuperuser collectstatic \
         test test-backend test-frontend coverage \
         lint lint-backend lint-frontend lint-stats ruff ruff-fix format format-check fmt sort-imports sort-imports-check lint-fix \
+        typecheck typecheck-report quality quality-fix \
         clean docker-clean docker-prune seed backup restore \
         prod-up prod-down prod-build prod-logs up-build

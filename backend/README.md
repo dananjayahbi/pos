@@ -228,6 +228,63 @@ make lint-stats
 
 **Ignored Rules:** E501 (line length — Black handles this), E203 (Black whitespace style)
 
+### Type Checking (mypy)
+
+This project uses [mypy](https://mypy.readthedocs.io/) for static type checking with strict mode enabled.
+
+```bash
+# Run type check
+make typecheck
+
+# Generate HTML report
+make typecheck-report
+
+# Run all quality checks (format + lint + typecheck)
+make quality
+```
+
+**Configuration:**
+- `mypy.ini`: Primary mypy configuration (strict mode, Django plugin, per-module overrides)
+- `pyproject.toml` → `[tool.mypy]`: Secondary reference configuration
+
+**Key Settings:**
+- Python 3.12 target
+- Strict mode enabled
+- Django plugin configured (`mypy_django_plugin.main`)
+- Migrations ignored (auto-generated)
+- Test files have relaxed typing rules
+
+**Adding Type Hints:**
+
+```python
+# Function with types
+def get_user(user_id: int) -> User:
+    return User.objects.get(id=user_id)
+
+# Optional parameter
+def find_users(name: str | None = None) -> QuerySet[User]:
+    if name:
+        return User.objects.filter(name__icontains=name)
+    return User.objects.all()
+```
+
+**Common Types:**
+
+| Type | Import | Example |
+|------|--------|---------|
+| QuerySet | `django.db.models` | `QuerySet[User]` |
+| HttpRequest | `django.http` | `request: HttpRequest` |
+| Request | `rest_framework.request` | `request: Request` |
+
+**IDE Setup:**
+- **VS Code:** Install Pylance extension (includes mypy support)
+- **PyCharm:** Enable mypy in Settings → Python Integrated Tools → Type Checker
+
+**Ignoring Errors:** Use `# type: ignore[error-code]` sparingly:
+```python
+result = untyped_library.call()  # type: ignore[no-untyped-call]
+```
+
 ---
 
 ## Architecture
