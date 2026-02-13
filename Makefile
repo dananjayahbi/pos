@@ -163,11 +163,15 @@ lint-frontend: ## Run frontend linters (ESLint)
 	$(FRONTEND_EXEC) npm run lint
 
 format: ## Format all code
+	$(BACKEND_EXEC) black .
 	$(BACKEND_EXEC) ruff format .
 	$(FRONTEND_EXEC) npm run format
 
 format-check: ## Check code formatting without changes
+	$(BACKEND_EXEC) black --check --diff .
 	$(BACKEND_EXEC) ruff format --check .
+
+fmt: format ## Alias for format
 
 # =============================================================================
 # Utility Commands
@@ -233,6 +237,6 @@ prod-logs: ## View production container logs
         dev dev-start dev-stop shell shell-backend shell-frontend dbshell db-reset manage \
         migrate makemigrations createsuperuser collectstatic \
         test test-backend test-frontend coverage \
-        lint lint-backend lint-frontend format format-check \
+        lint lint-backend lint-frontend format format-check fmt \
         clean docker-clean docker-prune seed backup restore \
         prod-up prod-down prod-build prod-logs up-build

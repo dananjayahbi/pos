@@ -129,9 +129,53 @@ The API will be available at **http://localhost:8000/**.
 | Command | Description |
 |---------|-------------|
 | `black .` | Format code |
+| `black --check --diff .` | Check formatting (CI) |
 | `isort .` | Sort imports |
 | `flake8` | Lint code |
 | `mypy .` | Type-check code |
+
+### Code Formatting (Black)
+
+This project uses [Black](https://black.readthedocs.io/) for Python code formatting.
+
+**Quick Commands:**
+
+```bash
+# Format all code
+make format
+
+# Check formatting (CI)
+make format-check
+
+# Format specific file
+black path/to/file.py
+```
+
+**Configuration** (`pyproject.toml`):
+- Line length: 88 characters
+- Target: Python 3.12
+- Excludes: migrations, venv, cache
+
+**IDE Setup:**
+
+*VS Code* — Install the Black Formatter extension (`ms-python.black-formatter`), then add to `.vscode/settings.json`:
+```json
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true
+    },
+    "black-formatter.args": ["--config", "pyproject.toml"]
+}
+```
+
+*PyCharm* — Settings → Tools → Black → Enable "On code reformat" → Set path to Black executable.
+
+**Guidelines:**
+- Run `make format` before committing
+- CI will reject unformatted code
+- Do not reformat Django migrations (auto-excluded)
+- Pre-commit hooks will be set up separately
 
 ---
 

@@ -37,12 +37,40 @@ Issues = "https://github.com/lankacommerce/pos/issues"
 line-length = 88
 target-version = ["py312"]
 include = '\.pyi?$'
-exclude = '''
+
+# Exclude patterns (extend-exclude preserves Black's sensible defaults)
+extend-exclude = '''
 /(
+    # Version control
     \.git
-  | \.venv
-  | migrations
-  | __pycache__
+    | \.hg
+
+    # Virtual environments
+    | \.venv
+    | venv
+    | env
+
+    # Cache directories
+    | __pycache__
+    | \.pytest_cache
+    | \.mypy_cache
+
+    # Build outputs
+    | build
+    | dist
+    | \.eggs
+    | .*\.egg-info
+
+    # Django generated files
+    | migrations
+
+    # IDE directories
+    | \.idea
+    | \.vscode
+
+    # Coverage reports
+    | htmlcov
+    | \.coverage
 )/
 '''
 
