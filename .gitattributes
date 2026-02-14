@@ -1,49 +1,122 @@
-# LankaCommerce Cloud (LCC) - Root .gitattributes
+# ==================================================
+# LankaCommerce Cloud - Git Attributes
+# ==================================================
+# Normalize line endings to LF for all text files
+# ==================================================
 
-# Auto-detect text files and normalize line endings
-* text=auto
+# Auto detect text files and normalize line endings
+* text=auto eol=lf
 
-# Source files
-*.py  text diff=python
-*.js  text
-*.jsx text
-*.ts  text
-*.tsx text
+# -------------------------------------------------
+# Source Code
+# -------------------------------------------------
+*.py text eol=lf diff=python
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf diff=html
+*.vue text eol=lf
+*.svelte text eol=lf
 
-# Data / config
-*.json text
-*.md   text diff=markdown
-*.html text diff=html
-*.css  text
-*.scss text
-*.yml  text
-*.yaml text
+# -------------------------------------------------
+# Configuration Files
+# -------------------------------------------------
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+*.conf text eol=lf
+*.env text eol=lf
 
-# Scripts (enforce platform-friendly EOL)
-*.sh   text eol=lf
-*.bat  text eol=crlf
-*.cmd  text eol=crlf
+# -------------------------------------------------
+# Documentation
+# -------------------------------------------------
+*.md text eol=lf diff=markdown
+*.txt text eol=lf
+*.rst text eol=lf
 
+# -------------------------------------------------
+# Shell Scripts
+# -------------------------------------------------
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# -------------------------------------------------
+# Windows Scripts (require CRLF)
+# -------------------------------------------------
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# -------------------------------------------------
+# Docker
+# -------------------------------------------------
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+.dockerignore text eol=lf
+
+# -------------------------------------------------
+# Make
+# -------------------------------------------------
+Makefile text eol=lf
+*.mk text eol=lf
+
+# -------------------------------------------------
+# Binary Files (do not normalize)
+# -------------------------------------------------
 # Images
-*.png  binary
-*.jpg  binary
+*.png binary
+*.jpg binary
 *.jpeg binary
-*.gif  binary
-*.ico  binary
-
-# SVG is XML/text
-*.svg  text
+*.gif binary
+*.ico binary
+*.webp binary
+*.svg text eol=lf
 
 # Fonts
-*.woff  binary
+*.woff binary
 *.woff2 binary
-*.ttf   binary
-*.eot   binary
+*.ttf binary
+*.eot binary
+*.otf binary
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.rar binary
 
 # Documents
 *.pdf binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
 
-# Lock files: avoid huge/noisy diffs
-package-lock.json text -diff
-pnpm-lock.yaml    text -diff
-poetry.lock       text -diff
+# Other binaries
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# -------------------------------------------------
+# Lock Files (exact format)
+# -------------------------------------------------
+package-lock.json text eol=lf -diff
+yarn.lock text eol=lf -diff
+pnpm-lock.yaml text eol=lf -diff
+poetry.lock text eol=lf -diff
+
+# -------------------------------------------------
+# Git Files
+# -------------------------------------------------
+.gitattributes text eol=lf
+.gitignore text eol=lf
+.gitkeep text eol=lf
