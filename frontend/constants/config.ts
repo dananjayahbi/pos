@@ -7,16 +7,16 @@
 // ── App Metadata ───────────────────────────────────────────────
 
 export const APP_CONFIG = {
-  name: "LankaCommerce Cloud",
-  shortName: "LCC",
-  version: "0.1.0",
-  description: "Multi-tenant SaaS ERP for Sri Lankan SMEs",
+  name: 'LankaCommerce Cloud',
+  shortName: 'LCC',
+  version: '0.1.0',
+  description: 'Multi-tenant SaaS ERP for Sri Lankan SMEs',
 } as const;
 
 // ── API Configuration ──────────────────────────────────────────
 
 export const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "/api",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || '/api',
   timeout: 30_000, // 30 seconds
   retryAttempts: 3,
   retryDelay: 1_000, // 1 second
@@ -25,8 +25,8 @@ export const API_CONFIG = {
 // ── Authentication ─────────────────────────────────────────────
 
 export const AUTH_CONFIG = {
-  tokenKey: "accessToken",
-  refreshKey: "refreshToken",
+  tokenKey: 'accessToken',
+  refreshKey: 'refreshToken',
   expiryBuffer: 60, // seconds before expiry to trigger refresh
 } as const;
 
@@ -42,18 +42,18 @@ export const PAGINATION = {
 
 export const SRI_LANKA = {
   currency: {
-    code: "LKR",
-    symbol: "₨",
-    name: "Sri Lankan Rupee",
+    code: 'LKR',
+    symbol: '₨',
+    name: 'Sri Lankan Rupee',
     decimals: 2,
   },
-  timezone: "Asia/Colombo",
-  locale: "en-LK",
-  phonePrefix: "+94",
-  phoneFormat: "+94 XX XXX XXXX",
-  dateFormat: "DD/MM/YYYY",
-  timeFormat: "HH:mm",
-  countryCode: "LK",
+  timezone: 'Asia/Colombo',
+  locale: 'en-LK',
+  phonePrefix: '+94',
+  phoneFormat: '+94 XX XXX XXXX',
+  dateFormat: 'DD/MM/YYYY',
+  timeFormat: 'HH:mm',
+  countryCode: 'LK',
 } as const;
 
 // ── Feature Flags ──────────────────────────────────────────────

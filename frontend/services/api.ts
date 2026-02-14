@@ -9,7 +9,7 @@
 //   await api.post<Product>('/products', newProduct)
 // ================================================================
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -31,13 +31,16 @@ class ApiClient {
   /**
    * Core request method — all HTTP methods delegate here.
    */
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const config: RequestInit = {
       ...options,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...this.getAuthHeaders(),
         ...this.getTenantHeaders(),
         ...options.headers,
@@ -62,7 +65,10 @@ class ApiClient {
    * Attach JWT bearer token if available.
    */
   private getAuthHeaders(): HeadersInit {
-    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+    const token =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('accessToken')
+        : null;
 
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
@@ -71,10 +77,11 @@ class ApiClient {
    * Attach tenant context from subdomain.
    */
   private getTenantHeaders(): HeadersInit {
-    const hostname = typeof window !== "undefined" ? window.location.hostname : "";
-    const tenant = hostname.split(".")[0];
+    const hostname =
+      typeof window !== 'undefined' ? window.location.hostname : '';
+    const tenant = hostname.split('.')[0];
 
-    return tenant ? { "X-Tenant": tenant } : {};
+    return tenant ? { 'X-Tenant': tenant } : {};
   }
 
   /**
@@ -95,32 +102,32 @@ class ApiClient {
   // ── HTTP Methods ─────────────────────────────────────────────
 
   get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "GET" });
+    return this.request<T>(endpoint, { method: 'GET' });
   }
 
   post<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: "POST",
+      method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   put<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: "PUT",
+      method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   patch<T>(endpoint: string, data?: unknown): Promise<T> {
     return this.request<T>(endpoint, {
-      method: "PATCH",
+      method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
     });
   }
 
   delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: "DELETE" });
+    return this.request<T>(endpoint, { method: 'DELETE' });
   }
 }
 

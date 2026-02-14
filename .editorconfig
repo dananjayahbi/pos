@@ -1,39 +1,58 @@
-# LankaCommerce Cloud (LCC) - Root EditorConfig
-# https://editorconfig.org/
+# ==================================================
+# LankaCommerce Cloud - EditorConfig
+# ==================================================
+# https://editorconfig.org
+# ==================================================
 
+# Top-most EditorConfig file
 root = true
 
+# Default for all files
 [*]
 charset = utf-8
 end_of_line = lf
+indent_style = space
+indent_size = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
-indent_style = space
-indent_size = 4
+max_line_length = 120
 
-# Python (PEP 8 / Black)
+# Python files - 4 spaces, 88 char lines (PEP 8 / Black)
 [*.py]
 indent_size = 4
 max_line_length = 88
 
-# JavaScript / TypeScript (Prettier defaults)
+# Frontend files - 2 spaces
 [*.{js,jsx,ts,tsx}]
 indent_size = 2
-max_line_length = 100
 
-# JSON / YAML
-[*.{json,yml,yaml}]
+# Configuration files
+[*.{json,yml,yaml,toml}]
 indent_size = 2
 
-# Markdown: allow trailing whitespace for line breaks
+# Documentation - preserve trailing spaces for line breaks
 [*.md]
+indent_size = 2
 trim_trailing_whitespace = false
-max_line_length = off
-
-# Makefile requires tabs
-[Makefile]
-indent_style = tab
 
 # Shell scripts
 [*.sh]
-end_of_line = lf
+indent_size = 4
+
+# Makefiles require tabs
+[Makefile]
+indent_style = tab
+
+[*.mk]
+indent_style = tab
+
+# Docker files
+[Dockerfile*]
+indent_size = 4
+
+# Windows files need CRLF
+[*.{bat,cmd}]
+end_of_line = crlf
+
+[*.ps1]
+end_of_line = crlf

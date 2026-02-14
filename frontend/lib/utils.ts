@@ -18,14 +18,14 @@ export const isDefined = <T>(value: T | undefined | null): value is T => {
  * Check if a value is a string.
  */
 export const isString = (value: unknown): value is string => {
-  return typeof value === "string";
+  return typeof value === 'string';
 };
 
 /**
  * Check if a value is a number (and not NaN).
  */
 export const isNumber = (value: unknown): value is number => {
-  return typeof value === "number" && !isNaN(value);
+  return typeof value === 'number' && !isNaN(value);
 };
 
 // ── Array Helpers ──────────────────────────────────────────────
@@ -49,7 +49,7 @@ export const range = (start: number, end: number): number[] => {
  */
 export const groupBy = <T, K extends keyof never>(
   array: T[],
-  keyFn: (item: T) => K,
+  keyFn: (item: T) => K
 ): Record<K, T[]> => {
   return array.reduce(
     (acc, item) => {
@@ -57,7 +57,7 @@ export const groupBy = <T, K extends keyof never>(
       acc[key] = [...(acc[key] || []), item];
       return acc;
     },
-    {} as Record<K, T[]>,
+    {} as Record<K, T[]>
   );
 };
 
@@ -75,7 +75,7 @@ export const sleep = (ms: number): Promise<void> => {
  */
 export const debounce = <T extends (...args: never[]) => void>(
   fn: T,
-  delay: number,
+  delay: number
 ): ((...args: Parameters<T>) => void) => {
   let timeoutId: ReturnType<typeof setTimeout>;
   return (...args: Parameters<T>) => {
@@ -89,7 +89,7 @@ export const debounce = <T extends (...args: never[]) => void>(
  */
 export const throttle = <T extends (...args: never[]) => void>(
   fn: T,
-  limit: number,
+  limit: number
 ): ((...args: Parameters<T>) => void) => {
   let inThrottle = false;
   return (...args: Parameters<T>) => {
@@ -117,7 +117,10 @@ export const clamp = (value: number, min: number, max: number): number => {
 /**
  * Create a new object with specified keys omitted.
  */
-export const omit = <T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
+export const omit = <T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Omit<T, K> => {
   const result = { ...obj };
   keys.forEach((key) => delete result[key]);
   return result;
@@ -126,7 +129,10 @@ export const omit = <T extends object, K extends keyof T>(obj: T, keys: K[]): Om
 /**
  * Create a new object with only the specified keys.
  */
-export const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
+export const pick = <T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Pick<T, K> => {
   const result = {} as Pick<T, K>;
   keys.forEach((key) => {
     if (key in obj) result[key] = obj[key];
