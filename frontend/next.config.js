@@ -5,6 +5,21 @@ const nextConfig = {
   poweredByHeader: false,
   output: 'standalone',
 
+  // ── Instrumentation ───────────────────────────────────────────
+  // Enables instrumentation.ts for startup env validation.
+  instrumentationHook: true,
+
+  // ── Environment Variables ─────────────────────────────────────
+  // Only NEXT_PUBLIC_ variables are exposed to the client bundle.
+  // Server-only variables (NEXTAUTH_SECRET, API_BASE_URL, etc.)
+  // are NOT included — validated at runtime via lib/env.ts.
+  env: {
+    NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME || 'LankaCommerce Cloud',
+    NEXT_PUBLIC_DEFAULT_CURRENCY: process.env.NEXT_PUBLIC_DEFAULT_CURRENCY || 'LKR',
+    NEXT_PUBLIC_DEFAULT_TIMEZONE: process.env.NEXT_PUBLIC_DEFAULT_TIMEZONE || 'Asia/Colombo',
+    NEXT_PUBLIC_DEFAULT_LOCALE: process.env.NEXT_PUBLIC_DEFAULT_LOCALE || 'en-LK',
+  },
+
   // ── TypeScript ────────────────────────────────────────────────
   typescript: {
     ignoreBuildErrors: false,

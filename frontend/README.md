@@ -263,6 +263,46 @@ if (process.env.NEXT_PUBLIC_ENABLE_POS === "true") {
 }
 ```
 
+### Runtime Validation (Zod)
+
+Environment variables are validated at **server startup** using [Zod v4](https://zod.dev/).
+If any required variable is missing or has an invalid format, the server will **fail fast**
+with a descriptive error message.
+
+**How it works:**
+
+1. `lib/env.ts` defines Zod schemas for all server and client env vars.
+2. `instrumentation.ts` imports `lib/env.ts` on startup (Next.js instrumentation hook).
+3. If validation fails, the server prints a formatted error list and exits.
+
+**Example error output:**
+
+```
+❌ Invalid environment variables:
+
+  ✗ NEXT_PUBLIC_API_URL: Required
+  ✗ NEXTAUTH_SECRET: Required
+  ✗ API_TIMEOUT: Expected number, received "abc"
+```
+
+**Using the validated env object:**
+
+```typescript
+import { env } from "@/lib/env";
+
+// ✅ Validated and typed — guaranteed to exist
+const apiUrl = env.NEXT_PUBLIC_API_URL;
+const timeout = env.API_TIMEOUT; // number
+const posEnabled = env.NEXT_PUBLIC_ENABLE_POS; // boolean
+```
+
+**Troubleshooting:**
+
+- Compare your `.env.local` against `.env.local.example` for missing variables.
+- Boolean variables accept: `true`, `false`, `1`, `0`, `yes`, `no` (case-insensitive).
+- Numeric variables must contain valid numbers (e.g., `30000`, not `30s`).
+- URL variables must include the protocol (e.g., `http://localhost:3000`).
+
 ---
 
 ## Sri Lanka Specifics
