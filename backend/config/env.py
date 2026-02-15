@@ -92,6 +92,21 @@ env = environ.Env(
     STRIPE_WEBHOOK_SECRET=(str, ""),
     STRIPE_API_VERSION=(str, "2024-06-20"),
 
+    # ── SMS Provider ────────────────────────────────────────────────────
+    SMS_PROVIDER=(str, ""),
+    SMS_API_KEY=(str, ""),
+    SMS_SENDER_ID=(str, "LCC"),
+
+    # ── AI / OpenAI ─────────────────────────────────────────────────────
+    OPENAI_API_KEY=(str, ""),
+    OPENAI_MODEL=(str, "gpt-4o-mini"),
+    OPENAI_MAX_TOKENS=(int, 4096),
+
+    # ── Site / App Identity ─────────────────────────────────────────────
+    SITE_NAME=(str, "LankaCommerce Cloud"),
+    SITE_URL=(str, "http://localhost:3000"),
+    SUPPORT_EMAIL=(str, "support@lankacommerce.lk"),
+
     # ── Localization ────────────────────────────────────────────────────
     LANGUAGE_CODE=(str, "en-us"),
     TIME_ZONE=(str, "Asia/Colombo"),
