@@ -101,6 +101,7 @@ Common commands (to be added with tooling in later tasks):
 
 - Master index: `Document-Series/00_PHASES_SUMMARY.md`
 - [Branching Strategy](docs/BRANCHING.md)
+- [Branch Protection & Merge Rules](docs/BRANCH_PROTECTION.md)
 - [Commit Conventions](docs/COMMITS.md)
 - [Code Review Guidelines](docs/CODE_REVIEW.md)
 - [Changelog](CHANGELOG.md)
