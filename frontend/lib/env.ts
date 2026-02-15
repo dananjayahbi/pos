@@ -13,17 +13,17 @@
  * @see types/env.d.ts for TypeScript declarations.
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 
 // ════════════════════════════════════════════════════════════════════════
 // HELPER SCHEMAS
 // ════════════════════════════════════════════════════════════════════════
 
 /** Coerce string boolean from env ("true"/"false") to actual boolean. */
-const booleanString = z.stringbool().optional().default("false");
+const booleanString = z.stringbool().optional().default(false);
 
 /** Optional string that defaults to empty string. */
-const optionalString = z.string().optional().default("");
+const optionalString = z.string().optional().default('');
 
 // ════════════════════════════════════════════════════════════════════════
 // SERVER-SIDE ENVIRONMENT SCHEMA
@@ -33,15 +33,19 @@ const optionalString = z.string().optional().default("");
 
 const serverSchema = z.object({
   NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 
   // ── API (server → backend) ──────────────────────────────────────────
-  API_BASE_URL: z.string().url().optional().default("http://backend:8000/api/v1"),
+  API_BASE_URL: z
+    .string()
+    .url()
+    .optional()
+    .default('http://backend:8000/api/v1'),
   API_TIMEOUT: z.coerce.number().int().positive().optional().default(30000),
 
   // ── Authentication ──────────────────────────────────────────────────
-  NEXTAUTH_URL: z.string().url().optional().default("http://localhost:3000"),
+  NEXTAUTH_URL: z.string().url().optional().default('http://localhost:3000'),
   NEXTAUTH_SECRET: optionalString,
 });
 
@@ -55,20 +59,17 @@ const serverSchema = z.object({
 
 const clientSchema = z.object({
   // ── API (browser → backend) ─────────────────────────────────────────
-  NEXT_PUBLIC_API_URL: z
-    .string()
-    .url()
-    .default("http://localhost:8000/api/v1"),
+  NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:8000/api/v1'),
 
   // ── Site ────────────────────────────────────────────────────────────
-  NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
-  NEXT_PUBLIC_SITE_NAME: z.string().default("LankaCommerce Cloud"),
+  NEXT_PUBLIC_SITE_URL: z.string().url().default('http://localhost:3000'),
+  NEXT_PUBLIC_SITE_NAME: z.string().default('LankaCommerce Cloud'),
   NEXT_PUBLIC_SITE_DESCRIPTION: z
     .string()
-    .default("Multi-tenant SaaS ERP for Sri Lankan SMEs"),
+    .default('Multi-tenant SaaS ERP for Sri Lankan SMEs'),
 
   // ── Authentication ──────────────────────────────────────────────────
-  NEXT_PUBLIC_AUTH_COOKIE_NAME: z.string().default("lcc_auth"),
+  NEXT_PUBLIC_AUTH_COOKIE_NAME: z.string().default('lcc_auth'),
   NEXT_PUBLIC_TOKEN_EXPIRY_BUFFER: z.coerce
     .number()
     .int()
@@ -78,9 +79,9 @@ const clientSchema = z.object({
   // ── Feature Flags ───────────────────────────────────────────────────
   NEXT_PUBLIC_ENABLE_ANALYTICS: booleanString,
   NEXT_PUBLIC_ENABLE_AI_FEATURES: booleanString,
-  NEXT_PUBLIC_ENABLE_WEBSTORE: z.stringbool().optional().default("true"),
-  NEXT_PUBLIC_ENABLE_POS: z.stringbool().optional().default("true"),
-  NEXT_PUBLIC_ENABLE_OFFLINE: z.stringbool().optional().default("true"),
+  NEXT_PUBLIC_ENABLE_WEBSTORE: z.stringbool().optional().default(true),
+  NEXT_PUBLIC_ENABLE_POS: z.stringbool().optional().default(true),
+  NEXT_PUBLIC_ENABLE_OFFLINE: z.stringbool().optional().default(true),
   NEXT_PUBLIC_DEBUG: booleanString,
 
   // ── Third-Party Services ────────────────────────────────────────────
@@ -90,19 +91,17 @@ const clientSchema = z.object({
   NEXT_PUBLIC_STRIPE_PUBLIC_KEY: optionalString,
 
   // ── Sri Lanka Localization ──────────────────────────────────────────
-  NEXT_PUBLIC_DEFAULT_LOCALE: z.string().default("en-LK"),
-  NEXT_PUBLIC_DEFAULT_TIMEZONE: z.string().default("Asia/Colombo"),
-  NEXT_PUBLIC_DEFAULT_CURRENCY: z.string().default("LKR"),
-  NEXT_PUBLIC_CURRENCY_SYMBOL: z.string().default("Rs."),
+  NEXT_PUBLIC_DEFAULT_LOCALE: z.string().default('en-LK'),
+  NEXT_PUBLIC_DEFAULT_TIMEZONE: z.string().default('Asia/Colombo'),
+  NEXT_PUBLIC_DEFAULT_CURRENCY: z.string().default('LKR'),
+  NEXT_PUBLIC_CURRENCY_SYMBOL: z.string().default('Rs.'),
 
   // ── Tenant ──────────────────────────────────────────────────────────
-  NEXT_PUBLIC_DEFAULT_TENANT: z.string().default("demo"),
-  NEXT_PUBLIC_TENANT_PATTERN: z
-    .string()
-    .default("{tenant}.lankacommerce.lk"),
+  NEXT_PUBLIC_DEFAULT_TENANT: z.string().default('demo'),
+  NEXT_PUBLIC_TENANT_PATTERN: z.string().default('{tenant}.lankacommerce.lk'),
 
   // ── Image / CDN ─────────────────────────────────────────────────────
-  NEXT_PUBLIC_IMAGE_DOMAIN: z.string().default("cdn.lankacommerce.lk"),
+  NEXT_PUBLIC_IMAGE_DOMAIN: z.string().default('cdn.lankacommerce.lk'),
   NEXT_PUBLIC_CLOUDINARY_CLOUD: optionalString,
 });
 
@@ -125,18 +124,18 @@ function validateEnv() {
 
   if (!result.success) {
     const formatted = result.error.issues
-      .map((issue) => `  ✗ ${issue.path.join(".")}: ${issue.message}`)
-      .join("\n");
+      .map((issue) => `  ✗ ${issue.path.join('.')}: ${issue.message}`)
+      .join('\n');
 
     console.error(
-      "\n🚨 Invalid environment variables:\n" +
+      '\n🚨 Invalid environment variables:\n' +
         formatted +
-        "\n\n" +
-        "💡 Check your .env.local file against .env.local.example.\n" +
-        "   See frontend/README.md → Environment Variables for help.\n"
+        '\n\n' +
+        '💡 Check your .env.local file against .env.local.example.\n' +
+        '   See frontend/README.md → Environment Variables for help.\n'
     );
 
-    throw new Error("Invalid environment variables. See console output above.");
+    throw new Error('Invalid environment variables. See console output above.');
   }
 
   return result.data;

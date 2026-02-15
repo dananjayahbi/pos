@@ -14,9 +14,9 @@ export async function register() {
   // This import triggers the validation in lib/env.ts.
   // If any required variables are missing or invalid, the server
   // will fail fast with a descriptive error message.
-  await import("@/lib/env");
+  await import('@/lib/env');
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("✅ Environment variables validated successfully");
+  if (process.env.NODE_ENV === 'development') {
+    console.log('✅ Environment variables validated successfully');
   }
 }

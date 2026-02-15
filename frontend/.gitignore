@@ -17,8 +17,11 @@ build/
 # ────────────────────────────────────────────────
 .env
 .env.local
+.env.development
+.env.production
 .env.*.local
 !.env.example
+!.env.local.example
 
 # ────────────────────────────────────────────────
 # TypeScript

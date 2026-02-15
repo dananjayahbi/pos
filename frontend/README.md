@@ -242,7 +242,7 @@ Next.js loads env files in this order (last wins):
 | File                   | Loaded When           | Committed? | Purpose                    |
 | ---------------------- | --------------------- | ---------- | -------------------------- |
 | `.env`                 | Always                | ✅ Yes     | Shared defaults            |
-| `.env.development`     | `NODE_ENV=development`| ✅ Yes     | Dev-specific defaults      |
+| `.env.development`     | `NODE_ENV=development`| ❌ No      | Dev-specific defaults      |
 | `.env.production`      | `NODE_ENV=production` | ❌ No      | Prod-specific defaults     |
 | `.env.local`           | Always (except test)  | ❌ No      | Local overrides + secrets  |
 | `.env.development.local` | Dev + local         | ❌ No      | Dev-local overrides        |
@@ -302,6 +302,88 @@ const posEnabled = env.NEXT_PUBLIC_ENABLE_POS; // boolean
 - Boolean variables accept: `true`, `false`, `1`, `0`, `yes`, `no` (case-insensitive).
 - Numeric variables must contain valid numbers (e.g., `30000`, not `30s`).
 - URL variables must include the protocol (e.g., `http://localhost:3000`).
+
+### Client vs Server Variables
+
+Environment variables fall into two categories based on the `NEXT_PUBLIC_` prefix:
+
+**Client-exposed variables** (`NEXT_PUBLIC_*`) — bundled into JavaScript, visible
+to the browser. Use for non-sensitive configuration:
+
+| Variable | Purpose | Runtime |
+| -------- | ------- | ------- |
+| `NEXT_PUBLIC_API_URL` | API endpoint for fetch calls | Client + Server |
+| `NEXT_PUBLIC_SITE_NAME` | Brand name in UI | Client + Server |
+| `NEXT_PUBLIC_ENABLE_POS` | Feature flag for POS module | Client + Server |
+| `NEXT_PUBLIC_DEFAULT_CURRENCY` | Display currency (LKR) | Client + Server |
+| `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` | Analytics tracking | Client + Server |
+
+**Server-only variables** (no prefix) — available in API routes, middleware,
+`getServerSideProps`, and Server Components. Use for secrets and internal config:
+
+| Variable | Purpose | Runtime |
+| -------- | ------- | ------- |
+| `NEXTAUTH_SECRET` | JWT signing secret | Server only |
+| `NEXTAUTH_URL` | Auth callback URL | Server only |
+| `API_BASE_URL` | Internal API base for SSR | Server only |
+| `API_TIMEOUT` | Request timeout in ms | Server only |
+| `NODE_ENV` | Runtime environment | Server only |
+
+**When to use which:**
+
+```typescript
+// ✅ Client component — use NEXT_PUBLIC_ variables
+"use client";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+// ✅ Server component / API route — both are available
+import { env } from "@/lib/env";
+const secret = env.NEXTAUTH_SECRET;     // server-only
+const siteUrl = env.NEXT_PUBLIC_API_URL; // also available server-side
+
+// ❌ WRONG — server-only variable in client code (will be undefined)
+"use client";
+const secret = process.env.NEXTAUTH_SECRET; // undefined!
+```
+
+### Env Helper Usage Conventions
+
+**Always use `lib/env.ts` as the single source of truth** for environment
+variables. This ensures runtime validation and type safety.
+
+**Preferred — import from the validated env helper:**
+
+```typescript
+import { env } from "@/lib/env";
+
+// ✅ Validated, typed, and guaranteed to exist
+const apiUrl = env.NEXT_PUBLIC_API_URL;    // string
+const timeout = env.API_TIMEOUT;           // number
+const posEnabled = env.NEXT_PUBLIC_ENABLE_POS; // boolean
+```
+
+**Avoid — direct `process.env` access in application code:**
+
+```typescript
+// ❌ Avoid — no validation, always returns string | undefined
+const timeout = process.env.API_TIMEOUT;
+const posEnabled = process.env.NEXT_PUBLIC_ENABLE_POS === "true";
+```
+
+**When direct access is acceptable:**
+
+- Inside `next.config.js` (runs before the app, cannot import TypeScript)
+- Inside configuration files that run at build time
+- In client components that only need `NEXT_PUBLIC_*` values where importing
+  the env module would cause server-only code to leak into the bundle
+
+**Adding a new variable:**
+
+1. Add to `.env.local.example` with documentation
+2. Add to `.env.example` (quick-reference)
+3. Add to `types/env.d.ts` for TypeScript support
+4. Add the Zod schema to `lib/env.ts` (server or client schema)
+5. Add to `.env.local` with the actual value
 
 ---
 
