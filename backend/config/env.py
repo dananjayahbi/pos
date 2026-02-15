@@ -54,8 +54,43 @@ env = environ.Env(
     CELERY_BROKER_URL=(str, "redis://localhost:6379/0"),
     CELERY_RESULT_BACKEND=(str, "redis://localhost:6379/0"),
 
-    # ── Email ───────────────────────────────────────────────────────────
+    # ── Email / SMTP ────────────────────────────────────────────────────
     EMAIL_BACKEND=(str, "django.core.mail.backends.console.EmailBackend"),
+    EMAIL_HOST=(str, "smtp.gmail.com"),
+    EMAIL_PORT=(int, 587),
+    EMAIL_HOST_USER=(str, ""),
+    EMAIL_HOST_PASSWORD=(str, ""),
+    EMAIL_USE_TLS=(bool, True),
+    DEFAULT_FROM_EMAIL=(str, "noreply@lankacommerce.lk"),
+
+    # ── AWS / S3 Storage ────────────────────────────────────────────────
+    AWS_ACCESS_KEY_ID=(str, ""),
+    AWS_SECRET_ACCESS_KEY=(str, ""),
+    AWS_STORAGE_BUCKET_NAME=(str, "lcc-media-dev"),
+    AWS_S3_REGION_NAME=(str, "ap-south-1"),
+    AWS_S3_ENDPOINT_URL=(str, ""),
+    DEFAULT_FILE_STORAGE=(str, "django.core.files.storage.FileSystemStorage"),
+
+    # ── CORS ────────────────────────────────────────────────────────────
+    CORS_ALLOWED_ORIGINS=(list, ["http://localhost:3000"]),
+    CORS_ALLOW_CREDENTIALS=(bool, True),
+
+    # ── JWT / Token Authentication ──────────────────────────────────────
+    JWT_ACCESS_TOKEN_LIFETIME_MINUTES=(int, 30),
+    JWT_REFRESH_TOKEN_LIFETIME_DAYS=(int, 7),
+    JWT_ROTATE_REFRESH_TOKENS=(bool, True),
+    JWT_BLACKLIST_AFTER_ROTATION=(bool, True),
+
+    # ── Sentry — Error Monitoring ───────────────────────────────────────
+    SENTRY_DSN=(str, ""),
+    SENTRY_ENVIRONMENT=(str, "local"),
+    SENTRY_TRACES_SAMPLE_RATE=(float, 0.1),
+
+    # ── Stripe — Payment Integration ────────────────────────────────────
+    STRIPE_SECRET_KEY=(str, ""),
+    STRIPE_PUBLISHABLE_KEY=(str, ""),
+    STRIPE_WEBHOOK_SECRET=(str, ""),
+    STRIPE_API_VERSION=(str, "2024-06-20"),
 
     # ── Localization ────────────────────────────────────────────────────
     LANGUAGE_CODE=(str, "en-us"),

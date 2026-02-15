@@ -53,6 +53,10 @@ CSRF_TRUSTED_ORIGINS = env.list(
     "CSRF_TRUSTED_ORIGINS", default=[],
 )
 
+# ── CORS (Cross-Origin Resource Sharing) ──────────────────────────────
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS")
+CORS_ALLOW_CREDENTIALS = env.bool("CORS_ALLOW_CREDENTIALS")
+
 
 # ════════════════════════════════════════════════════════════════════════
 # DATABASE  (Task 33)
@@ -156,7 +160,7 @@ EMAIL_SUBJECT_PREFIX = "[LCC] "
 # ERROR TRACKING — Sentry (optional)
 # ════════════════════════════════════════════════════════════════════════
 
-SENTRY_DSN = env("SENTRY_DSN", default="")
+SENTRY_DSN = env("SENTRY_DSN")
 if SENTRY_DSN:
     import sentry_sdk  # noqa: E402
     from sentry_sdk.integrations.django import DjangoIntegration  # noqa: E402
@@ -164,7 +168,8 @@ if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.1),
+        environment=env("SENTRY_ENVIRONMENT"),
+        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE"),
         send_default_pii=False,
     )
 
