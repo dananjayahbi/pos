@@ -47,6 +47,13 @@ const serverSchema = z.object({
   // ── Authentication ──────────────────────────────────────────────────
   NEXTAUTH_URL: z.string().url().optional().default('http://localhost:3000'),
   NEXTAUTH_SECRET: optionalString,
+
+  // ── Payment Secrets (server-only) ───────────────────────────────────
+  STRIPE_SECRET_KEY: optionalString,
+  STRIPE_WEBHOOK_SECRET: optionalString,
+
+  // ── Monitoring Secrets (server-only) ────────────────────────────────
+  SENTRY_AUTH_TOKEN: optionalString,
 });
 
 // ════════════════════════════════════════════════════════════════════════
@@ -93,6 +100,7 @@ const clientSchema = z.object({
   NEXT_PUBLIC_SENTRY_DSN: optionalString,
   NEXT_PUBLIC_PAYHERE_MERCHANT_ID: optionalString,
   NEXT_PUBLIC_STRIPE_PUBLIC_KEY: optionalString,
+  NEXT_PUBLIC_MAPS_API_KEY: optionalString,
 
   // ── Sri Lanka Localization ──────────────────────────────────────────
   NEXT_PUBLIC_DEFAULT_LOCALE: z.string().default('en-LK'),

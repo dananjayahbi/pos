@@ -68,6 +68,8 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_PAYHERE_MERCHANT_ID?: string;
     /** Stripe publishable key (pk_test_... or pk_live_...). */
     readonly NEXT_PUBLIC_STRIPE_PUBLIC_KEY?: string;
+    /** Google Maps JavaScript API key for store locator, delivery tracking. */
+    readonly NEXT_PUBLIC_MAPS_API_KEY?: string;
 
     // ── Sri Lanka Localization ───────────────────────────────
     /** Default BCP 47 locale (e.g., en-LK). */
@@ -90,5 +92,13 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_IMAGE_DOMAIN?: string;
     /** Cloudinary cloud name (if using Cloudinary). */
     readonly NEXT_PUBLIC_CLOUDINARY_CLOUD?: string;
+
+    // ── Server-Only Secrets ──────────────────────────────────
+    /** Stripe secret key for server-side payment processing (sk_test_... or sk_live_...). */
+    readonly STRIPE_SECRET_KEY?: string;
+    /** Stripe webhook signing secret for verifying event signatures (whsec_...). */
+    readonly STRIPE_WEBHOOK_SECRET?: string;
+    /** Sentry auth token for source map uploads during build (sntrys_...). */
+    readonly SENTRY_AUTH_TOKEN?: string;
   }
 }

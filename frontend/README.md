@@ -330,6 +330,9 @@ to the browser. Use for non-sensitive configuration:
 | `API_BASE_URL` | Internal API base for SSR | Server only |
 | `API_TIMEOUT` | Request timeout in ms | Server only |
 | `NODE_ENV` | Runtime environment | Server only |
+| `STRIPE_SECRET_KEY` | Stripe server-side payments | Server only |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook verification | Server only |
+| `SENTRY_AUTH_TOKEN` | Source map uploads (build) | Server only |
 
 **When to use which:**
 
@@ -386,6 +389,45 @@ const posEnabled = process.env.NEXT_PUBLIC_ENABLE_POS === "true";
 3. Add to `types/env.d.ts` for TypeScript support
 4. Add the Zod schema to `lib/env.ts` (server or client schema)
 5. Add to `.env.local` with the actual value
+
+### All Variables Reference
+
+| Variable | Type | Default | Category |
+| -------- | ---- | ------- | -------- |
+| `NEXT_PUBLIC_API_URL` | `string` (URL) | `http://localhost:8000/api/v1` | API |
+| `NEXT_PUBLIC_WS_URL` | `string` | `ws://localhost:8000/ws` | API |
+| `API_BASE_URL` | `string` (URL) | `http://backend:8000/api/v1` | API (server) |
+| `API_TIMEOUT` | `number` | `30000` | API (server) |
+| `NEXT_PUBLIC_SITE_URL` | `string` (URL) | `http://localhost:3000` | Site |
+| `NEXT_PUBLIC_SITE_NAME` | `string` | `LankaCommerce Cloud` | Site |
+| `NEXT_PUBLIC_APP_NAME` | `string` | `LCC` | Site |
+| `NEXT_PUBLIC_SITE_DESCRIPTION` | `string` | *(SaaS ERP description)* | Site |
+| `NEXTAUTH_URL` | `string` (URL) | `http://localhost:3000` | Auth (server) |
+| `NEXTAUTH_SECRET` | `string` | *(empty)* | Auth (server) |
+| `NEXT_PUBLIC_AUTH_COOKIE_NAME` | `string` | `lcc_auth` | Auth |
+| `NEXT_PUBLIC_TOKEN_EXPIRY_BUFFER` | `number` | `60` | Auth |
+| `NEXT_PUBLIC_ENABLE_ANALYTICS` | `boolean` | `false` | Feature Flags |
+| `NEXT_PUBLIC_ENABLE_AI_FEATURES` | `boolean` | `false` | Feature Flags |
+| `NEXT_PUBLIC_ENABLE_WEBSTORE` | `boolean` | `true` | Feature Flags |
+| `NEXT_PUBLIC_ENABLE_POS` | `boolean` | `true` | Feature Flags |
+| `NEXT_PUBLIC_ENABLE_OFFLINE` | `boolean` | `true` | Feature Flags |
+| `NEXT_PUBLIC_DEBUG` | `boolean` | `false` | Feature Flags |
+| `NEXT_PUBLIC_GA_TRACKING_ID` | `string` | *(empty)* | Analytics |
+| `NEXT_PUBLIC_SENTRY_DSN` | `string` | *(empty)* | Monitoring |
+| `NEXT_PUBLIC_PAYHERE_MERCHANT_ID` | `string` | *(empty)* | Payments |
+| `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` | `string` | *(empty)* | Payments |
+| `NEXT_PUBLIC_MAPS_API_KEY` | `string` | *(empty)* | Maps |
+| `STRIPE_SECRET_KEY` | `string` | *(empty)* | Payments (server) |
+| `STRIPE_WEBHOOK_SECRET` | `string` | *(empty)* | Payments (server) |
+| `SENTRY_AUTH_TOKEN` | `string` | *(empty)* | Monitoring (server) |
+| `NEXT_PUBLIC_DEFAULT_LOCALE` | `string` | `en-LK` | Localization |
+| `NEXT_PUBLIC_DEFAULT_TIMEZONE` | `string` | `Asia/Colombo` | Localization |
+| `NEXT_PUBLIC_DEFAULT_CURRENCY` | `string` | `LKR` | Localization |
+| `NEXT_PUBLIC_CURRENCY_SYMBOL` | `string` | `Rs.` | Localization |
+| `NEXT_PUBLIC_DEFAULT_TENANT` | `string` | `demo` | Tenant |
+| `NEXT_PUBLIC_TENANT_PATTERN` | `string` | `{tenant}.lankacommerce.lk` | Tenant |
+| `NEXT_PUBLIC_IMAGE_DOMAIN` | `string` | `cdn.lankacommerce.lk` | Image/CDN |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD` | `string` | *(empty)* | Image/CDN |
 
 ---
 
