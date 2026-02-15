@@ -5,6 +5,9 @@
 # Usage: Copy to docker-compose.override.yml and customize
 #   cp docker-compose.override.example.yml docker-compose.override.yml
 # Auto-merged with docker-compose.yml by Docker Compose
+#
+# Note: Base docker-compose.yml uses .env.docker for env_file.
+#   Ensure .env.docker exists (cp .env.docker.example .env.docker)
 # ==================================================
 
 services:
@@ -12,15 +15,15 @@ services:
     # Enable debugger port
     ports:
       - "8000:8000"
-      - "5678:5678"  # debugpy
+      - "5678:5678" # debugpy
     environment:
-      - DEBUG=true
-      - DJANGO_DEBUG_TOOLBAR=true
+      - DEBUG=${DEBUG:-True}
+      - DJANGO_DEBUG_TOOLBAR=${DJANGO_DEBUG_TOOLBAR:-true}
 
   frontend:
     environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - NODE_ENV=${NODE_ENV:-development}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000/api/v1}
 
   db:
     # Expose for external tools (pgAdmin, DBeaver, etc.)

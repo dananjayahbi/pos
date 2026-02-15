@@ -21,10 +21,15 @@ services:
       - backend-static:/app/staticfiles
       - backend-media:/app/mediafiles
     environment:
-      - DEBUG=true
-      - DJANGO_SETTINGS_MODULE=config.settings.local
+      - DEBUG=${DEBUG:-True}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-config.settings.local}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-docker-dev-secret-change-me-in-production}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,backend,0.0.0.0}
+      - DATABASE_URL=${DATABASE_URL:-postgres://lcc_user:dev_password_change_me@db:5432/lankacommerce}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
     env_file:
-      - .env
+      - .env.docker
     networks:
       - lcc-network
     depends_on:
@@ -55,11 +60,13 @@ services:
       - /app/node_modules
       - /app/.next
     environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-      - WATCHPACK_POLLING=true
+      - NODE_ENV=${NODE_ENV:-development}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000/api/v1}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      - API_BASE_URL=${API_BASE_URL:-http://backend:8000/api/v1}
+      - WATCHPACK_POLLING=${WATCHPACK_POLLING:-true}
     env_file:
-      - .env
+      - .env.docker
     networks:
       - lcc-network
     depends_on:
@@ -86,14 +93,14 @@ services:
       - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - ./docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     environment:
-      - POSTGRES_DB=lankacommerce
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password}
+      - POSTGRES_DB=${POSTGRES_DB:-lankacommerce}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_me}
     command: postgres -c config_file=/etc/postgresql/postgresql.conf
     networks:
       - lcc-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d lankacommerce"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lankacommerce}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -135,12 +142,12 @@ services:
       - ./docker/scripts:/scripts:ro
     command: /scripts/celery-worker.sh
     environment:
-      - CELERY_APP=config.celery:app
-      - CELERY_CONCURRENCY=2
-      - CELERY_QUEUES=default,high_priority,low_priority
-      - CELERY_LOG_LEVEL=info
+      - CELERY_APP=${CELERY_APP:-config.celery:app}
+      - CELERY_CONCURRENCY=${CELERY_CONCURRENCY:-2}
+      - CELERY_QUEUES=${CELERY_QUEUES:-default,high_priority,low_priority}
+      - CELERY_LOG_LEVEL=${CELERY_LOG_LEVEL:-info}
     env_file:
-      - .env
+      - .env.docker
     networks:
       - lcc-network
     depends_on:
@@ -151,17 +158,7 @@ services:
       backend:
         condition: service_started
     healthcheck:
-      test:
-        [
-          "CMD",
-          "celery",
-          "-A",
-          "config.celery",
-          "inspect",
-          "ping",
-          "--timeout",
-          "5",
-        ]
+      test: ["CMD", "celery", "-A", "config.celery", "inspect", "ping", "--timeout", "5"]
       interval: 60s
       timeout: 30s
       retries: 3
@@ -181,11 +178,11 @@ services:
       - ./docker/scripts:/scripts:ro
     command: /scripts/celery-beat.sh
     environment:
-      - CELERY_APP=config.celery:app
-      - CELERY_BEAT_SCHEDULER=django_celery_beat.schedulers:DatabaseScheduler
-      - CELERY_LOG_LEVEL=info
+      - CELERY_APP=${CELERY_APP:-config.celery:app}
+      - CELERY_BEAT_SCHEDULER=${CELERY_BEAT_SCHEDULER:-django_celery_beat.schedulers:DatabaseScheduler}
+      - CELERY_LOG_LEVEL=${CELERY_LOG_LEVEL:-info}
     env_file:
-      - .env
+      - .env.docker
     networks:
       - lcc-network
     depends_on:
@@ -210,11 +207,11 @@ services:
       - ./docker/scripts:/scripts:ro
     command: /scripts/flower.sh
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - FLOWER_PORT=5555
-      - FLOWER_BASIC_AUTH=admin:admin
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - FLOWER_PORT=${FLOWER_PORT:-5555}
+      - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH:-admin:admin}
     env_file:
-      - .env
+      - .env.docker
     networks:
       - lcc-network
     depends_on:

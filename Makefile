@@ -214,6 +214,37 @@ quality-fix: lint-fix typecheck ## Format, fix lint, and type check
 	@echo "Quality fixes applied!"
 
 # =============================================================================
+# Environment Validation Commands
+# =============================================================================
+
+## Environment Validation Commands:
+
+validate-env: validate-env-backend validate-env-frontend ## Validate all environment variables
+	@echo "All environment validations passed!"
+
+validate-env-backend: ## Validate backend environment variables
+	@echo "Validating backend environment..."
+	@python scripts/validate_env.py
+	@echo ""
+
+validate-env-frontend: ## Validate frontend environment variables
+	@echo "Validating frontend environment..."
+	@node frontend/scripts/check-env.cjs
+	@echo ""
+
+validate-env-strict: ## Validate all env variables in strict (production) mode
+	@echo "Running strict environment validation..."
+	@python scripts/validate_env.py --strict
+	@node frontend/scripts/check-env.cjs --strict
+	@echo ""
+
+validate-env-docker: ## Validate Docker environment variables
+	@echo "Validating Docker environment..."
+	@python scripts/validate_env.py --env-file .env.docker
+	@node frontend/scripts/check-env.cjs --env-file .env.docker
+	@echo ""
+
+# =============================================================================
 # Utility Commands
 # =============================================================================
 
@@ -279,5 +310,6 @@ prod-logs: ## View production container logs
         test test-backend test-frontend coverage \
         lint lint-backend lint-frontend lint-stats ruff ruff-fix format format-check fmt sort-imports sort-imports-check lint-fix \
         typecheck typecheck-report quality quality-fix \
+        validate-env validate-env-backend validate-env-frontend validate-env-strict validate-env-docker \
         clean docker-clean docker-prune seed backup restore \
         prod-up prod-down prod-build prod-logs up-build

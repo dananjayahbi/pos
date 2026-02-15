@@ -199,6 +199,7 @@ test-results/
 !.env.template
 !.env.sample
 !.env.local.example
+!.env.docker.example
 !.env.development
 
 # Secrets and credentials

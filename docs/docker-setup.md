@@ -18,8 +18,8 @@ LankaCommerce Cloud uses Docker and Docker Compose to provide a consistent devel
 git clone <repository-url>
 cd lankacommerce-cloud
 
-# Copy environment file
-cp .env.example .env
+# Copy Docker environment file
+cp .env.docker.example .env.docker
 
 # Start development environment
 make dev
@@ -30,15 +30,15 @@ make dev
 
 ## Services
 
-| Service | Container | URL | Description |
-|---------|-----------|-----|-------------|
-| Backend | lcc-backend | http://localhost:8000 | Django REST API |
-| Frontend | lcc-frontend | http://localhost:3000 | Next.js Application |
-| PostgreSQL | lcc-postgres | localhost:5432 | Database |
-| Redis | lcc-redis | localhost:6379 | Cache & Message Broker |
-| Celery Worker | lcc-celery-worker | - | Background Task Processing |
-| Celery Beat | lcc-celery-beat | - | Periodic Task Scheduler |
-| Flower | lcc-flower | http://localhost:5555 | Celery Monitoring Dashboard |
+| Service       | Container         | URL                   | Description                 |
+| ------------- | ----------------- | --------------------- | --------------------------- |
+| Backend       | lcc-backend       | http://localhost:8000 | Django REST API             |
+| Frontend      | lcc-frontend      | http://localhost:3000 | Next.js Application         |
+| PostgreSQL    | lcc-postgres      | localhost:5432        | Database                    |
+| Redis         | lcc-redis         | localhost:6379        | Cache & Message Broker      |
+| Celery Worker | lcc-celery-worker | -                     | Background Task Processing  |
+| Celery Beat   | lcc-celery-beat   | -                     | Periodic Task Scheduler     |
+| Flower        | lcc-flower        | http://localhost:5555 | Celery Monitoring Dashboard |
 
 ## Common Commands
 
@@ -143,27 +143,30 @@ docker compose exec frontend sh
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and configure:
+Copy `.env.docker.example` to `.env.docker` and configure. See [DOCKER_ENV.md](DOCKER_ENV.md) for full documentation and [SECRETS.md](SECRETS.md) for secrets management policy.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DJANGO_SECRET_KEY` | (generated) | Django secret key |
-| `DJANGO_SETTINGS_MODULE` | `config.settings.local` | Django settings module |
-| `DEBUG` | `True` | Enable debug mode |
-| `DATABASE_URL` | `postgres://lcc_user:...@db:5432/lankacommerce` | PostgreSQL connection |
-| `REDIS_URL` | `redis://redis:6379/0` | Redis connection |
-| `CELERY_BROKER_URL` | `redis://redis:6379/0` | Celery broker URL |
-| `CELERY_RESULT_BACKEND` | `redis://redis:6379/1` | Celery result backend |
-| `CELERY_CONCURRENCY` | `2` | Celery worker concurrency |
-| `CELERY_LOG_LEVEL` | `info` | Celery log level |
-| `FLOWER_BASIC_AUTH` | `admin:admin` | Flower dashboard credentials |
-| `TZ` | `Asia/Colombo` | Container timezone |
+> **Note:** Docker services use `.env.docker` (not `.env`). Service hostnames use Docker Compose service names (e.g., `db`, `redis`, `backend`). Never commit `.env.docker` — see [SECRETS.md](SECRETS.md) for handling guidelines.
+
+| Variable                 | Default                                         | Description                  |
+| ------------------------ | ----------------------------------------------- | ---------------------------- |
+| `DJANGO_SECRET_KEY`      | (generated)                                     | Django secret key            |
+| `DJANGO_SETTINGS_MODULE` | `config.settings.local`                         | Django settings module       |
+| `DEBUG`                  | `True`                                          | Enable debug mode            |
+| `DATABASE_URL`           | `postgres://lcc_user:...@db:5432/lankacommerce` | PostgreSQL connection        |
+| `REDIS_URL`              | `redis://redis:6379/0`                          | Redis connection             |
+| `CELERY_BROKER_URL`      | `redis://redis:6379/0`                          | Celery broker URL            |
+| `CELERY_RESULT_BACKEND`  | `redis://redis:6379/1`                          | Celery result backend        |
+| `CELERY_CONCURRENCY`     | `2`                                             | Celery worker concurrency    |
+| `CELERY_LOG_LEVEL`       | `info`                                          | Celery log level             |
+| `FLOWER_BASIC_AUTH`      | `admin:admin`                                   | Flower dashboard credentials |
+| `TZ`                     | `Asia/Colombo`                                  | Container timezone           |
 
 ## Development Workflow
 
 ### Hot Reload
 
 Both backend and frontend support hot reload in development:
+
 - **Backend:** Django's runserver auto-reloads on Python file changes
 - **Frontend:** Next.js Fast Refresh updates on save (with `WATCHPACK_POLLING=true` for Docker)
 
@@ -254,7 +257,9 @@ docker/
 ├── docker-compose.prod.yml             # Production overrides
 ├── docker-compose.override.example.yml # Local override template
 ├── .dockerignore                       # Docker build exclusions
-├── .env.example                        # Environment template
+├── .env.example                        # General environment template
+├── .env.docker.example                 # Docker-specific env template (committed)
+├── .env.docker                         # Docker-specific env file (gitignored)
 └── Makefile                            # Make targets
 ```
 
@@ -286,13 +291,13 @@ docker/
 
 ## Health Checks
 
-| Service | Method | Interval |
-|---------|--------|----------|
-| PostgreSQL | `pg_isready -U postgres` | 10s |
-| Redis | `redis-cli ping` | 10s |
-| Backend | `curl -f http://localhost:8000/health/` | 30s |
-| Frontend | `curl -f http://localhost:3000/api/health` | 30s |
-| Celery Worker | `celery -A config.celery inspect ping` | 30s |
+| Service       | Method                                     | Interval |
+| ------------- | ------------------------------------------ | -------- |
+| PostgreSQL    | `pg_isready -U postgres`                   | 10s      |
+| Redis         | `redis-cli ping`                           | 10s      |
+| Backend       | `curl -f http://localhost:8000/health/`    | 30s      |
+| Frontend      | `curl -f http://localhost:3000/api/health` | 30s      |
+| Celery Worker | `celery -A config.celery inspect ping`     | 30s      |
 
 ## Troubleshooting
 
@@ -325,7 +330,7 @@ cp docker-compose.override.example.yml docker-compose.override.yml
 ### Database Connection Error
 
 1. Ensure PostgreSQL container is healthy: `docker compose ps db`
-2. Check `DATABASE_URL` in `.env`
+2. Check `DATABASE_URL` in `.env.docker`
 3. Wait for initialization to complete (first run takes longer)
 4. Try resetting: `make db-reset`
 
@@ -333,7 +338,7 @@ cp docker-compose.override.example.yml docker-compose.override.yml
 
 1. Check Redis container: `docker compose ps redis`
 2. Test connectivity: `docker compose exec redis redis-cli ping`
-3. Check `REDIS_URL` in `.env`
+3. Check `REDIS_URL` in `.env.docker`
 
 ### Celery Worker Not Processing Tasks
 
