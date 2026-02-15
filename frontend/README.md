@@ -207,12 +207,61 @@ import { Button } from '@/components/ui/Button'
 
 ## Environment Variables
 
-See `.env.local.example` for all available variables.
+See `.env.local.example` for all available variables with documentation.
 
-| Pattern         | Meaning                |
-| --------------- | ---------------------- |
-| `NEXT_PUBLIC_*` | Exposed to the browser |
-| Without prefix  | Server-side only       |
+### Quick Start
+
+```bash
+cp .env.local.example .env.local
+# Edit .env.local with your values
+```
+
+### NEXT_PUBLIC\_ Exposure Rules
+
+Next.js uses the `NEXT_PUBLIC_` prefix to control which environment variables
+are exposed to the browser bundle:
+
+| Pattern           | Available In              | Bundled? | Example                          |
+| ----------------- | ------------------------- | -------- | -------------------------------- |
+| `NEXT_PUBLIC_*`   | Client + Server           | ✅ Yes   | `NEXT_PUBLIC_API_URL`            |
+| Without prefix    | Server only (API routes, SSR, middleware) | ❌ No    | `NEXTAUTH_SECRET`, `API_BASE_URL` |
+
+**⚠️ Security Rules:**
+
+1. **NEVER** put secrets in `NEXT_PUBLIC_` variables — they are embedded in the
+   JavaScript bundle and visible to anyone.
+2. Server-only variables (`NEXTAUTH_SECRET`, `API_BASE_URL`) are **never**
+   accessible in client-side code (`use client` components, event handlers).
+3. `NEXT_PUBLIC_` values are **inlined at build time** — changing them requires
+   a rebuild (`next build`).
+
+### Environment File Loading Order (Next.js)
+
+Next.js loads env files in this order (last wins):
+
+| File                   | Loaded When           | Committed? | Purpose                    |
+| ---------------------- | --------------------- | ---------- | -------------------------- |
+| `.env`                 | Always                | ✅ Yes     | Shared defaults            |
+| `.env.development`     | `NODE_ENV=development`| ✅ Yes     | Dev-specific defaults      |
+| `.env.production`      | `NODE_ENV=production` | ❌ No      | Prod-specific defaults     |
+| `.env.local`           | Always (except test)  | ❌ No      | Local overrides + secrets  |
+| `.env.development.local` | Dev + local         | ❌ No      | Dev-local overrides        |
+| `.env.production.local`  | Prod + local        | ❌ No      | Prod-local overrides       |
+
+### TypeScript Support
+
+All env variables are typed in `types/env.d.ts`. Access with full IntelliSense:
+
+```typescript
+// ✅ Type-safe access
+const apiUrl = process.env.NEXT_PUBLIC_API_URL; // string
+const secret = process.env.NEXTAUTH_SECRET;     // string | undefined
+
+// ✅ Feature flag check
+if (process.env.NEXT_PUBLIC_ENABLE_POS === "true") {
+  // POS module enabled
+}
+```
 
 ---
 
