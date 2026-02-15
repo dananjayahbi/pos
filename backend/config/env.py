@@ -79,6 +79,12 @@ env = environ.Env(
 # The .env file is primarily for local development convenience.
 
 ENV_FILE = BASE_DIR / ".env"
+ENV_FILE_LOCAL = BASE_DIR / ".env.local"
+
+# Read .env.local first (if present), then .env on top (if present).
+# This allows .env to override .env.local values when both exist.
+if ENV_FILE_LOCAL.is_file():
+    env.read_env(str(ENV_FILE_LOCAL))
 
 if ENV_FILE.is_file():
     env.read_env(str(ENV_FILE))
