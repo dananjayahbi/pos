@@ -313,10 +313,12 @@ to the browser. Use for non-sensitive configuration:
 | Variable | Purpose | Runtime |
 | -------- | ------- | ------- |
 | `NEXT_PUBLIC_API_URL` | API endpoint for fetch calls | Client + Server |
+| `NEXT_PUBLIC_WS_URL` | WebSocket for real-time features | Client + Server |
 | `NEXT_PUBLIC_SITE_NAME` | Brand name in UI | Client + Server |
+| `NEXT_PUBLIC_APP_NAME` | Short name (PWA, tabs) | Client + Server |
 | `NEXT_PUBLIC_ENABLE_POS` | Feature flag for POS module | Client + Server |
 | `NEXT_PUBLIC_DEFAULT_CURRENCY` | Display currency (LKR) | Client + Server |
-| `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` | Analytics tracking | Client + Server |
+| `NEXT_PUBLIC_GA_TRACKING_ID` | Analytics tracking | Client + Server |
 
 **Server-only variables** (no prefix) — available in API routes, middleware,
 `getServerSideProps`, and Server Components. Use for secrets and internal config:

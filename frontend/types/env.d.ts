@@ -18,6 +18,8 @@ declare namespace NodeJS {
     // ── API Configuration ────────────────────────────────────
     /** Backend API base URL (client-side, from browser). */
     readonly NEXT_PUBLIC_API_URL: string;
+    /** WebSocket URL for real-time features (notifications, live updates, POS sync). */
+    readonly NEXT_PUBLIC_WS_URL?: string;
     /** Backend API base URL (server-side, Docker network). */
     readonly API_BASE_URL?: string;
     /** API request timeout in milliseconds. */
@@ -26,8 +28,10 @@ declare namespace NodeJS {
     // ── Site Configuration ───────────────────────────────────
     /** Canonical frontend URL. */
     readonly NEXT_PUBLIC_SITE_URL: string;
-    /** Application display name. */
+    /** Application display name (full). */
     readonly NEXT_PUBLIC_SITE_NAME?: string;
+    /** Short application name for PWA, browser tabs, mobile home screen. */
+    readonly NEXT_PUBLIC_APP_NAME?: string;
     /** Application description for SEO. */
     readonly NEXT_PUBLIC_SITE_DESCRIPTION?: string;
 

@@ -12,6 +12,8 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_SITE_NAME:
       process.env.NEXT_PUBLIC_SITE_NAME || 'LankaCommerce Cloud',
+    NEXT_PUBLIC_APP_NAME:
+      process.env.NEXT_PUBLIC_APP_NAME || 'LCC',
     NEXT_PUBLIC_DEFAULT_CURRENCY:
       process.env.NEXT_PUBLIC_DEFAULT_CURRENCY || 'LKR',
     NEXT_PUBLIC_DEFAULT_TIMEZONE:

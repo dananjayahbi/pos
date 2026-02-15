@@ -61,9 +61,13 @@ const clientSchema = z.object({
   // ── API (browser → backend) ─────────────────────────────────────────
   NEXT_PUBLIC_API_URL: z.string().url().default('http://localhost:8000/api/v1'),
 
+  // ── WebSocket (real-time features) ──────────────────────────────────
+  NEXT_PUBLIC_WS_URL: z.string().default('ws://localhost:8000/ws'),
+
   // ── Site ────────────────────────────────────────────────────────────
   NEXT_PUBLIC_SITE_URL: z.string().url().default('http://localhost:3000'),
   NEXT_PUBLIC_SITE_NAME: z.string().default('LankaCommerce Cloud'),
+  NEXT_PUBLIC_APP_NAME: z.string().default('LCC'),
   NEXT_PUBLIC_SITE_DESCRIPTION: z
     .string()
     .default('Multi-tenant SaaS ERP for Sri Lankan SMEs'),
