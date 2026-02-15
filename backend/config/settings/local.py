@@ -11,8 +11,9 @@ Usage:
     Set DJANGO_ENV=local (default) or run without setting it.
 """
 
-import os
+import os  # noqa: F401
 
+from config.env import env  # noqa: F401
 from config.settings.base import *  # noqa: F401, F403
 
 
@@ -22,15 +23,15 @@ from config.settings.base import *  # noqa: F401, F403
 
 DEBUG = True
 
-SECRET_KEY = os.environ.get(
+SECRET_KEY = env(
     "DJANGO_SECRET_KEY",
-    "django-insecure-local-dev-key-do-not-use-in-production",
+    default="django-insecure-local-dev-key-do-not-use-in-production",
 )
 
-ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS",
-    "localhost,127.0.0.1,0.0.0.0",
-).split(",")
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS",
+    default=["localhost", "127.0.0.1", "0.0.0.0"],
+)
 
 # Required for django-debug-toolbar
 INTERNAL_IPS = [
@@ -60,12 +61,12 @@ MIDDLEWARE += [  # noqa: F405
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.environ.get("DB_NAME", "llc-dev"),
-        "USER": os.environ.get("DB_USER", "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "postgres"),
-        "HOST": os.environ.get("DB_HOST", "db"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+        "ENGINE": env("DB_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": env("DB_NAME", default="llc-dev"),
+        "USER": env("DB_USER", default="postgres"),
+        "PASSWORD": env("DB_PASSWORD", default="postgres"),
+        "HOST": env("DB_HOST", default="db"),
+        "PORT": env.int("DB_PORT", default=5432),
         "OPTIONS": {
             "connect_timeout": 5,
         },

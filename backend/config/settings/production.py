@@ -12,8 +12,9 @@ Required environment variables:
     SENTRY_DSN              - (optional) Sentry error tracking
 """
 
-import os
+import os  # noqa: F401
 
+from config.env import env  # noqa: F401
 from config.settings.base import *  # noqa: F401, F403
 
 
@@ -23,9 +24,9 @@ from config.settings.base import *  # noqa: F401, F403
 
 DEBUG = False
 
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 # ── HTTPS ──────────────────────────────────────────────────────────────
 SECURE_SSL_REDIRECT = True
@@ -48,9 +49,9 @@ SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 
 # ── CSRF trusted origins ──────────────────────────────────────────────
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    "CSRF_TRUSTED_ORIGINS", ""
-).split(",")
+CSRF_TRUSTED_ORIGINS = env.list(
+    "CSRF_TRUSTED_ORIGINS", default=[],
+)
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -63,16 +64,16 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.postgresql"),
-        "NAME": os.environ.get("DB_NAME", "lankacommerce"),
-        "USER": os.environ.get("DB_USER", "lcc_user"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+        "ENGINE": env("DB_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": env("DB_NAME", default="lankacommerce"),
+        "USER": env("DB_USER", default="lcc_user"),
+        "PASSWORD": env("DB_PASSWORD", default=""),
+        "HOST": env("DB_HOST", default="localhost"),
+        "PORT": env.int("DB_PORT", default=5432),
         "CONN_MAX_AGE": 60,
         "CONN_HEALTH_CHECKS": True,
         "OPTIONS": {
-            "sslmode": os.environ.get("DB_SSLMODE", "require"),
+            "sslmode": env("DB_SSLMODE", default="require"),
         },
     }
 }
@@ -91,7 +92,7 @@ DATABASES = {
 # CACHING — Redis  (Task 34)
 # ════════════════════════════════════════════════════════════════════════
 
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+REDIS_URL = env("REDIS_URL")
 
 CACHES = {
     "default": {
@@ -111,8 +112,8 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
 # ── Celery broker ─────────────────────────────────────────────────────
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", REDIS_URL)
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", REDIS_URL)
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 
 
 # ── Channel Layers (Redis-backed) ────────────────────────────────────
@@ -120,7 +121,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get("REDIS_URL", REDIS_URL)],
+            "hosts": [env("REDIS_URL")],
             "capacity": 1500,
             "expiry": 10,
         },
@@ -133,12 +134,12 @@ CHANNEL_LAYERS = {
 # ════════════════════════════════════════════════════════════════════════
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@lankacommerce.lk")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@lankacommerce.lk")
 EMAIL_SUBJECT_PREFIX = "[LCC] "
 
 
@@ -155,7 +156,7 @@ EMAIL_SUBJECT_PREFIX = "[LCC] "
 # ERROR TRACKING — Sentry (optional)
 # ════════════════════════════════════════════════════════════════════════
 
-SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+SENTRY_DSN = env("SENTRY_DSN", default="")
 if SENTRY_DSN:
     import sentry_sdk  # noqa: E402
     from sentry_sdk.integrations.django import DjangoIntegration  # noqa: E402
@@ -163,7 +164,7 @@ if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        traces_sample_rate=float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0.1")),
+        traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.1),
         send_default_pii=False,
     )
 

@@ -17,7 +17,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 import os  # noqa: F401
 from pathlib import Path
 
-import environ  # django-environ
+from config.env import BASE_DIR, env  # Centralized env loader
+
 
 # ── Future imports (uncomment when packages are installed) ──────────────
 # import dj_database_url                        # database URL parsing
@@ -26,36 +27,20 @@ import environ  # django-environ
 # ════════════════════════════════════════════════════════════════════════
 # PATH CONFIGURATION
 # ════════════════════════════════════════════════════════════════════════
-# __file__  → base.py
-# .parent   → config/settings/
-# .parent   → config/
-# .parent   → backend/   ← this is BASE_DIR
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# ── django-environ: read .env file if present ───────────────────────────
-env = environ.Env(
-    DEBUG=(bool, False),
-    DJANGO_SECRET_KEY=(str, "django-insecure-CHANGE-ME-IN-ENVIRONMENT-SETTINGS"),
-    ALLOWED_HOSTS=(list, []),
-)
-# Read .env file from project root (backend/)
-env_file = BASE_DIR / ".env"
-if env_file.is_file():
-    env.read_env(str(env_file))
+# BASE_DIR is imported from config.env and points to backend/
 
 
 # ════════════════════════════════════════════════════════════════════════
 # SECURITY — SECRET KEY / DEBUG / HOSTS
 # ════════════════════════════════════════════════════════════════════════
-# These are placeholders; they will be overridden by environment-specific
-# settings files. NEVER deploy with these values.
+# These use the centralized env loader from config.env.
+# Defaults are defined there; override via .env or system env vars.
 
-SECRET_KEY = "django-insecure-CHANGE-ME-IN-ENVIRONMENT-SETTINGS"
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
-DEBUG = False  # Overridden in local.py / test.py
+DEBUG = env.bool("DEBUG")
 
-ALLOWED_HOSTS: list[str] = []  # Overridden per environment
+ALLOWED_HOSTS: list[str] = env.list("ALLOWED_HOSTS")
 
 
 # ════════════════════════════════════════════════════════════════════════
