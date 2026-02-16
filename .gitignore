@@ -300,6 +300,7 @@ nppBackup/
 *.sql
 *.dump
 !migrations/*.sql
+!docker/postgres/init/*.sql
 
 # -------------------------------------------------
 # Media and Uploads

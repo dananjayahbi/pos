@@ -59,10 +59,16 @@ CORS_ALLOW_CREDENTIALS = env.bool("CORS_ALLOW_CREDENTIALS")
 
 
 # ════════════════════════════════════════════════════════════════════════
-# DATABASE  (Task 33)
+# DATABASE  (Task 33 — Updated for PgBouncer in Phase 2)
 # ════════════════════════════════════════════════════════════════════════
-# In production, DATABASE_URL is the canonical source of truth.
-# Format: postgres://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require
+# In production, all application traffic routes through PgBouncer for
+# connection pooling. PgBouncer uses transaction pooling mode.
+#
+# CONN_MAX_AGE must be 0 with transaction pooling — persistent
+# connections would leak tenant search_path between requests.
+#
+# DISABLE_SERVER_SIDE_CURSORS must be True because PgBouncer does not
+# support server-side cursors in transaction pooling mode.
 #
 # Phase 2 will switch ENGINE to django_tenants.postgresql_backend.
 
@@ -72,10 +78,11 @@ DATABASES = {
         "NAME": env("DB_NAME", default="lankacommerce"),
         "USER": env("DB_USER", default="lcc_user"),
         "PASSWORD": env("DB_PASSWORD", default=""),
-        "HOST": env("DB_HOST", default="localhost"),
-        "PORT": env.int("DB_PORT", default=5432),
-        "CONN_MAX_AGE": 60,
+        "HOST": env("DB_HOST", default="pgbouncer"),
+        "PORT": env.int("DB_PORT", default=6432),
+        "CONN_MAX_AGE": 0,
         "CONN_HEALTH_CHECKS": True,
+        "DISABLE_SERVER_SIDE_CURSORS": True,
         "OPTIONS": {
             "sslmode": env("DB_SSLMODE", default="require"),
         },

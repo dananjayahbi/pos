@@ -61,7 +61,20 @@
 
 ---
 
-## 🔒 Security & Secrets
+## � Database Documentation
+
+| Document                                                          | Description                                               |
+| ----------------------------------------------------------------- | --------------------------------------------------------- |
+| [Schema Naming & Multi-Tenancy Layout](database/schema-naming.md) | Tenant schema naming, public schema baseline, search_path |
+| [PgBouncer Connection Pooling](database/pgbouncer.md)             | Connection pooling configuration, Django integration      |
+| [Indexing Guidelines](database/indexing-guidelines.md)            | Index strategy, naming conventions, monitoring            |
+| [Performance Tuning Guide](database/performance-tuning.md)        | All tuning parameters, rationale, and checklist           |
+| [Backup and Recovery Procedures](database/backup-procedures.md)   | Backup strategy, restore workflows, WAL archiving         |
+| [Monitoring Queries](database/monitoring-queries.md)              | Database health, performance, and capacity monitoring     |
+
+---
+
+## �🔒 Security & Secrets
 
 | Document                          | Description                                                      |
 | --------------------------------- | ---------------------------------------------------------------- |
@@ -155,6 +168,13 @@ docs/
 │   ├── apps.md
 │   ├── models.md
 │   └── api.md
+├── database/             # Database architecture docs
+│   ├── schema-naming.md
+│   ├── pgbouncer.md
+│   ├── indexing-guidelines.md
+│   ├── performance-tuning.md
+│   ├── backup-procedures.md
+│   └── monitoring-queries.md
 ├── frontend/             # Frontend technical docs
 │   ├── README.md
 │   ├── components.md

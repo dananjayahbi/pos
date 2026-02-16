@@ -25,7 +25,7 @@ services:
       - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-config.settings.local}
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-docker-dev-secret-change-me-in-production}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,backend,0.0.0.0}
-      - DATABASE_URL=${DATABASE_URL:-postgres://lcc_user:dev_password_change_me@db:5432/lankacommerce}
+      - DATABASE_URL=${DATABASE_URL:-postgres://lcc_user:dev_password_change_me@pgbouncer:6432/lankacommerce}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
     env_file:
@@ -33,7 +33,7 @@ services:
     networks:
       - lcc-network
     depends_on:
-      db:
+      pgbouncer:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -90,17 +90,43 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres-wal-archive:/var/lib/postgresql/wal_archive
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
       - ./docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./docker/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-lankacommerce}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dev_password_change_me}
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
     networks:
       - lcc-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lankacommerce}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  # -------------------------------------------------
+  # PgBouncer - Connection Pooler
+  # -------------------------------------------------
+  pgbouncer:
+    image: edoburu/pgbouncer:1.23.1-p2
+    container_name: lcc-pgbouncer
+    ports:
+      - "6432:6432"
+    volumes:
+      - ./docker/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./docker/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+    networks:
+      - lcc-network
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 6432 -U lcc_user -d lankacommerce || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -151,7 +177,7 @@ services:
     networks:
       - lcc-network
     depends_on:
-      db:
+      pgbouncer:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -186,7 +212,7 @@ services:
     networks:
       - lcc-network
     depends_on:
-      db:
+      pgbouncer:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -233,6 +259,9 @@ networks:
 volumes:
   postgres-data:
     name: lcc-postgres-data
+    driver: local
+  postgres-wal-archive:
+    name: lcc-postgres-wal-archive
     driver: local
   redis-data:
     name: lcc-redis-data

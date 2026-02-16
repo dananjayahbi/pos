@@ -272,15 +272,44 @@ seed: ## Seed the database with sample data
 	$(MANAGE) loaddata fixtures/*.json
 	@echo "Database seeded successfully."
 
-backup: ## Backup the database
-	@mkdir -p backups
-	$(COMPOSE) exec db pg_dump -U lcc_user lcc_dev > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
-	@echo "Database backup created."
+backup: ## Backup the database (comprehensive, with retention)
+	@bash scripts/db-backup.sh
+	@echo "Database backup completed. See backups/ directory."
 
-restore: ## Restore the database from the latest backup
-	@echo "Restoring from latest backup..."
-	$(COMPOSE) exec -T db psql -U lcc_user lcc_dev < $$(ls -t backups/*.sql | head -1)
-	@echo "Database restored."
+backup-all: ## Backup all databases (main + test)
+	@bash scripts/db-backup.sh --all
+	@echo "All database backups completed."
+
+restore: ## Restore the database from a backup file (usage: make restore f=backups/daily/lankacommerce_20250101_120000.dump)
+	@if [ -z "$(f)" ]; then \
+		echo "Usage: make restore f=<backup_file>"; \
+		echo "  Latest backup: backups/latest/lankacommerce_latest.dump"; \
+		exit 1; \
+	fi
+	@bash scripts/db-restore.sh $(f)
+	@echo "Database restore completed."
+
+restore-latest: ## Restore the database from the latest backup
+	@bash scripts/db-restore.sh backups/latest/lankacommerce_latest.dump
+	@echo "Database restored from latest backup."
+
+backup-list: ## List available backup files
+	@echo ""
+	@echo "Available Backups:"
+	@echo "=================="
+	@echo ""
+	@echo "Latest:"
+	@ls -lh backups/latest/*.dump 2>/dev/null || echo "  (none)"
+	@echo ""
+	@echo "Daily:"
+	@ls -lh backups/daily/*.dump 2>/dev/null || echo "  (none)"
+	@echo ""
+	@echo "Weekly:"
+	@ls -lh backups/weekly/*.dump 2>/dev/null || echo "  (none)"
+	@echo ""
+	@echo "Monthly:"
+	@ls -lh backups/monthly/*.dump 2>/dev/null || echo "  (none)"
+	@echo ""
 
 # =============================================================================
 # Production Commands

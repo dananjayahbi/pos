@@ -52,21 +52,31 @@ MIDDLEWARE += [  # noqa: F405
 
 
 # ════════════════════════════════════════════════════════════════════════
-# DATABASE  (Task 30)
+# DATABASE  (Task 30 — Updated for PgBouncer in Phase 2)
 # ════════════════════════════════════════════════════════════════════════
-# Connects to PostgreSQL. Reads credentials from environment variables
-# with sensible defaults for local Docker development.
+# Application traffic routes through PgBouncer (port 6432) for
+# connection pooling. PgBouncer uses transaction pooling mode, which
+# is required for django-tenants search_path isolation.
+#
+# CONN_MAX_AGE must be 0 with transaction pooling — persistent
+# connections would leak tenant search_path between requests.
+#
+# DISABLE_SERVER_SIDE_CURSORS must be True because PgBouncer does not
+# support server-side cursors in transaction pooling mode.
 #
 # In Phase 2 the ENGINE will change to django_tenants.postgresql_backend.
 
 DATABASES = {
     "default": {
         "ENGINE": env("DB_ENGINE", default="django.db.backends.postgresql"),
-        "NAME": env("DB_NAME", default="llc-dev"),
-        "USER": env("DB_USER", default="postgres"),
-        "PASSWORD": env("DB_PASSWORD", default="postgres"),
-        "HOST": env("DB_HOST", default="db"),
-        "PORT": env.int("DB_PORT", default=5432),
+        "NAME": env("DB_NAME", default="lankacommerce"),
+        "USER": env("DB_USER", default="lcc_user"),
+        "PASSWORD": env("DB_PASSWORD", default="dev_password_change_me"),
+        "HOST": env("DB_HOST", default="pgbouncer"),
+        "PORT": env.int("DB_PORT", default=6432),
+        "CONN_MAX_AGE": 0,
+        "CONN_HEALTH_CHECKS": True,
+        "DISABLE_SERVER_SIDE_CURSORS": True,
         "OPTIONS": {
             "connect_timeout": 5,
         },
