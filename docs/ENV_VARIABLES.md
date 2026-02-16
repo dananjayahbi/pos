@@ -37,33 +37,33 @@
 
 ### Naming Conventions
 
-| Prefix / Pattern | Scope | Example |
-|---|---|---|
-| `DJANGO_*` | Django framework settings | `DJANGO_SECRET_KEY` |
-| `DB_*` | Database connection | `DB_HOST`, `DB_PORT` |
-| `CELERY_*` | Celery task queue | `CELERY_BROKER_URL` |
-| `NEXT_PUBLIC_*` | Frontend — **exposed to browser** | `NEXT_PUBLIC_API_URL` |
-| *(no prefix)* | Frontend server-side only | `API_BASE_URL`, `NEXTAUTH_SECRET` |
-| `POSTGRES_*` | Docker Postgres init only | `POSTGRES_DB` |
-| `AWS_*` | AWS / S3 storage | `AWS_ACCESS_KEY_ID` |
+| Prefix / Pattern | Scope                             | Example                           |
+| ---------------- | --------------------------------- | --------------------------------- |
+| `DJANGO_*`       | Django framework settings         | `DJANGO_SECRET_KEY`               |
+| `DB_*`           | Database connection               | `DB_HOST`, `DB_PORT`              |
+| `CELERY_*`       | Celery task queue                 | `CELERY_BROKER_URL`               |
+| `NEXT_PUBLIC_*`  | Frontend — **exposed to browser** | `NEXT_PUBLIC_API_URL`             |
+| _(no prefix)_    | Frontend server-side only         | `API_BASE_URL`, `NEXTAUTH_SECRET` |
+| `POSTGRES_*`     | Docker Postgres init only         | `POSTGRES_DB`                     |
+| `AWS_*`          | AWS / S3 storage                  | `AWS_ACCESS_KEY_ID`               |
 
 ### Value Types
 
-| Type | Format | Examples |
-|---|---|---|
-| `str` | Plain string | `config.settings.local` |
-| `bool` | `True` / `False` (backend) or `true` / `false` (frontend) | `True`, `false` |
-| `int` | Integer number | `5432`, `30` |
-| `float` | Decimal number | `0.1` |
-| `list` | Comma-separated values | `localhost,127.0.0.1,.lankacommerce.lk` |
+| Type    | Format                                                    | Examples                                |
+| ------- | --------------------------------------------------------- | --------------------------------------- |
+| `str`   | Plain string                                              | `config.settings.local`                 |
+| `bool`  | `True` / `False` (backend) or `true` / `false` (frontend) | `True`, `false`                         |
+| `int`   | Integer number                                            | `5432`, `30`                            |
+| `float` | Decimal number                                            | `0.1`                                   |
+| `list`  | Comma-separated values                                    | `localhost,127.0.0.1,.lankacommerce.lk` |
 
 ### Required Status Legend
 
-| Label | Meaning |
-|---|---|
-| **Yes** | Always required in every environment |
-| **Yes (prod)** | Required in production; optional locally |
-| **No** | Optional; sensible default provided |
+| Label               | Meaning                                   |
+| ------------------- | ----------------------------------------- |
+| **Yes**             | Always required in every environment      |
+| **Yes (prod)**      | Required in production; optional locally  |
+| **No**              | Optional; sensible default provided       |
 | **For \<feature\>** | Required only when the feature is enabled |
 
 ### General Rules
@@ -82,13 +82,13 @@
 
 ### Security
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `DJANGO_SECRET_KEY` | str | `django-insecure-CHANGE-ME` | Yes (prod) | Django cryptographic signing key used for sessions, tokens, and CSRF. **Must** be a unique, unpredictable value in production. |
-| `DEBUG` | bool | `False` | No | Enable Django debug mode. **Never** enable in production. |
-| `ALLOWED_HOSTS` | list | `[]` | Yes (prod) | Comma-separated list of hostnames the server will respond to. |
-| `DJANGO_SETTINGS_MODULE` | str | `config.settings.local` | Yes | Python path to the active settings module. |
-| `LOG_LEVEL` | str | `INFO` | No | Root logger level. One of `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`. |
+| Variable                 | Type | Default                     | Required   | Description                                                                                                                    |
+| ------------------------ | ---- | --------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `DJANGO_SECRET_KEY`      | str  | `django-insecure-CHANGE-ME` | Yes (prod) | Django cryptographic signing key used for sessions, tokens, and CSRF. **Must** be a unique, unpredictable value in production. |
+| `DEBUG`                  | bool | `False`                     | No         | Enable Django debug mode. **Never** enable in production.                                                                      |
+| `ALLOWED_HOSTS`          | list | `[]`                        | Yes (prod) | Comma-separated list of hostnames the server will respond to.                                                                  |
+| `DJANGO_SETTINGS_MODULE` | str  | `config.settings.local`     | Yes        | Python path to the active settings module.                                                                                     |
+| `LOG_LEVEL`              | str  | `INFO`                      | No         | Root logger level. One of `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`.                                                     |
 
 **Example:**
 
@@ -104,15 +104,15 @@ LOG_LEVEL=WARNING
 
 ### Database
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `DATABASE_URL` | str | `postgres://postgres:postgres@localhost:5432/lankacommerce` | Yes | Full PostgreSQL connection URL. Takes precedence over individual `DB_*` vars. |
-| `DB_ENGINE` | str | `django.db.backends.postgresql` | No | Django database engine. |
-| `DB_HOST` | str | `localhost` | No | Database server hostname. |
-| `DB_PORT` | int | `5432` | No | Database server port. |
-| `DB_NAME` | str | `lankacommerce_dev` | No | Database name. |
-| `DB_USER` | str | `lcc_user` | No | Database username. |
-| `DB_PASSWORD` | str | *(empty)* | Yes (prod) | Database password. |
+| Variable       | Type | Default                                                     | Required   | Description                                                                   |
+| -------------- | ---- | ----------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
+| `DATABASE_URL` | str  | `postgres://postgres:postgres@localhost:5432/lankacommerce` | Yes        | Full PostgreSQL connection URL. Takes precedence over individual `DB_*` vars. |
+| `DB_ENGINE`    | str  | `django.db.backends.postgresql`                             | No         | Django database engine.                                                       |
+| `DB_HOST`      | str  | `localhost`                                                 | No         | Database server hostname.                                                     |
+| `DB_PORT`      | int  | `5432`                                                      | No         | Database server port.                                                         |
+| `DB_NAME`      | str  | `lankacommerce_dev`                                         | No         | Database name.                                                                |
+| `DB_USER`      | str  | `lcc_user`                                                  | No         | Database username.                                                            |
+| `DB_PASSWORD`  | str  | _(empty)_                                                   | Yes (prod) | Database password.                                                            |
 
 > **Note:** When `DATABASE_URL` is provided, the individual `DB_*` variables are ignored.
 
@@ -126,10 +126,10 @@ DATABASE_URL=postgres://lcc_user:strong_password@db:5432/lankacommerce
 
 ### Redis / Cache
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `REDIS_URL` | str | `redis://localhost:6379/0` | Yes | Primary Redis connection URL. |
-| `CACHE_URL` | str | `redis://localhost:6379/1` | No | Django cache backend URL (uses a separate Redis DB index). |
+| Variable    | Type | Default                    | Required | Description                                                |
+| ----------- | ---- | -------------------------- | -------- | ---------------------------------------------------------- |
+| `REDIS_URL` | str  | `redis://localhost:6379/0` | Yes      | Primary Redis connection URL.                              |
+| `CACHE_URL` | str  | `redis://localhost:6379/1` | No       | Django cache backend URL (uses a separate Redis DB index). |
 
 **Example:**
 
@@ -142,15 +142,15 @@ CACHE_URL=redis://redis:6379/1
 
 ### Celery
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `CELERY_BROKER_URL` | str | `redis://localhost:6379/0` | Yes | Message broker URL for Celery workers. |
-| `CELERY_RESULT_BACKEND` | str | `redis://localhost:6379/0` | No | Backend for storing task results. |
-| `CELERY_APP` | str | `config.celery:app` | No | Python path to the Celery application instance. |
-| `CELERY_CONCURRENCY` | int | `2` | No | Number of concurrent worker processes/threads. |
-| `CELERY_LOG_LEVEL` | str | `info` | No | Celery worker log level. |
-| `CELERY_QUEUES` | str | `default,high_priority,low_priority` | No | Comma-separated list of queues the worker consumes. |
-| `CELERY_BEAT_SCHEDULER` | str | `django_celery_beat.schedulers:DatabaseScheduler` | No | Scheduler class for periodic tasks. |
+| Variable                | Type | Default                                           | Required | Description                                         |
+| ----------------------- | ---- | ------------------------------------------------- | -------- | --------------------------------------------------- |
+| `CELERY_BROKER_URL`     | str  | `redis://localhost:6379/0`                        | Yes      | Message broker URL for Celery workers.              |
+| `CELERY_RESULT_BACKEND` | str  | `redis://localhost:6379/0`                        | No       | Backend for storing task results.                   |
+| `CELERY_APP`            | str  | `config.celery:app`                               | No       | Python path to the Celery application instance.     |
+| `CELERY_CONCURRENCY`    | int  | `2`                                               | No       | Number of concurrent worker processes/threads.      |
+| `CELERY_LOG_LEVEL`      | str  | `info`                                            | No       | Celery worker log level.                            |
+| `CELERY_QUEUES`         | str  | `default,high_priority,low_priority`              | No       | Comma-separated list of queues the worker consumes. |
+| `CELERY_BEAT_SCHEDULER` | str  | `django_celery_beat.schedulers:DatabaseScheduler` | No       | Scheduler class for periodic tasks.                 |
 
 **Example:**
 
@@ -166,15 +166,15 @@ CELERY_QUEUES=default,high_priority,low_priority
 
 ### Email / SMTP
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `EMAIL_BACKEND` | str | `django.core.mail.backends.console.EmailBackend` | No | Email backend class. Use `django.core.mail.backends.smtp.EmailBackend` in production. |
-| `EMAIL_HOST` | str | `smtp.gmail.com` | No | SMTP server hostname. |
-| `EMAIL_PORT` | int | `587` | No | SMTP server port. |
-| `EMAIL_HOST_USER` | str | *(empty)* | Yes (prod) | SMTP authentication username. |
-| `EMAIL_HOST_PASSWORD` | str | *(empty)* | Yes (prod) | SMTP authentication password or app-specific password. |
-| `EMAIL_USE_TLS` | bool | `True` | No | Enable STARTTLS for the SMTP connection. |
-| `DEFAULT_FROM_EMAIL` | str | `noreply@lankacommerce.lk` | No | Default "From" address for outgoing emails. |
+| Variable              | Type | Default                                          | Required   | Description                                                                           |
+| --------------------- | ---- | ------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------- |
+| `EMAIL_BACKEND`       | str  | `django.core.mail.backends.console.EmailBackend` | No         | Email backend class. Use `django.core.mail.backends.smtp.EmailBackend` in production. |
+| `EMAIL_HOST`          | str  | `smtp.gmail.com`                                 | No         | SMTP server hostname.                                                                 |
+| `EMAIL_PORT`          | int  | `587`                                            | No         | SMTP server port.                                                                     |
+| `EMAIL_HOST_USER`     | str  | _(empty)_                                        | Yes (prod) | SMTP authentication username.                                                         |
+| `EMAIL_HOST_PASSWORD` | str  | _(empty)_                                        | Yes (prod) | SMTP authentication password or app-specific password.                                |
+| `EMAIL_USE_TLS`       | bool | `True`                                           | No         | Enable STARTTLS for the SMTP connection.                                              |
+| `DEFAULT_FROM_EMAIL`  | str  | `noreply@lankacommerce.lk`                       | No         | Default "From" address for outgoing emails.                                           |
 
 **Example (production):**
 
@@ -192,14 +192,14 @@ DEFAULT_FROM_EMAIL="LankaCommerce <noreply@lankacommerce.lk>"
 
 ### AWS / S3
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `AWS_ACCESS_KEY_ID` | str | *(empty)* | For S3 | IAM access key ID. |
-| `AWS_SECRET_ACCESS_KEY` | str | *(empty)* | For S3 | IAM secret access key. |
-| `AWS_STORAGE_BUCKET_NAME` | str | `lcc-media-dev` | For S3 | S3 bucket name for media uploads. |
-| `AWS_S3_REGION_NAME` | str | `ap-south-1` | For S3 | AWS region (Mumbai is closest to Sri Lanka). |
-| `AWS_S3_ENDPOINT_URL` | str | *(empty)* | For S3-compat | Custom endpoint for S3-compatible stores (e.g., MinIO, DigitalOcean Spaces). |
-| `DEFAULT_FILE_STORAGE` | str | `django.core.files.storage.FileSystemStorage` | No | Django file storage backend. Set to `storages.backends.s3boto3.S3Boto3Storage` for S3. |
+| Variable                  | Type | Default                                       | Required      | Description                                                                            |
+| ------------------------- | ---- | --------------------------------------------- | ------------- | -------------------------------------------------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`       | str  | _(empty)_                                     | For S3        | IAM access key ID.                                                                     |
+| `AWS_SECRET_ACCESS_KEY`   | str  | _(empty)_                                     | For S3        | IAM secret access key.                                                                 |
+| `AWS_STORAGE_BUCKET_NAME` | str  | `lcc-media-dev`                               | For S3        | S3 bucket name for media uploads.                                                      |
+| `AWS_S3_REGION_NAME`      | str  | `ap-south-1`                                  | For S3        | AWS region (Mumbai is closest to Sri Lanka).                                           |
+| `AWS_S3_ENDPOINT_URL`     | str  | _(empty)_                                     | For S3-compat | Custom endpoint for S3-compatible stores (e.g., MinIO, DigitalOcean Spaces).           |
+| `DEFAULT_FILE_STORAGE`    | str  | `django.core.files.storage.FileSystemStorage` | No            | Django file storage backend. Set to `storages.backends.s3boto3.S3Boto3Storage` for S3. |
 
 **Example (production with S3):**
 
@@ -215,10 +215,10 @@ DEFAULT_FILE_STORAGE=storages.backends.s3boto3.S3Boto3Storage
 
 ### CORS
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `CORS_ALLOWED_ORIGINS` | list | `http://localhost:3000` | Yes | Comma-separated list of origins permitted for cross-origin requests. |
-| `CORS_ALLOW_CREDENTIALS` | bool | `True` | No | Whether cookies and auth headers are allowed in cross-origin requests. |
+| Variable                 | Type | Default                 | Required | Description                                                            |
+| ------------------------ | ---- | ----------------------- | -------- | ---------------------------------------------------------------------- |
+| `CORS_ALLOWED_ORIGINS`   | list | `http://localhost:3000` | Yes      | Comma-separated list of origins permitted for cross-origin requests.   |
+| `CORS_ALLOW_CREDENTIALS` | bool | `True`                  | No       | Whether cookies and auth headers are allowed in cross-origin requests. |
 
 **Example:**
 
@@ -231,12 +231,12 @@ CORS_ALLOW_CREDENTIALS=True
 
 ### JWT
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `JWT_ACCESS_TOKEN_LIFETIME_MINUTES` | int | `30` | No | Access token validity in minutes. |
-| `JWT_REFRESH_TOKEN_LIFETIME_DAYS` | int | `7` | No | Refresh token validity in days. |
-| `JWT_ROTATE_REFRESH_TOKENS` | bool | `True` | No | Issue a new refresh token on each refresh. |
-| `JWT_BLACKLIST_AFTER_ROTATION` | bool | `True` | No | Blacklist the old refresh token after rotation. |
+| Variable                            | Type | Default | Required | Description                                     |
+| ----------------------------------- | ---- | ------- | -------- | ----------------------------------------------- |
+| `JWT_ACCESS_TOKEN_LIFETIME_MINUTES` | int  | `30`    | No       | Access token validity in minutes.               |
+| `JWT_REFRESH_TOKEN_LIFETIME_DAYS`   | int  | `7`     | No       | Refresh token validity in days.                 |
+| `JWT_ROTATE_REFRESH_TOKENS`         | bool | `True`  | No       | Issue a new refresh token on each refresh.      |
+| `JWT_BLACKLIST_AFTER_ROTATION`      | bool | `True`  | No       | Blacklist the old refresh token after rotation. |
 
 **Example:**
 
@@ -251,11 +251,11 @@ JWT_BLACKLIST_AFTER_ROTATION=True
 
 ### Sentry
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `SENTRY_DSN` | str | *(empty)* | For monitoring | Sentry project DSN (Data Source Name). |
-| `SENTRY_ENVIRONMENT` | str | `local` | No | Environment tag sent with every event (e.g., `local`, `staging`, `production`). |
-| `SENTRY_TRACES_SAMPLE_RATE` | float | `0.1` | No | Percentage of transactions to trace (`0.0` – `1.0`). |
+| Variable                    | Type  | Default   | Required       | Description                                                                     |
+| --------------------------- | ----- | --------- | -------------- | ------------------------------------------------------------------------------- |
+| `SENTRY_DSN`                | str   | _(empty)_ | For monitoring | Sentry project DSN (Data Source Name).                                          |
+| `SENTRY_ENVIRONMENT`        | str   | `local`   | No             | Environment tag sent with every event (e.g., `local`, `staging`, `production`). |
+| `SENTRY_TRACES_SAMPLE_RATE` | float | `0.1`     | No             | Percentage of transactions to trace (`0.0` – `1.0`).                            |
 
 **Example:**
 
@@ -269,12 +269,12 @@ SENTRY_TRACES_SAMPLE_RATE=0.2
 
 ### Stripe
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `STRIPE_SECRET_KEY` | str | *(empty)* | For payments | Stripe secret key (`sk_test_...` or `sk_live_...`). |
-| `STRIPE_PUBLISHABLE_KEY` | str | *(empty)* | For payments | Stripe publishable key (`pk_test_...` or `pk_live_...`). |
-| `STRIPE_WEBHOOK_SECRET` | str | *(empty)* | For webhooks | Stripe webhook signing secret (`whsec_...`). |
-| `STRIPE_API_VERSION` | str | `2024-06-20` | No | Pinned Stripe API version for deterministic behavior. |
+| Variable                 | Type | Default      | Required     | Description                                              |
+| ------------------------ | ---- | ------------ | ------------ | -------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`      | str  | _(empty)_    | For payments | Stripe secret key (`sk_test_...` or `sk_live_...`).      |
+| `STRIPE_PUBLISHABLE_KEY` | str  | _(empty)_    | For payments | Stripe publishable key (`pk_test_...` or `pk_live_...`). |
+| `STRIPE_WEBHOOK_SECRET`  | str  | _(empty)_    | For webhooks | Stripe webhook signing secret (`whsec_...`).             |
+| `STRIPE_API_VERSION`     | str  | `2024-06-20` | No           | Pinned Stripe API version for deterministic behavior.    |
 
 **Example:**
 
@@ -289,52 +289,52 @@ STRIPE_API_VERSION=2024-06-20
 
 ### SMS
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `SMS_PROVIDER` | str | *(empty)* | For SMS | SMS gateway provider name. |
-| `SMS_API_KEY` | str | *(empty)* | For SMS | Provider API key. |
-| `SMS_SENDER_ID` | str | `LCC` | No | Sender ID displayed on the recipient's device. |
+| Variable        | Type | Default   | Required | Description                                    |
+| --------------- | ---- | --------- | -------- | ---------------------------------------------- |
+| `SMS_PROVIDER`  | str  | _(empty)_ | For SMS  | SMS gateway provider name.                     |
+| `SMS_API_KEY`   | str  | _(empty)_ | For SMS  | Provider API key.                              |
+| `SMS_SENDER_ID` | str  | `LCC`     | No       | Sender ID displayed on the recipient's device. |
 
 ---
 
 ### AI / OpenAI
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `OPENAI_API_KEY` | str | *(empty)* | For AI | OpenAI API key. |
-| `OPENAI_MODEL` | str | `gpt-4o-mini` | No | Model identifier for AI requests. |
-| `OPENAI_MAX_TOKENS` | int | `4096` | No | Maximum tokens per completion request. |
+| Variable            | Type | Default       | Required | Description                            |
+| ------------------- | ---- | ------------- | -------- | -------------------------------------- |
+| `OPENAI_API_KEY`    | str  | _(empty)_     | For AI   | OpenAI API key.                        |
+| `OPENAI_MODEL`      | str  | `gpt-4o-mini` | No       | Model identifier for AI requests.      |
+| `OPENAI_MAX_TOKENS` | int  | `4096`        | No       | Maximum tokens per completion request. |
 
 ---
 
 ### Site / App
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `SITE_NAME` | str | `LankaCommerce Cloud` | No | Application display name. |
-| `SITE_URL` | str | `http://localhost:3000` | No | Canonical frontend URL (used for emails, links). |
-| `SUPPORT_EMAIL` | str | `support@lankacommerce.lk` | No | Support contact email address. |
-| `LANGUAGE_CODE` | str | `en-us` | No | Django i18n default language. |
-| `TIME_ZONE` | str | `Asia/Colombo` | No | IANA timezone for the application. |
+| Variable        | Type | Default                    | Required | Description                                      |
+| --------------- | ---- | -------------------------- | -------- | ------------------------------------------------ |
+| `SITE_NAME`     | str  | `LankaCommerce Cloud`      | No       | Application display name.                        |
+| `SITE_URL`      | str  | `http://localhost:3000`    | No       | Canonical frontend URL (used for emails, links). |
+| `SUPPORT_EMAIL` | str  | `support@lankacommerce.lk` | No       | Support contact email address.                   |
+| `LANGUAGE_CODE` | str  | `en-us`                    | No       | Django i18n default language.                    |
+| `TIME_ZONE`     | str  | `Asia/Colombo`             | No       | IANA timezone for the application.               |
 
 ---
 
 ### Multi-Tenancy
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `TENANT_MODEL` | str | `tenants.Tenant` | Yes | Python path to the Tenant model. |
-| `TENANT_DOMAIN_MODEL` | str | `tenants.Domain` | Yes | Python path to the Domain model. |
-| `PUBLIC_SCHEMA_NAME` | str | `public` | No | PostgreSQL schema used for shared (public) tables. |
+| Variable              | Type | Default          | Required | Description                                        |
+| --------------------- | ---- | ---------------- | -------- | -------------------------------------------------- |
+| `TENANT_MODEL`        | str  | `tenants.Tenant` | Yes      | Python path to the Tenant model.                   |
+| `TENANT_DOMAIN_MODEL` | str  | `tenants.Domain` | Yes      | Python path to the Domain model.                   |
+| `PUBLIC_SCHEMA_NAME`  | str  | `public`         | No       | PostgreSQL schema used for shared (public) tables. |
 
 ---
 
 ### Security (Additional)
 
-| Variable | Type | Default | Required | Description |
-|---|---|---|---|---|
-| `CSRF_TRUSTED_ORIGINS` | str | `http://localhost:3000` | Yes (prod) | Comma-separated origins trusted for CSRF. Must match actual deployment domains. |
-| `SECURE_SSL_REDIRECT` | bool | `False` | Yes (prod: `True`) | Redirect all HTTP requests to HTTPS. |
+| Variable               | Type | Default                 | Required           | Description                                                                     |
+| ---------------------- | ---- | ----------------------- | ------------------ | ------------------------------------------------------------------------------- |
+| `CSRF_TRUSTED_ORIGINS` | str  | `http://localhost:3000` | Yes (prod)         | Comma-separated origins trusted for CSRF. Must match actual deployment domains. |
+| `SECURE_SSL_REDIRECT`  | bool | `False`                 | Yes (prod: `True`) | Redirect all HTTP requests to HTTPS.                                            |
 
 **Example (production):**
 
@@ -353,36 +353,36 @@ SECURE_SSL_REDIRECT=True
 
 > ⚠️ **These variables are embedded into the JavaScript bundle at build time and are visible to end users.** Never put secrets here.
 
-| Variable | Default | Required | Description |
-|---|---|---|---|
-| `NEXT_PUBLIC_API_URL` | `http://localhost:8000/api/v1` | Yes | API endpoint called from the **browser**. |
-| `NEXT_PUBLIC_WS_URL` | `ws://localhost:8000/ws` | No | WebSocket endpoint for real-time features. |
-| `NEXT_PUBLIC_SITE_URL` | `http://localhost:3000` | Yes | Canonical frontend URL. |
-| `NEXT_PUBLIC_SITE_NAME` | `LankaCommerce Cloud` | No | Full display name (page titles, branding). |
-| `NEXT_PUBLIC_APP_NAME` | `LCC` | No | Short name (PWA manifest, mobile). |
-| `NEXT_PUBLIC_SITE_DESCRIPTION` | `Multi-tenant SaaS...` | No | SEO meta description. |
-| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | No | Application URL (PWA start URL). |
-| `NEXT_PUBLIC_AUTH_COOKIE_NAME` | `lcc_auth` | No | Name of the authentication cookie. |
-| `NEXT_PUBLIC_TOKEN_EXPIRY_BUFFER` | `60` | No | Seconds before expiry to trigger token refresh. |
-| `NEXT_PUBLIC_ENABLE_ANALYTICS` | `false` | No | Enable/disable analytics tracking. |
-| `NEXT_PUBLIC_ENABLE_AI_FEATURES` | `false` | No | Enable/disable AI-powered features. |
-| `NEXT_PUBLIC_ENABLE_WEBSTORE` | `true` | No | Enable/disable webstore module. |
-| `NEXT_PUBLIC_ENABLE_POS` | `true` | No | Enable/disable POS module. |
-| `NEXT_PUBLIC_ENABLE_OFFLINE` | `true` | No | Enable/disable offline mode (service worker). |
-| `NEXT_PUBLIC_DEBUG` | `false` | No | Enable frontend debug logging. |
-| `NEXT_PUBLIC_GA_TRACKING_ID` | *(empty)* | No | Google Analytics measurement ID. |
-| `NEXT_PUBLIC_SENTRY_DSN` | *(empty)* | No | Sentry DSN for frontend error tracking. |
-| `NEXT_PUBLIC_PAYHERE_MERCHANT_ID` | *(empty)* | No | PayHere merchant ID (Sri Lanka payments). |
-| `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` | *(empty)* | No | Stripe publishable key (`pk_test_...` / `pk_live_...`). |
-| `NEXT_PUBLIC_MAPS_API_KEY` | *(empty)* | No | Google Maps JavaScript API key. |
-| `NEXT_PUBLIC_DEFAULT_LOCALE` | `en-LK` | No | BCP 47 locale tag. |
-| `NEXT_PUBLIC_DEFAULT_TIMEZONE` | `Asia/Colombo` | No | IANA timezone for UI display. |
-| `NEXT_PUBLIC_DEFAULT_CURRENCY` | `LKR` | No | ISO 4217 currency code. |
-| `NEXT_PUBLIC_CURRENCY_SYMBOL` | `Rs.` | No | Currency display symbol. |
-| `NEXT_PUBLIC_DEFAULT_TENANT` | `demo` | No | Default tenant slug for development. |
-| `NEXT_PUBLIC_TENANT_PATTERN` | `{tenant}.lankacommerce.lk` | No | Tenant subdomain URL pattern. |
-| `NEXT_PUBLIC_IMAGE_DOMAIN` | `cdn.lankacommerce.lk` | No | Image CDN domain (Next.js `images.domains`). |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD` | *(empty)* | No | Cloudinary cloud name for image transforms. |
+| Variable                          | Default                        | Required | Description                                             |
+| --------------------------------- | ------------------------------ | -------- | ------------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL`             | `http://localhost:8000/api/v1` | Yes      | API endpoint called from the **browser**.               |
+| `NEXT_PUBLIC_WS_URL`              | `ws://localhost:8000/ws`       | No       | WebSocket endpoint for real-time features.              |
+| `NEXT_PUBLIC_SITE_URL`            | `http://localhost:3000`        | Yes      | Canonical frontend URL.                                 |
+| `NEXT_PUBLIC_SITE_NAME`           | `LankaCommerce Cloud`          | No       | Full display name (page titles, branding).              |
+| `NEXT_PUBLIC_APP_NAME`            | `LCC`                          | No       | Short name (PWA manifest, mobile).                      |
+| `NEXT_PUBLIC_SITE_DESCRIPTION`    | `Multi-tenant SaaS...`         | No       | SEO meta description.                                   |
+| `NEXT_PUBLIC_APP_URL`             | `http://localhost:3000`        | No       | Application URL (PWA start URL).                        |
+| `NEXT_PUBLIC_AUTH_COOKIE_NAME`    | `lcc_auth`                     | No       | Name of the authentication cookie.                      |
+| `NEXT_PUBLIC_TOKEN_EXPIRY_BUFFER` | `60`                           | No       | Seconds before expiry to trigger token refresh.         |
+| `NEXT_PUBLIC_ENABLE_ANALYTICS`    | `false`                        | No       | Enable/disable analytics tracking.                      |
+| `NEXT_PUBLIC_ENABLE_AI_FEATURES`  | `false`                        | No       | Enable/disable AI-powered features.                     |
+| `NEXT_PUBLIC_ENABLE_WEBSTORE`     | `true`                         | No       | Enable/disable webstore module.                         |
+| `NEXT_PUBLIC_ENABLE_POS`          | `true`                         | No       | Enable/disable POS module.                              |
+| `NEXT_PUBLIC_ENABLE_OFFLINE`      | `true`                         | No       | Enable/disable offline mode (service worker).           |
+| `NEXT_PUBLIC_DEBUG`               | `false`                        | No       | Enable frontend debug logging.                          |
+| `NEXT_PUBLIC_GA_TRACKING_ID`      | _(empty)_                      | No       | Google Analytics measurement ID.                        |
+| `NEXT_PUBLIC_SENTRY_DSN`          | _(empty)_                      | No       | Sentry DSN for frontend error tracking.                 |
+| `NEXT_PUBLIC_PAYHERE_MERCHANT_ID` | _(empty)_                      | No       | PayHere merchant ID (Sri Lanka payments).               |
+| `NEXT_PUBLIC_STRIPE_PUBLIC_KEY`   | _(empty)_                      | No       | Stripe publishable key (`pk_test_...` / `pk_live_...`). |
+| `NEXT_PUBLIC_MAPS_API_KEY`        | _(empty)_                      | No       | Google Maps JavaScript API key.                         |
+| `NEXT_PUBLIC_DEFAULT_LOCALE`      | `en-LK`                        | No       | BCP 47 locale tag.                                      |
+| `NEXT_PUBLIC_DEFAULT_TIMEZONE`    | `Asia/Colombo`                 | No       | IANA timezone for UI display.                           |
+| `NEXT_PUBLIC_DEFAULT_CURRENCY`    | `LKR`                          | No       | ISO 4217 currency code.                                 |
+| `NEXT_PUBLIC_CURRENCY_SYMBOL`     | `Rs.`                          | No       | Currency display symbol.                                |
+| `NEXT_PUBLIC_DEFAULT_TENANT`      | `demo`                         | No       | Default tenant slug for development.                    |
+| `NEXT_PUBLIC_TENANT_PATTERN`      | `{tenant}.lankacommerce.lk`    | No       | Tenant subdomain URL pattern.                           |
+| `NEXT_PUBLIC_IMAGE_DOMAIN`        | `cdn.lankacommerce.lk`         | No       | Image CDN domain (Next.js `images.domains`).            |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD`    | _(empty)_                      | No       | Cloudinary cloud name for image transforms.             |
 
 **Example:**
 
@@ -401,15 +401,15 @@ NEXT_PUBLIC_DEFAULT_CURRENCY=LKR
 
 > These variables are **only** available in Next.js API routes, `getServerSideProps`, server components, and middleware. They are **never** shipped to the browser.
 
-| Variable | Default | Required | Description |
-|---|---|---|---|
-| `API_BASE_URL` | `http://backend:8000/api/v1` | Yes | Backend URL used from SSR and API routes. In Docker this uses the service name `backend`. |
-| `API_TIMEOUT` | `30000` | No | HTTP request timeout in milliseconds. |
-| `NEXTAUTH_URL` | `http://localhost:3000` | Yes | NextAuth.js callback URL. Must match the canonical frontend URL. |
-| `NEXTAUTH_SECRET` | *(empty)* | Yes (prod) | Secret used by NextAuth.js to sign/encrypt JWTs. |
-| `STRIPE_SECRET_KEY` | *(empty)* | For payments | Stripe secret key (server-side only). |
-| `STRIPE_WEBHOOK_SECRET` | *(empty)* | For webhooks | Stripe webhook signing secret. |
-| `SENTRY_AUTH_TOKEN` | *(empty)* | No | Sentry auth token for uploading source maps during build. |
+| Variable                | Default                      | Required     | Description                                                                               |
+| ----------------------- | ---------------------------- | ------------ | ----------------------------------------------------------------------------------------- |
+| `API_BASE_URL`          | `http://backend:8000/api/v1` | Yes          | Backend URL used from SSR and API routes. In Docker this uses the service name `backend`. |
+| `API_TIMEOUT`           | `30000`                      | No           | HTTP request timeout in milliseconds.                                                     |
+| `NEXTAUTH_URL`          | `http://localhost:3000`      | Yes          | NextAuth.js callback URL. Must match the canonical frontend URL.                          |
+| `NEXTAUTH_SECRET`       | _(empty)_                    | Yes (prod)   | Secret used by NextAuth.js to sign/encrypt JWTs.                                          |
+| `STRIPE_SECRET_KEY`     | _(empty)_                    | For payments | Stripe secret key (server-side only).                                                     |
+| `STRIPE_WEBHOOK_SECRET` | _(empty)_                    | For webhooks | Stripe webhook signing secret.                                                            |
+| `SENTRY_AUTH_TOKEN`     | _(empty)_                    | No           | Sentry auth token for uploading source maps during build.                                 |
 
 **Example:**
 
@@ -426,29 +426,29 @@ NEXTAUTH_SECRET=$(openssl rand -base64 32)
 
 > These values differ between local development (bare-metal) and Docker Compose environments because containers reference each other by **service name** rather than `localhost`.
 
-| Variable | Docker Value | Local Value | Purpose |
-|---|---|---|---|
-| `DB_HOST` | `db` | `localhost` | PostgreSQL service hostname |
-| `REDIS_HOST` | `redis` | `localhost` | Redis service hostname |
-| `DATABASE_URL` | `postgres://postgres:dev_password_change_me@db:5432/lankacommerce` | `postgres://postgres:postgres@localhost:5432/lankacommerce` | Full PostgreSQL connection URL |
-| `REDIS_URL` | `redis://redis:6379/0` | `redis://localhost:6379/0` | Redis connection URL |
-| `CELERY_BROKER_URL` | `redis://redis:6379/0` | `redis://localhost:6379/0` | Celery message broker |
-| `API_BASE_URL` | `http://backend:8000/api/v1` | `http://localhost:8000/api/v1` | Frontend SSR → Backend |
-| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1,backend,0.0.0.0` | `localhost,127.0.0.1` | Django allowed hosts |
+| Variable               | Docker Value                                                       | Local Value                                                 | Purpose                        |
+| ---------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------- | ------------------------------ |
+| `DB_HOST`              | `db`                                                               | `localhost`                                                 | PostgreSQL service hostname    |
+| `REDIS_HOST`           | `redis`                                                            | `localhost`                                                 | Redis service hostname         |
+| `DATABASE_URL`         | `postgres://postgres:dev_password_change_me@db:5432/lankacommerce` | `postgres://postgres:postgres@localhost:5432/lankacommerce` | Full PostgreSQL connection URL |
+| `REDIS_URL`            | `redis://redis:6379/0`                                             | `redis://localhost:6379/0`                                  | Redis connection URL           |
+| `CELERY_BROKER_URL`    | `redis://redis:6379/0`                                             | `redis://localhost:6379/0`                                  | Celery message broker          |
+| `API_BASE_URL`         | `http://backend:8000/api/v1`                                       | `http://localhost:8000/api/v1`                              | Frontend SSR → Backend         |
+| `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1,backend,0.0.0.0`                              | `localhost,127.0.0.1`                                       | Django allowed hosts           |
 
 ### Docker-Only Init Variables
 
 These variables are used **exclusively** by Docker Compose services for first-time initialization and are **not** read by the application code.
 
-| Variable | Default | Service | Purpose |
-|---|---|---|---|
-| `POSTGRES_DB` | `lankacommerce` | `db` (PostgreSQL) | Database created on first run |
-| `POSTGRES_USER` | `postgres` | `db` (PostgreSQL) | Superuser created on first run |
-| `POSTGRES_PASSWORD` | `dev_password_change_me` | `db` (PostgreSQL) | Superuser password |
-| `WATCHPACK_POLLING` | `true` | `frontend` (Next.js) | Enable file-system polling for hot reload inside containers |
-| `NODE_ENV` | `development` | `frontend` (Next.js) | Node.js environment mode |
-| `FLOWER_PORT` | `5555` | `flower` (Celery) | Flower monitoring dashboard port |
-| `FLOWER_BASIC_AUTH` | `admin:admin` | `flower` (Celery) | Flower HTTP basic auth credentials |
+| Variable            | Default                  | Service              | Purpose                                                     |
+| ------------------- | ------------------------ | -------------------- | ----------------------------------------------------------- |
+| `POSTGRES_DB`       | `lankacommerce`          | `db` (PostgreSQL)    | Database created on first run                               |
+| `POSTGRES_USER`     | `postgres`               | `db` (PostgreSQL)    | Superuser created on first run                              |
+| `POSTGRES_PASSWORD` | `dev_password_change_me` | `db` (PostgreSQL)    | Superuser password                                          |
+| `WATCHPACK_POLLING` | `true`                   | `frontend` (Next.js) | Enable file-system polling for hot reload inside containers |
+| `NODE_ENV`          | `development`            | `frontend` (Next.js) | Node.js environment mode                                    |
+| `FLOWER_PORT`       | `5555`                   | `flower` (Celery)    | Flower monitoring dashboard port                            |
+| `FLOWER_BASIC_AUTH` | `admin:admin`            | `flower` (Celery)    | Flower HTTP basic auth credentials                          |
 
 > **Tip:** Copy `.env.docker.example` to `.env.docker` and customize before running `docker compose up`.
 
@@ -487,6 +487,7 @@ These variables are used **exclusively** by Docker Compose services for first-ti
 **Cause:** The variable is not defined in any loaded `.env` file or system environment.
 
 **Fix:**
+
 1. Verify the `.env` file exists in the expected location.
 2. Check the [loading order](#environment-file-loading-order) — a higher-priority source may be shadowing it.
 3. Ensure there are no typos in the variable name.
@@ -499,6 +500,7 @@ These variables are used **exclusively** by Docker Compose services for first-ti
 **Cause:** The URL does not conform to the expected `postgres://` scheme.
 
 **Fix:**
+
 ```bash
 # ✅ Correct
 DATABASE_URL=postgres://user:password@host:5432/dbname
@@ -541,6 +543,7 @@ DJANGO_SECRET_KEY="your-generated-secret-key-here"
 **Cause:** The frontend cannot reach the backend API.
 
 **Fix:**
+
 1. Confirm the backend is running: `curl http://localhost:8000/api/v1/health/`
 2. In Docker, ensure both services are on the same network and the frontend uses `http://backend:8000/api/v1` for SSR (`API_BASE_URL`) and `http://localhost:8000/api/v1` for browser requests (`NEXT_PUBLIC_API_URL`).
 3. Check that `CORS_ALLOWED_ORIGINS` includes the frontend origin.
@@ -552,6 +555,7 @@ DJANGO_SECRET_KEY="your-generated-secret-key-here"
 **Cause:** Redis is not running or not reachable.
 
 **Fix:**
+
 1. Verify Redis is running: `redis-cli ping` (should return `PONG`).
 2. In Docker, ensure the Redis service is healthy: `docker compose ps redis`.
 3. Confirm the URL uses the correct hostname (`redis` in Docker, `localhost` locally).
@@ -581,6 +585,7 @@ NEXTAUTH_SECRET="your-generated-base64-secret"
 **Cause:** The `CORS_ALLOWED_ORIGINS` or `CSRF_TRUSTED_ORIGINS` do not match the actual domain the frontend is served from.
 
 **Fix:**
+
 - Both variables must include the **exact** origin (scheme + host + port if non-standard).
 - They must match the domain users see in their browser address bar.
 
@@ -597,11 +602,11 @@ CORS_ALLOWED_ORIGINS=https://lankacommerce.lk/,lankacommerce.lk
 
 ### Validation Commands
 
-| Command | Description |
-|---|---|
-| `make validate-env` | Run basic environment validation (warns on missing optional vars). |
-| `make validate-env-strict` | Strict validation — fails on any missing required variable. |
-| `make validate-env-docker` | Validate the Docker-specific `.env.docker` file. |
+| Command                    | Description                                                        |
+| -------------------------- | ------------------------------------------------------------------ |
+| `make validate-env`        | Run basic environment validation (warns on missing optional vars). |
+| `make validate-env-strict` | Strict validation — fails on any missing required variable.        |
+| `make validate-env-docker` | Validate the Docker-specific `.env.docker` file.                   |
 
 ```bash
 # Quick validation
@@ -618,17 +623,17 @@ make validate-env-docker
 
 ## Related Documentation
 
-| Resource | Description |
-|---|---|
-| [docs/DOCKER_ENV.md](DOCKER_ENV.md) | Docker environment setup guide |
-| [docs/SECRETS.md](SECRETS.md) | Secrets management policy |
-| [docs/docker-setup.md](docker-setup.md) | Docker development setup walkthrough |
-| `backend/.env.example` | Backend environment template |
-| `frontend/.env.local.example` | Frontend environment template |
-| `.env.docker.example` | Docker environment template |
-| `scripts/validate_env.py` | Backend environment validation script |
-| `frontend/scripts/check-env.js` | Frontend environment validation script |
+| Resource                                | Description                            |
+| --------------------------------------- | -------------------------------------- |
+| [docs/DOCKER_ENV.md](DOCKER_ENV.md)     | Docker environment setup guide         |
+| [docs/SECRETS.md](SECRETS.md)           | Secrets management policy              |
+| [docs/docker-setup.md](docker-setup.md) | Docker development setup walkthrough   |
+| `backend/.env.example`                  | Backend environment template           |
+| `frontend/.env.local.example`           | Frontend environment template          |
+| `.env.docker.example`                   | Docker environment template            |
+| `scripts/validate_env.py`               | Backend environment validation script  |
+| `frontend/scripts/check-env.js`         | Frontend environment validation script |
 
 ---
 
-*Last updated: 2026-02-15*
+_Last updated: 2026-02-15_

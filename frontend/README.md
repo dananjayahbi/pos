@@ -102,6 +102,8 @@ frontend/
 └── ...config files  # tsconfig, tailwind, postcss, etc.
 ```
 
+> For deeper frontend architecture and component documentation, see [docs/frontend/](../docs/frontend/README.md).
+
 ---
 
 ## Linting
@@ -208,6 +210,10 @@ import { Button } from '@/components/ui/Button'
 ## Environment Variables
 
 See `.env.local.example` for all available variables with documentation.
+
+> For the complete cross-project variable reference, see the [Environment Variable Reference](../docs/ENV_VARIABLES.md).
+> For secrets handling and rotation policy, see [Secrets Management](../docs/SECRETS.md).
+> For Docker-specific environment loading, see [Docker Environment Variables](../docs/DOCKER_ENV.md).
 
 ### Quick Start
 
@@ -440,12 +446,385 @@ const posEnabled = process.env.NEXT_PUBLIC_ENABLE_POS === "true";
 
 ---
 
+## Build and Deployment
+
+### Development Build
+
+```bash
+pnpm dev
+```
+
+Starts Next.js in **development mode** with hot reloading and Turbopack support. Changes are reflected instantly in the browser.
+
+### Production Build
+
+```bash
+pnpm build
+```
+
+Compiles and optimizes the application for production. TypeScript is checked, pages are pre-rendered where possible, and assets are minified.
+
+### Production Preview
+
+```bash
+pnpm start
+```
+
+Runs the production build locally so you can verify the output before deploying.
+
+### Static Analysis Before Build
+
+Always run these checks before building for production:
+
+```bash
+pnpm type-check   # TypeScript type checking (tsc --noEmit)
+pnpm lint          # ESLint checks
+```
+
+Both commands must pass cleanly before a production build is created.
+
+### Docker Build
+
+The frontend Dockerfile uses a **multi-stage build** for minimal image size:
+
+1. **deps** — installs production dependencies
+2. **build** — compiles the Next.js application
+3. **production** — copies only the build output and production `node_modules`
+
+### Build Output
+
+The `.next/` directory contains the compiled application (pages, chunks, static assets). This directory is git-ignored and regenerated on every build.
+
+### Bundle Analysis
+
+```bash
+pnpm analyze
+```
+
+Opens an interactive treemap of the JavaScript bundle to identify large dependencies and optimization opportunities.
+
+### Environment Note
+
+> **⚠️ Important:** `NEXT_PUBLIC_*` environment variables are **inlined at build time**. If you change any `NEXT_PUBLIC_*` value, you must run `pnpm build` again for the change to take effect.
+
+---
+
+## App Router Conventions
+
+The frontend uses the **Next.js App Router** (`app/` directory). Follow these conventions for consistency.
+
+### File Conventions
+
+| File            | Purpose                                                  |
+| --------------- | -------------------------------------------------------- |
+| `page.tsx`      | Route page — the UI rendered at that URL segment         |
+| `layout.tsx`    | Shared layout — wraps child pages, persists across navigations |
+| `loading.tsx`   | Loading state — shown via `<Suspense>` while the page loads  |
+| `error.tsx`     | Error boundary — catches and displays runtime errors     |
+| `not-found.tsx` | 404 page — shown when no route matches                   |
+| `route.ts`      | API route handler — serverless endpoint (GET, POST, etc.) |
+
+### Route Groups
+
+Use parentheses `(group)` for **logical grouping** without affecting the URL:
+
+```
+app/
+├── (auth)/           # Auth pages — URL is /login, not /auth/login
+│   ├── login/
+│   └── register/
+├── (dashboard)/      # Dashboard pages — URL is /inventory, not /dashboard/inventory
+│   ├── inventory/
+│   └── sales/
+└── (webstore)/       # Webstore pages
+    ├── products/
+    └── cart/
+```
+
+### Server vs Client Components
+
+- **Server Components** are the default — they render on the server, can access databases and secrets directly, and ship zero JavaScript to the client.
+- Add the `"use client"` directive **only** when the component needs:
+  - Event handlers (`onClick`, `onChange`, etc.)
+  - React state (`useState`, `useReducer`)
+  - Effects (`useEffect`, `useLayoutEffect`)
+  - Browser-only APIs (`window`, `localStorage`, `IntersectionObserver`)
+
+### Data Fetching
+
+- **Server Components** fetch data directly using `async/await` (e.g., call your API in the component body).
+- **Client Components** fetch data via **React Query** hooks for caching, re-fetching, and optimistic updates.
+
+### Layout Nesting
+
+Layouts wrap their child segments and **persist across page navigations** (they don't unmount). Use layouts for:
+
+- Navigation bars and sidebars
+- Authentication wrappers
+- Shared page structure (breadcrumbs, page titles)
+
+### Metadata
+
+Use the `metadata` export or `generateMetadata()` function for SEO:
+
+```typescript
+// Static metadata
+export const metadata = {
+  title: "Inventory | LankaCommerce Cloud",
+  description: "Manage your inventory across all locations",
+};
+
+// Dynamic metadata
+export async function generateMetadata({ params }) {
+  const product = await getProduct(params.id);
+  return { title: product.name };
+}
+```
+
+---
+
+## Styling Guidelines
+
+### Tailwind CSS First
+
+Use **Tailwind CSS utility classes** for all styling. Avoid writing custom CSS unless absolutely necessary (e.g., complex animations, third-party overrides).
+
+```tsx
+// ✅ Good — Tailwind utilities
+<div className="flex items-center gap-4 rounded-lg bg-white p-6 shadow-sm">
+
+// ❌ Avoid — custom CSS
+<div className={styles.card}>
+```
+
+### Shadcn/UI Components
+
+Use pre-built components from the **shadcn/ui** library as the design base. Customize appearance via the `className` prop:
+
+```tsx
+import { Button } from "@/components/ui/Button";
+
+<Button variant="outline" className="w-full">
+  Save Changes
+</Button>
+```
+
+### Theming
+
+- **Dark / light mode** is supported via `next-themes`.
+- Use **CSS variables** for color tokens so themes switch seamlessly.
+- Toggle theme with the `useTheme()` hook from `next-themes`.
+
+### Responsive Design
+
+Follow a **mobile-first** approach. Use Tailwind breakpoint prefixes to scale up:
+
+| Prefix | Min-width | Target          |
+| ------ | --------- | --------------- |
+| *(none)* | 0px     | Mobile (default) |
+| `sm:`  | 640px     | Small tablets    |
+| `md:`  | 768px     | Tablets          |
+| `lg:`  | 1024px    | Laptops          |
+| `xl:`  | 1280px    | Desktops         |
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+```
+
+### Class Merging
+
+Use the `cn()` utility (from `@/lib/cn`) to safely merge conditional Tailwind classes without conflicts:
+
+```tsx
+import { cn } from "@/lib/cn";
+
+<button className={cn("rounded px-4 py-2", isActive && "bg-primary text-white")}>
+```
+
+### Class Variance Authority (CVA)
+
+Use **CVA** for components with multiple variants (size, color, state):
+
+```tsx
+import { cva } from "class-variance-authority";
+
+const badge = cva("inline-flex items-center rounded-full font-medium", {
+  variants: {
+    variant: { default: "bg-gray-100", success: "bg-green-100 text-green-800" },
+    size: { sm: "px-2 py-0.5 text-xs", md: "px-3 py-1 text-sm" },
+  },
+  defaultVariants: { variant: "default", size: "md" },
+});
+```
+
+### Avoid
+
+- **Inline styles** (`style={{ }}`) — hard to maintain, no responsive support
+- **CSS Modules** (`*.module.css`) — not needed with Tailwind
+- **styled-components** — adds runtime overhead, conflicts with Server Components
+- **Global CSS** — only acceptable for CSS variable definitions in `styles/globals.css`
+
+---
+
+## Component Conventions
+
+### File Naming
+
+Use **PascalCase** for component files:
+
+```
+Button.tsx    SalesTable.tsx    InvoiceCard.tsx
+```
+
+### Directory Structure
+
+If a component has related files (tests, types, sub-components), give it its own directory:
+
+```
+components/
+├── ui/
+│   └── Button.tsx             # Simple — single file
+├── forms/
+│   └── DatePicker/
+│       ├── DatePicker.tsx     # Main component
+│       ├── DatePicker.test.tsx
+│       └── types.ts           # Local types
+```
+
+### Exports
+
+Prefer **named exports** over default exports:
+
+```typescript
+// ✅ Named export
+export function SalesTable({ data }: SalesTableProps) { ... }
+
+// ❌ Avoid default export
+export default function SalesTable({ data }: SalesTableProps) { ... }
+```
+
+### Props Interface
+
+Define props as an `interface` named `ComponentNameProps` at the top of the file:
+
+```typescript
+interface SalesTableProps {
+  data: Sale[];
+  onRowClick?: (sale: Sale) => void;
+  isLoading?: boolean;
+}
+
+export function SalesTable({ data, onRowClick, isLoading }: SalesTableProps) {
+  // ...
+}
+```
+
+### Component Categories
+
+| Directory   | Purpose                                 | Examples                              |
+| ----------- | --------------------------------------- | ------------------------------------- |
+| `ui/`       | Base UI primitives from shadcn/ui       | Button, Input, Card, Dialog, Badge    |
+| `layout/`   | Page structure components               | Header, Sidebar, Footer, PageWrapper  |
+| `forms/`    | Form-related components                 | FormField, Select, DatePicker, FileUpload |
+| `common/`   | Shared business components              | Logo, Avatar, Spinner, EmptyState     |
+
+### When to Create Shared Components
+
+If a component is used in **3 or more places**, extract it to `components/common/`. Before that, keep it co-located with the feature that owns it.
+
+### Server vs Client Components
+
+- **Default to Server Components** — they ship zero JS, can access server resources, and are faster.
+- Only add `"use client"` when the component needs browser APIs, React state (`useState`), or effects (`useEffect`).
+- Keep client boundaries as low as possible — wrap only the interactive part, not the entire page.
+
+---
+
 ## Testing
+
+### Test Framework
+
+Tests use **Jest** with **React Testing Library** for component testing. This combination provides fast unit tests with a DOM-like environment that encourages testing components the way users interact with them.
+
+### Commands
 
 ```bash
 pnpm test              # Run all tests
-pnpm test --watch      # Watch mode
-pnpm test --coverage   # With coverage report
+pnpm test --watch      # Watch mode (re-runs on file changes)
+pnpm test --coverage   # Generate coverage report
+```
+
+### Test Categories
+
+| Category             | Scope                                     | Status   |
+| -------------------- | ----------------------------------------- | -------- |
+| **Unit tests**       | Components, hooks, utility functions      | ✅ Active |
+| **Integration tests** | Page-level rendering, connected components | ✅ Active |
+| **E2E tests**        | Full user flows across pages              | 🔜 Planned (Playwright) |
+
+### Test Location
+
+- **Global tests:** `__tests__/` directory at the project root
+- **Co-located tests:** alongside the component they test (e.g., `components/ui/Button.test.tsx`)
+
+### Naming Convention
+
+```
+ComponentName.test.tsx    # Component tests
+useHookName.test.ts       # Hook tests
+formatCurrency.test.ts    # Utility tests
+```
+
+All test files use the `*.test.ts` or `*.test.tsx` extension.
+
+### Coverage Targets
+
+| Area                    | Minimum Coverage |
+| ----------------------- | ---------------- |
+| Utilities and hooks     | 80%              |
+| Components              | 70%              |
+
+### Common Test Patterns
+
+**Render testing** — verify the component renders correctly:
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import { Badge } from "@/components/ui/Badge";
+
+test("renders badge with text", () => {
+  render(<Badge>Active</Badge>);
+  expect(screen.getByText("Active")).toBeInTheDocument();
+});
+```
+
+**User interaction** — simulate clicks, typing, and other events:
+
+```tsx
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+test("calls onClick when button is pressed", async () => {
+  const handleClick = jest.fn();
+  render(<Button onClick={handleClick}>Save</Button>);
+  await userEvent.click(screen.getByRole("button", { name: /save/i }));
+  expect(handleClick).toHaveBeenCalledTimes(1);
+});
+```
+
+**API mocking** — mock fetch/service calls for isolated tests:
+
+```tsx
+import { rest } from "msw";
+import { server } from "@/tests/mocks/server";
+
+beforeEach(() => {
+  server.use(
+    rest.get("/api/v1/products", (_req, res, ctx) =>
+      res(ctx.json([{ id: 1, name: "Widget" }]))
+    )
+  );
+});
 ```
 
 ---
