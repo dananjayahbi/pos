@@ -27,11 +27,12 @@ Each ADR follows the [Michael Nygard format](https://cognitect.com/blog/2011/11/
 
 ## ADR Index
 
-| #                                          | Title                  | Status   | Date    |
-| ------------------------------------------ | ---------------------- | -------- | ------- |
-| [ADR-0001](0001-monorepo-structure.md)     | Monorepo Structure     | Accepted | 2025-01 |
-| [ADR-0002](0002-multi-tenancy-approach.md) | Multi-Tenancy Approach | Accepted | 2025-01 |
-| [ADR-0003](0003-technology-stack.md)       | Technology Stack       | Accepted | 2025-01 |
+| #                                             | Title                     | Status   | Date    |
+| --------------------------------------------- | ------------------------- | -------- | ------- |
+| [ADR-0001](0001-monorepo-structure.md)        | Monorepo Structure        | Accepted | 2025-01 |
+| [ADR-0002](0002-multi-tenancy-approach.md)    | Multi-Tenancy Approach    | Accepted | 2025-01 |
+| [ADR-0003](0003-technology-stack.md)          | Technology Stack          | Accepted | 2025-01 |
+| [ADR-0004](0004-per-tenant-authentication.md) | Per-Tenant Authentication | Accepted | 2026-02 |
 
 ---
 

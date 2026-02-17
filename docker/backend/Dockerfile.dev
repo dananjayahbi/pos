@@ -39,7 +39,8 @@ RUN pip install --upgrade pip \
 COPY . .
 
 # Copy and configure entrypoint
-COPY docker/backend/entrypoint.sh /entrypoint.sh
+# entrypoint.sh lives in the backend build context
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Set entrypoint

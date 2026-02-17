@@ -61,6 +61,9 @@ CORS_ALLOW_CREDENTIALS = env.bool("CORS_ALLOW_CREDENTIALS")
 # ════════════════════════════════════════════════════════════════════════
 # DATABASE  (Task 33 — Updated for PgBouncer in Phase 2)
 # ════════════════════════════════════════════════════════════════════════
+# Driver: psycopg v3 (psycopg[binary] 3.3.2) — the modern async-capable
+# PostgreSQL adapter. Replaces the legacy psycopg2-binary.
+#
 # In production, all application traffic routes through PgBouncer for
 # connection pooling. PgBouncer uses transaction pooling mode.
 #
@@ -70,11 +73,13 @@ CORS_ALLOW_CREDENTIALS = env.bool("CORS_ALLOW_CREDENTIALS")
 # DISABLE_SERVER_SIDE_CURSORS must be True because PgBouncer does not
 # support server-side cursors in transaction pooling mode.
 #
-# Phase 2 will switch ENGINE to django_tenants.postgresql_backend.
+# Multi-Tenancy: django-tenants 3.10.0 installed and verified
+# compatible with Django 5.2.x. ENGINE is now set to
+# django_tenants.postgresql_backend for multi-tenant schema support.
 
 DATABASES = {
     "default": {
-        "ENGINE": env("DB_ENGINE", default="django.db.backends.postgresql"),
+        "ENGINE": env("DB_ENGINE", default="django_tenants.postgresql_backend"),
         "NAME": env("DB_NAME", default="lankacommerce"),
         "USER": env("DB_USER", default="lcc_user"),
         "PASSWORD": env("DB_PASSWORD", default=""),

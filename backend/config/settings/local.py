@@ -54,6 +54,9 @@ MIDDLEWARE += [  # noqa: F405
 # ════════════════════════════════════════════════════════════════════════
 # DATABASE  (Task 30 — Updated for PgBouncer in Phase 2)
 # ════════════════════════════════════════════════════════════════════════
+# Driver: psycopg v3 (psycopg[binary] 3.3.2) — the modern async-capable
+# PostgreSQL adapter. Replaces the legacy psycopg2-binary.
+#
 # Application traffic routes through PgBouncer (port 6432) for
 # connection pooling. PgBouncer uses transaction pooling mode, which
 # is required for django-tenants search_path isolation.
@@ -64,11 +67,13 @@ MIDDLEWARE += [  # noqa: F405
 # DISABLE_SERVER_SIDE_CURSORS must be True because PgBouncer does not
 # support server-side cursors in transaction pooling mode.
 #
-# In Phase 2 the ENGINE will change to django_tenants.postgresql_backend.
+# Multi-Tenancy: django-tenants 3.10.0 installed and verified
+# compatible with Django 5.2.x. ENGINE is now set to
+# django_tenants.postgresql_backend for multi-tenant schema support.
 
 DATABASES = {
     "default": {
-        "ENGINE": env("DB_ENGINE", default="django.db.backends.postgresql"),
+        "ENGINE": env("DB_ENGINE", default="django_tenants.postgresql_backend"),
         "NAME": env("DB_NAME", default="lankacommerce"),
         "USER": env("DB_USER", default="lcc_user"),
         "PASSWORD": env("DB_PASSWORD", default="dev_password_change_me"),

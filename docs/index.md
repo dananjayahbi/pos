@@ -63,14 +63,20 @@
 
 ## � Database Documentation
 
-| Document                                                          | Description                                               |
-| ----------------------------------------------------------------- | --------------------------------------------------------- |
-| [Schema Naming & Multi-Tenancy Layout](database/schema-naming.md) | Tenant schema naming, public schema baseline, search_path |
-| [PgBouncer Connection Pooling](database/pgbouncer.md)             | Connection pooling configuration, Django integration      |
-| [Indexing Guidelines](database/indexing-guidelines.md)            | Index strategy, naming conventions, monitoring            |
-| [Performance Tuning Guide](database/performance-tuning.md)        | All tuning parameters, rationale, and checklist           |
-| [Backup and Recovery Procedures](database/backup-procedures.md)   | Backup strategy, restore workflows, WAL archiving         |
-| [Monitoring Queries](database/monitoring-queries.md)              | Database health, performance, and capacity monitoring     |
+| Document                                                                | Description                                                  |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Schema Naming & Multi-Tenancy Layout](database/schema-naming.md)       | Tenant schema naming, public schema baseline, search_path    |
+| [Tenant Settings Reference](database/tenant-settings.md)                | Django-tenants configuration, storage, and safety rules      |
+| [App Classification — SHARED vs TENANT](database/app-classification.md) | How apps are classified for multi-tenant schema isolation    |
+| [Tenant and Domain Models](database/tenant-models.md)                   | Tenant and Domain model reference, fields, and admin         |
+| [Database Routers](database/database-routers.md)                        | Router configuration, routing rules, cross-schema prevention |
+| [Database Routing Guide](multi-tenancy/database-routing.md)             | How routing works across schemas (overview)                  |
+| [Tenant Management Commands](multi-tenancy/tenant-commands.md)          | tenant_create, tenant_list commands and Makefile targets     |
+| [PgBouncer Connection Pooling](database/pgbouncer.md)                   | Connection pooling configuration, Django integration         |
+| [Indexing Guidelines](database/indexing-guidelines.md)                  | Index strategy, naming conventions, monitoring               |
+| [Performance Tuning Guide](database/performance-tuning.md)              | All tuning parameters, rationale, and checklist              |
+| [Backup and Recovery Procedures](database/backup-procedures.md)         | Backup strategy, restore workflows, WAL archiving            |
+| [Monitoring Queries](database/monitoring-queries.md)                    | Database health, performance, and capacity monitoring        |
 
 ---
 
@@ -85,13 +91,14 @@
 
 ## � Architecture Decision Records
 
-| Document                                                       | Description                                       |
-| -------------------------------------------------------------- | ------------------------------------------------- |
-| [ADR Index](adr/README.md)                                     | Full list of architecture decision records        |
-| [ADR-0001: Monorepo Structure](adr/0001-monorepo-structure.md) | Why we chose a monorepo over polyrepo             |
-| [ADR-0002: Multi-Tenancy](adr/0002-multi-tenancy-approach.md)  | Schema-based multi-tenancy with django-tenants    |
-| [ADR-0003: Technology Stack](adr/0003-technology-stack.md)     | Django, Next.js, PostgreSQL, and supporting tools |
-| [ADR Template](adr/template.md)                                | Template for creating new ADRs                    |
+| Document                                                           | Description                                       |
+| ------------------------------------------------------------------ | ------------------------------------------------- |
+| [ADR Index](adr/README.md)                                         | Full list of architecture decision records        |
+| [ADR-0001: Monorepo Structure](adr/0001-monorepo-structure.md)     | Why we chose a monorepo over polyrepo             |
+| [ADR-0002: Multi-Tenancy](adr/0002-multi-tenancy-approach.md)      | Schema-based multi-tenancy with django-tenants    |
+| [ADR-0003: Technology Stack](adr/0003-technology-stack.md)         | Django, Next.js, PostgreSQL, and supporting tools |
+| [ADR-0004: Per-Tenant Auth](adr/0004-per-tenant-authentication.md) | Per-tenant authentication and user isolation      |
+| [ADR Template](adr/template.md)                                    | Template for creating new ADRs                    |
 
 ---
 
@@ -153,7 +160,8 @@ docs/
 │   ├── template.md
 │   ├── 0001-monorepo-structure.md
 │   ├── 0002-multi-tenancy-approach.md
-│   └── 0003-technology-stack.md
+│   ├── 0003-technology-stack.md
+│   └── 0004-per-tenant-authentication.md
 ├── api/                  # API documentation
 │   ├── overview.md
 │   ├── authentication.md
@@ -170,11 +178,18 @@ docs/
 │   └── api.md
 ├── database/             # Database architecture docs
 │   ├── schema-naming.md
+│   ├── tenant-settings.md
+│   ├── app-classification.md
+│   ├── tenant-models.md
+│   ├── database-routers.md
 │   ├── pgbouncer.md
 │   ├── indexing-guidelines.md
 │   ├── performance-tuning.md
 │   ├── backup-procedures.md
 │   └── monitoring-queries.md
+├── multi-tenancy/        # Multi-tenancy guides
+│   ├── database-routing.md
+│   └── tenant-commands.md
 ├── frontend/             # Frontend technical docs
 │   ├── README.md
 │   ├── components.md

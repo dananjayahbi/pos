@@ -312,6 +312,38 @@ backup-list: ## List available backup files
 	@echo ""
 
 # =============================================================================
+# Tenant Management Commands
+# =============================================================================
+
+## Tenant Management Commands:
+
+tenant-list: ## List all tenants with their details
+	$(MANAGE) tenant_list
+
+tenant-list-verbose: ## List all tenants with verbose details
+	$(MANAGE) tenant_list --verbose
+
+tenant-list-active: ## List only active tenants
+	$(MANAGE) tenant_list --status active
+
+tenant-create: ## Create a new tenant (usage: make tenant-create name="Acme" slug="acme")
+	@if [ -z "$(name)" ] || [ -z "$(slug)" ]; then \
+		echo "Usage: make tenant-create name=\"Business Name\" slug=\"business-slug\""; \
+		echo "  Optional: domain=\"custom.domain\" status=\"active\" paid_until=\"2025-12-31\""; \
+		exit 1; \
+	fi
+	$(MANAGE) tenant_create --name "$(name)" --slug "$(slug)" $(if $(domain),--domain "$(domain)") $(if $(status),--status "$(status)") $(if $(paid_until),--paid-until "$(paid_until)")
+
+tenant-migrate-shared: ## Run shared schema migrations
+	$(MANAGE) migrate_schemas --shared
+
+tenant-migrate-tenant: ## Run tenant schema migrations
+	$(MANAGE) migrate_schemas --tenant
+
+tenant-migrate-all: ## Run all schema migrations (shared + tenant)
+	$(MANAGE) migrate_schemas
+
+# =============================================================================
 # Production Commands
 # =============================================================================
 
@@ -341,4 +373,6 @@ prod-logs: ## View production container logs
         typecheck typecheck-report quality quality-fix \
         validate-env validate-env-backend validate-env-frontend validate-env-strict validate-env-docker \
         clean docker-clean docker-prune seed backup restore \
+        tenant-list tenant-list-verbose tenant-list-active tenant-create \
+        tenant-migrate-shared tenant-migrate-tenant tenant-migrate-all \
         prod-up prod-down prod-build prod-logs up-build

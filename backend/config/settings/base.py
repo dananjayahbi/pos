@@ -46,6 +46,14 @@ ALLOWED_HOSTS: list[str] = env.list("ALLOWED_HOSTS")
 # ════════════════════════════════════════════════════════════════════════
 # APPLICATION DEFINITION  (Task 20)
 # ════════════════════════════════════════════════════════════════════════
+# NOTE: INSTALLED_APPS is now defined in database.py using the
+# django-tenants pattern: SHARED_APPS + unique TENANT_APPS.
+#
+# The lists below are kept as reference for which apps are installed,
+# but they are NO LONGER used to build INSTALLED_APPS. Any new app
+# must be added to SHARED_APPS or TENANT_APPS in database.py.
+#
+# See: backend/config/settings/database.py
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -57,7 +65,7 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS: list[str] = [
-    # "django_tenants",                  # Multi-tenancy (Phase 2)
+    "django_tenants",                    # Multi-tenancy (Phase 2)
     "channels",                          # Django Channels (WebSocket)
     "rest_framework",                    # Django REST Framework
     "django_filters",                    # Query filtering
@@ -93,7 +101,8 @@ LOCAL_APPS: list[str] = [
     "apps.integrations",                 # Third-party integrations
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+# INSTALLED_APPS is defined in database.py via SHARED_APPS + TENANT_APPS.
+# The import happens via: from config.settings.database import *
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -266,23 +275,16 @@ CHANNEL_LAYERS = {
 
 
 # ════════════════════════════════════════════════════════════════════════
-# DATABASE  (Task 23 — Placeholder)
+# DATABASE  (Task 23 — Configured in Phase 2)
 # ════════════════════════════════════════════════════════════════════════
 # Database credentials are NEVER stored here.
 # Each environment file (local.py, production.py, test.py) overrides
-# DATABASES with its own configuration.
+# DATABASES with its own connection configuration.
 #
-# Expected format for PostgreSQL with django-tenants (Phase 2):
-#   DATABASES = {
-#       "default": {
-#           "ENGINE": "django_tenants.postgresql_backend",
-#           "NAME": ...,
-#           "USER": ...,
-#           "PASSWORD": ...,
-#           "HOST": ...,
-#           "PORT": "5432",
-#       }
-#   }
+# Multi-tenancy settings (TENANT_MODEL, TENANT_DOMAIN_MODEL,
+# DATABASE_ROUTERS) are centralized in config/settings/database.py.
+
+from config.settings.database import *  # noqa: E402, F401, F403
 
 DATABASES: dict = {}
 
@@ -294,9 +296,8 @@ DATABASES: dict = {}
 # Custom user model — must be set before first migration (Phase 3)
 # AUTH_USER_MODEL = "users.User"  # Uncomment when User model is created
 
-# Multi-tenancy models — configured for django-tenants (Phase 2)
-TENANT_MODEL = "tenants.Tenant"
-TENANT_DOMAIN_MODEL = "tenants.Domain"
+# TENANT_MODEL and TENANT_DOMAIN_MODEL are imported from
+# config/settings/database.py via the wildcard import above.
 
 # Authentication backends — will be extended for JWT, social auth
 # AUTHENTICATION_BACKENDS = [
@@ -368,7 +369,11 @@ STATICFILES_FINDERS = [
 ]
 
 # WhiteNoise: Serve static files with compression and caching
+# Media storage: Tenant-aware partitioning (each tenant gets MEDIA_ROOT/<schema_name>/)
 STORAGES = {
+    "default": {
+        "BACKEND": "django_tenants.files.storage.TenantFileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },

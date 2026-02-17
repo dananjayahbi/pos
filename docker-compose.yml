@@ -113,10 +113,10 @@ services:
   # PgBouncer - Connection Pooler
   # -------------------------------------------------
   pgbouncer:
-    image: edoburu/pgbouncer:1.23.1-p2
+    image: edoburu/pgbouncer:latest
     container_name: lcc-pgbouncer
     ports:
-      - "6432:6432"
+      - "${PGBOUNCER_HOST_PORT:-6432}:6432"
     volumes:
       - ./docker/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
       - ./docker/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro

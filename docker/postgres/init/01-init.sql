@@ -35,32 +35,40 @@ CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 -- ---------------------------------------------------
 -- 2. Create main application database
 -- ---------------------------------------------------
+-- Note: POSTGRES_DB env var in docker-compose may
+-- already create this database. The exception handler
+-- skips creation gracefully if it already exists.
+-- ---------------------------------------------------
 \connect postgres
 
-SELECT 'Creating main database: lankacommerce' AS status;
+SELECT 'Creating main database: lankacommerce (if not exists)' AS status;
 
-CREATE DATABASE lankacommerce
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'C'
-    LC_CTYPE = 'C'
-    TEMPLATE = template0
-    CONNECTION LIMIT = -1;
+SELECT 'lankacommerce already exists — skipping' AS status
+WHERE EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce');
+
+SELECT 'Creating lankacommerce...' AS status
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce');
+
+-- CREATE DATABASE cannot run inside a transaction block,
+-- so we use \gexec to conditionally execute it.
+SELECT 'CREATE DATABASE lankacommerce WITH OWNER = postgres ENCODING = ''UTF8'' LC_COLLATE = ''C'' LC_CTYPE = ''C'' TEMPLATE = template0 CONNECTION LIMIT = -1'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce')
+\gexec
 
 -- ---------------------------------------------------
 -- 3. Create test database
 -- ---------------------------------------------------
-SELECT 'Creating test database: lankacommerce_test' AS status;
+SELECT 'Creating test database: lankacommerce_test (if not exists)' AS status;
 
-CREATE DATABASE lankacommerce_test
-    WITH
-    OWNER = postgres
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'C'
-    LC_CTYPE = 'C'
-    TEMPLATE = template0
-    CONNECTION LIMIT = -1;
+SELECT 'lankacommerce_test already exists — skipping' AS status
+WHERE EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce_test');
+
+SELECT 'Creating lankacommerce_test...' AS status
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce_test');
+
+SELECT 'CREATE DATABASE lankacommerce_test WITH OWNER = postgres ENCODING = ''UTF8'' LC_COLLATE = ''C'' LC_CTYPE = ''C'' TEMPLATE = template0 CONNECTION LIMIT = -1'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce_test')
+\gexec
 
 -- ---------------------------------------------------
 -- 4. Create application user
