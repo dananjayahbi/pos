@@ -122,6 +122,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Custom middleware will be added here (Phase 3)
+    # "apps.platform.middleware.feature_flags.FeatureFlagMiddleware",  # Phase 3
 ]
 
 
@@ -293,16 +294,20 @@ DATABASES: dict = {}
 # AUTHENTICATION  (Task 24)
 # ════════════════════════════════════════════════════════════════════════
 
-# Custom user model — must be set before first migration (Phase 3)
-# AUTH_USER_MODEL = "users.User"  # Uncomment when User model is created
+# Custom user model — must be set before first migration.
+# PlatformUser is the platform-level auth model in the public schema.
+# Tenant-scoped users will be handled separately in the users app.
+AUTH_USER_MODEL = "platform.PlatformUser"
 
 # TENANT_MODEL and TENANT_DOMAIN_MODEL are imported from
 # config/settings/database.py via the wildcard import above.
 
-# Authentication backends — will be extended for JWT, social auth
-# AUTHENTICATION_BACKENDS = [
-#     "django.contrib.auth.backends.ModelBackend",
-# ]
+# Authentication backends — will be extended for JWT, social auth.
+# EmailBackend enables authentication using email + password, which
+# aligns with PlatformUser's USERNAME_FIELD = "email".
+AUTHENTICATION_BACKENDS = [
+    "apps.platform.backends.EmailBackend",
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {

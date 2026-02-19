@@ -63,20 +63,49 @@
 
 ## � Database Documentation
 
-| Document                                                                | Description                                                  |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------ |
-| [Schema Naming & Multi-Tenancy Layout](database/schema-naming.md)       | Tenant schema naming, public schema baseline, search_path    |
-| [Tenant Settings Reference](database/tenant-settings.md)                | Django-tenants configuration, storage, and safety rules      |
-| [App Classification — SHARED vs TENANT](database/app-classification.md) | How apps are classified for multi-tenant schema isolation    |
-| [Tenant and Domain Models](database/tenant-models.md)                   | Tenant and Domain model reference, fields, and admin         |
-| [Database Routers](database/database-routers.md)                        | Router configuration, routing rules, cross-schema prevention |
-| [Database Routing Guide](multi-tenancy/database-routing.md)             | How routing works across schemas (overview)                  |
-| [Tenant Management Commands](multi-tenancy/tenant-commands.md)          | tenant_create, tenant_list commands and Makefile targets     |
-| [PgBouncer Connection Pooling](database/pgbouncer.md)                   | Connection pooling configuration, Django integration         |
-| [Indexing Guidelines](database/indexing-guidelines.md)                  | Index strategy, naming conventions, monitoring               |
-| [Performance Tuning Guide](database/performance-tuning.md)              | All tuning parameters, rationale, and checklist              |
-| [Backup and Recovery Procedures](database/backup-procedures.md)         | Backup strategy, restore workflows, WAL archiving            |
-| [Monitoring Queries](database/monitoring-queries.md)                    | Database health, performance, and capacity monitoring        |
+| Document                                                                | Description                                                    |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [Schema Naming & Multi-Tenancy Layout](database/schema-naming.md)       | Tenant schema naming, public schema baseline, search_path      |
+| [Tenant Settings Reference](database/tenant-settings.md)                | Django-tenants configuration, storage, and safety rules        |
+| [App Classification — SHARED vs TENANT](database/app-classification.md) | How apps are classified for multi-tenant schema isolation      |
+| [Tenant and Domain Models](database/tenant-models.md)                   | Tenant and Domain model reference, fields, and admin           |
+| [Database Routers](database/database-routers.md)                        | Router configuration, routing rules, cross-schema prevention   |
+| [Database Routing Guide](multi-tenancy/database-routing.md)             | How routing works across schemas (overview)                    |
+| [Tenant Management Commands](multi-tenancy/tenant-commands.md)          | tenant_create, tenant_list commands and Makefile targets       |
+| [Public Schema ERD](database/public-schema-erd.md)                      | Entity relationships and model reference for the public schema |
+| [Naming Conventions](database/naming-conventions.md)                    | Table, field, schema, and index naming rules                   |
+| [PgBouncer Connection Pooling](database/pgbouncer.md)                   | Connection pooling configuration, Django integration           |
+| [Indexing Guidelines](database/indexing-guidelines.md)                  | Index strategy, naming conventions, monitoring                 |
+| [Performance Tuning Guide](database/performance-tuning.md)              | All tuning parameters, rationale, and checklist                |
+| [Backup and Recovery Procedures](database/backup-procedures.md)         | Backup strategy, restore workflows, WAL archiving              |
+| [Monitoring Queries](database/monitoring-queries.md)                    | Database health, performance, and capacity monitoring          |
+
+---
+
+## 💼 SaaS Platform
+
+| Document                                         | Description                                               |
+| ------------------------------------------------ | --------------------------------------------------------- |
+| [Subscription Plans](saas/subscription-plans.md) | Plan tiers, pricing in LKR, resource limits, and features |
+| [Feature Flags](saas/feature-flags.md)           | Feature flag model, rollout strategy, and key naming      |
+
+---
+
+## 🏢 Platform Services
+
+| Document                                   | Description                                             |
+| ------------------------------------------ | ------------------------------------------------------- |
+| [Audit Logging](platform/audit-logging.md) | Audit event types, actor tracking, and retention policy |
+| [Billing Setup](platform/billing-setup.md) | Billing model, BRN validation, and payment lifecycle    |
+
+---
+
+## � Users & Authentication
+
+| Document                                      | Description                                            |
+| --------------------------------------------- | ------------------------------------------------------ |
+| [User Hierarchy](users/user-hierarchy.md)     | Platform vs tenant user architecture and access levels |
+| [Role Permissions](users/role-permissions.md) | Platform role definitions and permission matrix        |
 
 ---
 
@@ -182,6 +211,8 @@ docs/
 │   ├── app-classification.md
 │   ├── tenant-models.md
 │   ├── database-routers.md
+│   ├── public-schema-erd.md
+│   ├── naming-conventions.md
 │   ├── pgbouncer.md
 │   ├── indexing-guidelines.md
 │   ├── performance-tuning.md
@@ -190,6 +221,14 @@ docs/
 ├── multi-tenancy/        # Multi-tenancy guides
 │   ├── database-routing.md
 │   └── tenant-commands.md
+├── saas/                 # SaaS platform docs
+│   ├── subscription-plans.md
+│   └── feature-flags.md
+├── platform/             # Platform services docs
+│   ├── audit-logging.md
+│   └── billing-setup.md
+├── users/                # User & auth docs
+│   └── user-hierarchy.md
 ├── frontend/             # Frontend technical docs
 │   ├── README.md
 │   ├── components.md

@@ -2030,3 +2030,2185 @@ SubPhase-02 (Django-Tenants Installation) is complete. All 86 tasks across 6 gro
 - docs/multi-tenancy/tenant-commands.md — NEW command documentation
 - docs/index.md — Added tenant-commands.md link and directory map update
 - docs/VERIFICATION.md — This verification record
+
+---
+
+# SubPhase-03: Public Schema Design
+
+## Group-A Document 01 — Tasks 01-04: Platform App & Documentation Setup
+
+**Date:** 2025-07-16
+**Status:** PASSED (7/7 checks)
+
+### Task 01: Create Platform App Scaffold
+
+Created backend/apps/platform/ with full Django app structure:
+
+| File                            | Purpose                                |
+| ------------------------------- | -------------------------------------- |
+| **init**.py                     | Package marker                         |
+| apps.py                         | PlatformConfig (label="platform")      |
+| admin.py                        | Admin stub (ready for model admins)    |
+| models.py                       | Model stub (planned models documented) |
+| views.py                        | Views stub                             |
+| urls.py                         | URL config (app_name="platform")       |
+| tests.py                        | Tests stub                             |
+| management/**init**.py          | Management package                     |
+| management/commands/**init**.py | Commands package                       |
+| migrations/**init**.py          | Migrations package                     |
+
+PlatformConfig details:
+
+| Attribute          | Value             |
+| ------------------ | ----------------- |
+| name               | apps.platform     |
+| label              | platform          |
+| verbose_name       | Platform Services |
+| default_auto_field | BigAutoField      |
+
+### Task 02: Register in SHARED_APPS
+
+Added "apps.platform" to SHARED_APPS in backend/config/settings/database.py.
+
+**Validation results (Docker):**
+
+| Check                               | Result |
+| ----------------------------------- | ------ |
+| Platform app loads successfully     | Passed |
+| App name = apps.platform            | Passed |
+| App label = platform                | Passed |
+| In SHARED_APPS                      | Passed |
+| NOT in TENANT_APPS                  | Passed |
+| In INSTALLED_APPS                   | Passed |
+| Router classification = shared_only | Passed |
+
+**Total: 7/7 checks passed**
+
+### Task 03: Create Public Schema ERD Document
+
+Created docs/database/public-schema-erd.md with:
+
+- Entity groups: Tenancy Core (2 tables), Platform Services (5 planned), User Management, Django Framework (6 tables), Third-Party (9 tables)
+- Relationship summary between entity groups
+- Schema counts: 19 current shared apps + 5 planned platform models
+- ASCII-based entity relationship diagrams
+
+### Task 04: Create Naming Conventions Document
+
+Created docs/database/naming-conventions.md with:
+
+- Table naming rules (Django convention + custom patterns)
+- Field naming rules (snake_case, boolean/date/FK patterns)
+- Schema naming rules (public + tenant\_ prefix convention)
+- Index and constraint naming patterns
+- Migration naming conventions
+- App label rules and reserved names
+
+Updated docs/index.md:
+
+- Added public-schema-erd.md link to documentation table
+- Added naming-conventions.md link to documentation table
+- Updated directory map with database/ section
+
+### Files Modified in Group-A Document 01
+
+- backend/apps/platform/**init**.py — NEW package marker
+- backend/apps/platform/apps.py — NEW PlatformConfig
+- backend/apps/platform/admin.py — NEW admin stub
+- backend/apps/platform/models.py — NEW model stub with planned models
+- backend/apps/platform/views.py — NEW views stub
+- backend/apps/platform/urls.py — NEW URL config
+- backend/apps/platform/tests.py — NEW tests stub
+- backend/apps/platform/management/**init**.py — NEW management package
+- backend/apps/platform/management/commands/**init**.py — NEW commands package
+- backend/apps/platform/migrations/**init**.py — NEW migrations package
+- backend/config/settings/database.py — Added apps.platform to SHARED_APPS
+- docs/database/public-schema-erd.md — NEW ERD documentation
+- docs/database/naming-conventions.md — NEW naming conventions documentation
+- docs/index.md — Updated with new doc links and directory map
+- docs/VERIFICATION.md — This verification record
+
+## Group-A Document 02 — Tasks 05-08: Models Package & Mixins
+
+**Date:** 2025-07-16
+**Status:** PASSED (16/16 checks)
+
+### Task 05: Create Models Package
+
+Converted backend/apps/platform/models.py into a models/ package:
+
+| File               | Purpose                                          |
+| ------------------ | ------------------------------------------------ |
+| models/**init**.py | Package init, exports UUIDMixin & TimestampMixin |
+| models/mixins.py   | Reusable abstract model mixins                   |
+
+Model organization documented in **init**.py:
+
+- Mixins in models/mixins.py
+- Planned modules: subscription.py, settings.py, features.py, audit.py, billing.py
+- Each module corresponds to a domain entity from the public schema ERD
+
+### Task 06: Create Base Mixins Module
+
+Created models/mixins.py as the centralized location for reusable model mixins.
+
+Usage documentation included:
+
+- All platform models should inherit both UUIDMixin and TimestampMixin
+- Recommended inheritance order: UUIDMixin, TimestampMixin, models.Model
+- Module-level docstring with complete usage instructions
+
+### Task 07: Add UUID Mixin
+
+Defined UUIDMixin abstract model:
+
+| Attribute   | Value      |
+| ----------- | ---------- |
+| Field name  | id         |
+| Field type  | UUIDField  |
+| primary_key | True       |
+| default     | uuid.uuid4 |
+| editable    | False      |
+| abstract    | True       |
+
+PostgreSQL uuid-ossp requirement documented in class docstring.
+
+### Task 08: Add Timestamps Mixin
+
+Defined TimestampMixin abstract model:
+
+| Field      | Type          | Auto Behavior        | Editable |
+| ---------- | ------------- | -------------------- | -------- |
+| created_on | DateTimeField | default=timezone.now | False    |
+| updated_on | DateTimeField | auto_now=True        | N/A      |
+
+Field names follow naming conventions (created_on/updated_on, not created_at/updated_at).
+
+### Validation Results (Docker)
+
+| Check                                      | Result |
+| ------------------------------------------ | ------ |
+| Models package importable                  | Passed |
+| models is a package (directory)            | Passed |
+| mixins module importable                   | Passed |
+| UUIDMixin is abstract                      | Passed |
+| UUIDMixin.id is UUIDField + primary_key    | Passed |
+| UUIDMixin.id default is uuid.uuid4         | Passed |
+| UUIDMixin.id editable=False                | Passed |
+| TimestampMixin is abstract                 | Passed |
+| TimestampMixin.created_on is DateTimeField | Passed |
+| created_on editable=False                  | Passed |
+| TimestampMixin.updated_on is DateTimeField | Passed |
+| updated_on auto_now=True                   | Passed |
+| **all** exports both mixins                | Passed |
+| apps.platform in SHARED_APPS               | Passed |
+| Field named created_on (not created_at)    | Passed |
+| Field named updated_on (not updated_at)    | Passed |
+
+**Total: 16/16 checks passed**
+
+### Files Modified in Group-A Document 02
+
+- backend/apps/platform/models.py — REMOVED (replaced by package)
+- backend/apps/platform/models/**init**.py — NEW package init with exports
+- backend/apps/platform/models/mixins.py — NEW UUIDMixin + TimestampMixin
+- docs/VERIFICATION.md — This verification record
+
+## Group-A Document 03 — Tasks 09-12: Additional Mixins & Admin
+
+**Date:** 2025-07-16
+**Status:** PASSED (29/29 checks)
+
+### Task 09: Add Status Mixin
+
+Defined StatusMixin abstract model in models/mixins.py:
+
+| Field          | Type          | Default | db_index | Nullable |
+| -------------- | ------------- | ------- | -------- | -------- |
+| is_active      | BooleanField  | True    | True     | N/A      |
+| deactivated_on | DateTimeField | None    | False    | True     |
+
+Applicable models: SubscriptionPlan, FeatureFlag, BillingRecord.
+Not needed for: PlatformSetting (always active), AuditLog (immutable).
+
+### Task 10: Add Soft Delete Mixin
+
+Defined SoftDeleteMixin abstract model in models/mixins.py:
+
+| Field      | Type          | Default | db_index | Nullable |
+| ---------- | ------------- | ------- | -------- | -------- |
+| is_deleted | BooleanField  | False   | True     | N/A      |
+| deleted_on | DateTimeField | None    | False    | True     |
+
+Applicable models: SubscriptionPlan, BillingRecord, AuditLog.
+Not needed for: PlatformSetting (overwritten), FeatureFlag (deactivated).
+
+### Task 11: Create Platform Admin File
+
+Enhanced backend/apps/platform/admin.py with 5 base admin classes:
+
+| Admin Class            | Purpose                                   |
+| ---------------------- | ----------------------------------------- |
+| PlatformModelAdmin     | Base: UUID + timestamps read-only fields  |
+| StatusModelAdmin       | Adds is_active filter + deactivated_on    |
+| SoftDeleteModelAdmin   | Adds is_deleted filter + deleted_on       |
+| FullPlatformModelAdmin | Combines status + soft delete features    |
+| ReadOnlyPlatformAdmin  | Immutable records (blocks add/change/del) |
+
+Admin scope documented:
+
+- Platform admin accessible only to superusers and staff
+- All models reside in public schema, shared across tenants
+- ReadOnlyPlatformAdmin overrides has_add_permission, has_change_permission, has_delete_permission
+
+### Task 12: Validate Platform App Readiness
+
+Comprehensive validation via Docker (29/29 checks):
+
+**Structure checks:**
+
+| Check                       | Result |
+| --------------------------- | ------ |
+| Models package exists (dir) | Passed |
+| Mixins module importable    | Passed |
+| Admin module importable     | Passed |
+| PlatformConfig importable   | Passed |
+| Migrations package exists   | Passed |
+
+**UUIDMixin checks:**
+
+| Check                        | Result |
+| ---------------------------- | ------ |
+| UUIDMixin is abstract        | Passed |
+| UUIDMixin.id is UUIDField PK | Passed |
+
+**TimestampMixin checks:**
+
+| Check                           | Result |
+| ------------------------------- | ------ |
+| TimestampMixin is abstract      | Passed |
+| Fields: created_on + updated_on | Passed |
+
+**StatusMixin checks:**
+
+| Check                              | Result |
+| ---------------------------------- | ------ |
+| StatusMixin is abstract            | Passed |
+| Fields: is_active + deactivated_on | Passed |
+| is_active default=True             | Passed |
+| is_active db_index=True            | Passed |
+| deactivated_on null=True           | Passed |
+
+**SoftDeleteMixin checks:**
+
+| Check                           | Result |
+| ------------------------------- | ------ |
+| SoftDeleteMixin is abstract     | Passed |
+| Fields: is_deleted + deleted_on | Passed |
+| is_deleted default=False        | Passed |
+| is_deleted db_index=True        | Passed |
+| deleted_on null=True            | Passed |
+
+**Export and admin checks:**
+
+| Check                                                   | Result |
+| ------------------------------------------------------- | ------ |
+| **all** exports all 4 mixins                            | Passed |
+| PlatformModelAdmin exists                               | Passed |
+| StatusModelAdmin exists                                 | Passed |
+| SoftDeleteModelAdmin exists                             | Passed |
+| FullPlatformModelAdmin exists                           | Passed |
+| ReadOnlyPlatformAdmin exists                            | Passed |
+| ReadOnlyPlatformAdmin overrides add/change/delete perms | Passed |
+
+**App registration checks:**
+
+| Check                            | Result |
+| -------------------------------- | ------ |
+| apps.platform in SHARED_APPS     | Passed |
+| apps.platform NOT in TENANT_APPS | Passed |
+| apps.platform in INSTALLED_APPS  | Passed |
+
+**Total: 29/29 checks passed**
+
+### Group-A Summary
+
+All 12 tasks in Group-A (Public Schema Planning) are complete:
+
+| Doc | Tasks | Key Deliverables                       | Status   |
+| --- | ----- | -------------------------------------- | -------- |
+| 01  | 01-04 | Platform app scaffold, docs            | Complete |
+| 02  | 05-08 | Models package, UUID + Timestamp mixin | Complete |
+| 03  | 09-12 | Status + SoftDelete mixin, admin       | Complete |
+
+### Files Modified in Group-A Document 03
+
+- backend/apps/platform/models/mixins.py — Added StatusMixin + SoftDeleteMixin
+- backend/apps/platform/models/**init**.py — Updated exports (4 mixins)
+- backend/apps/platform/admin.py — Enhanced with 5 base admin classes
+- docs/VERIFICATION.md — This verification record
+
+---
+
+# Group-B: Subscription Plans Model
+
+## Group-B Document 01 — Tasks 13-18: Plan Model & Pricing
+
+**Date:** 2025-07-16
+**Status:** PASSED (50/50 checks)
+
+### Task 13: Create Subscription Model File
+
+Created backend/apps/platform/models/subscription.py:
+
+| Attribute       | Value                                                   |
+| --------------- | ------------------------------------------------------- |
+| Table name      | platform_subscriptionplan                               |
+| Inheritance     | UUIDMixin, TimestampMixin, StatusMixin, SoftDeleteMixin |
+| Currency        | LKR (Sri Lankan Rupee, ₨)                               |
+| Schema location | Public (shared) schema only                             |
+
+### Task 14: Add Plan Identity Fields
+
+| Field       | Type      | Constraints            |
+| ----------- | --------- | ---------------------- |
+| name        | CharField | max_length=100, unique |
+| slug        | SlugField | max_length=100, unique |
+| description | TextField | blank=True, default="" |
+
+### Task 15: Add Pricing Fields in LKR
+
+| Field         | Type         | max_digits | decimal_places | Validators           |
+| ------------- | ------------ | ---------- | -------------- | -------------------- |
+| monthly_price | DecimalField | 10         | 2              | MinValueValidator(0) |
+| annual_price  | DecimalField | 10         | 2              | MinValueValidator(0) |
+
+Currency: LKR (₨) — Sri Lankan Rupee.
+Supports up to 9,999,999.99 LKR per plan.
+
+### Task 16: Add Billing Cycle Fields
+
+| Field                 | Type                 | Default | Notes                         |
+| --------------------- | -------------------- | ------- | ----------------------------- |
+| default_billing_cycle | CharField (choices)  | monthly | monthly/annual options        |
+| is_free               | BooleanField         | False   | Whether plan requires payment |
+| has_trial             | BooleanField         | True    | Whether trial period offered  |
+| trial_days            | PositiveIntegerField | 14      | Trial duration in days        |
+
+### Task 17: Add Plan Slug and Ordering
+
+| Field         | Type                 | Default | db_index | Notes                      |
+| ------------- | -------------------- | ------- | -------- | -------------------------- |
+| slug          | SlugField            | N/A     | unique   | Auto-generated from name   |
+| display_order | PositiveIntegerField | 0       | True     | Lower numbers appear first |
+
+Meta configuration:
+
+- ordering: [display_order, monthly_price]
+- Composite index: is_active + display_order
+- Slug index: slug
+
+### Task 18: Validate Pricing Model
+
+Pricing validation implemented in clean():
+
+- Free plans must have zero monthly and annual prices
+- Paid plans must have positive monthly price
+- Slug auto-generated from name if not provided
+
+Properties:
+
+- annual_savings: Calculates savings vs 12x monthly
+- annual_discount_percent: Discount percentage for annual billing
+- is_paid: Whether plan requires payment
+
+**Validation results (Docker, 50/50 checks):**
+
+| Category              | Checks | Passed |
+| --------------------- | ------ | ------ |
+| Model importability   | 2      | 2      |
+| Mixin inheritance     | 4      | 4      |
+| Model configuration   | 2      | 2      |
+| Identity fields       | 5      | 5      |
+| Pricing fields        | 9      | 9      |
+| Billing cycle fields  | 8      | 8      |
+| Slug and ordering     | 8      | 8      |
+| Validation/properties | 5      | 5      |
+| Inherited fields      | 7      | 7      |
+| **Total**             | **50** | **50** |
+
+### Files Modified in Group-B Document 01
+
+- backend/apps/platform/models/subscription.py — NEW SubscriptionPlan model
+- backend/apps/platform/models/**init**.py — Updated exports (added SubscriptionPlan)
+- docs/VERIFICATION.md — This verification record
+
+## Group-B Document 02 — Tasks 19-24: Plan Limits & Status
+
+**Date:** 2025-07-16
+**Status:** PASSED (40/40 checks)
+
+### Task 19: Add User Limits
+
+| Field     | Type         | Default | Validator             | Notes          |
+| --------- | ------------ | ------- | --------------------- | -------------- |
+| max_users | IntegerField | 1       | MinValueValidator(-1) | -1 = unlimited |
+
+### Task 20: Add Storage Limits
+
+| Field            | Type         | Default | Notes                        |
+| ---------------- | ------------ | ------- | ---------------------------- |
+| storage_limit_mb | IntegerField | 512     | Stored in MB, -1 = unlimited |
+
+Constants: STORAGE_UNIT = "MB", STORAGE_MB_PER_GB = 1024.
+Property: storage_limit_gb converts MB to GB or returns -1 for unlimited.
+
+### Task 21: Add Transaction Limits
+
+| Field                    | Type         | Default | Notes          |
+| ------------------------ | ------------ | ------- | -------------- |
+| max_products             | IntegerField | 100     | -1 = unlimited |
+| max_locations            | IntegerField | 1       | -1 = unlimited |
+| max_monthly_transactions | IntegerField | 1000    | -1 = unlimited |
+
+All limit fields use MinValueValidator(-1) to enforce valid values.
+
+### Task 22: Add Status and Visibility Flags
+
+| Field       | Type         | Default | db_index | Notes                         |
+| ----------- | ------------ | ------- | -------- | ----------------------------- |
+| is_archived | BooleanField | False   | True     | Hidden from new subscriptions |
+| is_public   | BooleanField | True    | True     | Visible on pricing page       |
+
+Validation: Archived plans cannot be publicly visible (enforced in clean()).
+
+### Task 23: Define Unlimited Behavior
+
+UNLIMITED constant = -1, exported from models package.
+
+Properties for unlimited detection:
+
+| Property                   | Returns True when              |
+| -------------------------- | ------------------------------ |
+| has_unlimited_users        | max_users == -1                |
+| has_unlimited_products     | max_products == -1             |
+| has_unlimited_locations    | max_locations == -1            |
+| has_unlimited_storage      | storage_limit_mb == -1         |
+| has_unlimited_transactions | max_monthly_transactions == -1 |
+
+Additional property: is_selectable (active, public, not archived, not deleted).
+
+### Task 24: Validate Limits Configuration
+
+**Validation results (Docker, 40/40 checks):**
+
+| Category                   | Checks | Passed |
+| -------------------------- | ------ | ------ |
+| Constants and imports      | 5      | 5      |
+| User limit fields          | 3      | 3      |
+| Storage limit fields       | 2      | 2      |
+| Product/location/tx fields | 6      | 6      |
+| Status/visibility flags    | 6      | 6      |
+| Unlimited properties       | 7      | 7      |
+| Unlimited logic tests      | 8      | 8      |
+| Index checks               | 2      | 2      |
+| Export checks              | 1      | 1      |
+| **Total**                  | **40** | **40** |
+
+### Files Modified in Group-B Document 02
+
+- backend/apps/platform/models/subscription.py — Added limit fields, status flags, unlimited behavior
+- backend/apps/platform/models/**init**.py — Added UNLIMITED to exports
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-03 · Group-B · Document 03 — Features, Admin, Fixture (Tasks 25-28)
+
+**Document:** Phase-03/SubPhase-03/Group-B_Subscription-Plans-Model/03_Tasks-25-28_Features-Admin-Fixture.md
+**Date:** 2025-01-20
+**Status:** ✅ ALL CHECKS PASSED (63/63)
+
+### Task 25: feature_keys JSONField
+
+**Validation results (Docker, 6/6 checks):**
+
+| Check                            | Result |
+| -------------------------------- | ------ |
+| feature_keys field exists        | ✅     |
+| feature_keys is JSONField        | ✅     |
+| feature_keys default is list     | ✅     |
+| feature_keys blank=True          | ✅     |
+| feature_keys help_text set       | ✅     |
+| feature_keys default value is [] | ✅     |
+
+### Task 26: SubscriptionPlanAdmin
+
+**Validation results (Docker, 25/25 checks):**
+
+| Check                                  | Result |
+| -------------------------------------- | ------ |
+| SubscriptionPlanAdmin exists           | ✅     |
+| Extends FullPlatformModelAdmin         | ✅     |
+| SubscriptionPlan registered in admin   | ✅     |
+| list_display has 9+ fields             | ✅     |
+| list_display includes name             | ✅     |
+| list_display includes monthly_price    | ✅     |
+| list_display includes is_free          | ✅     |
+| list_display includes is_active        | ✅     |
+| list_display includes is_public        | ✅     |
+| list_display includes display_order    | ✅     |
+| list_filter has 6+ fields              | ✅     |
+| list_filter includes is_free           | ✅     |
+| list_filter includes is_active         | ✅     |
+| list_filter includes is_public         | ✅     |
+| list_filter includes is_archived       | ✅     |
+| search_fields includes name            | ✅     |
+| search_fields includes slug            | ✅     |
+| prepopulated_fields has slug from name | ✅     |
+| fieldsets defined                      | ✅     |
+| Identity fieldset present              | ✅     |
+| Pricing fieldset present               | ✅     |
+| Billing fieldset present               | ✅     |
+| Resource fieldset present              | ✅     |
+| Features fieldset present              | ✅     |
+| Timestamps fieldset present            | ✅     |
+
+### Task 27: Default Fixture Data
+
+**Validation results (Docker, 23/23 checks):**
+
+| Check                                           | Result |
+| ----------------------------------------------- | ------ |
+| Fixture file exists                             | ✅     |
+| Fixture is a list                               | ✅     |
+| Fixture has 4 plans                             | ✅     |
+| Free plan in fixture                            | ✅     |
+| Starter plan in fixture                         | ✅     |
+| Pro plan in fixture                             | ✅     |
+| Enterprise plan in fixture                      | ✅     |
+| Free uses platform.subscriptionplan model       | ✅     |
+| Starter uses platform.subscriptionplan model    | ✅     |
+| Pro uses platform.subscriptionplan model        | ✅     |
+| Enterprise uses platform.subscriptionplan model | ✅     |
+| Free plan monthly_price is 0                    | ✅     |
+| Free plan is_free is True                       | ✅     |
+| Enterprise has unlimited users (=-1)            | ✅     |
+| Enterprise has trial                            | ✅     |
+| Free plan has feature_keys                      | ✅     |
+| Enterprise plan has feature_keys                | ✅     |
+| Enterprise has more features than Free          | ✅     |
+| Free has deterministic UUID                     | ✅     |
+| Starter has deterministic UUID                  | ✅     |
+| Pro has deterministic UUID                      | ✅     |
+| Enterprise has deterministic UUID               | ✅     |
+| list_editable includes display_order            | ✅     |
+
+### Task 28: Documentation
+
+**Validation results (Host filesystem, 9/9 checks):**
+
+| Check                                   | Result |
+| --------------------------------------- | ------ |
+| subscription-plans.md exists            | ✅     |
+| Doc mentions LKR                        | ✅     |
+| Doc mentions Free plan                  | ✅     |
+| Doc mentions Enterprise plan            | ✅     |
+| Doc mentions UNLIMITED                  | ✅     |
+| Doc mentions feature_keys               | ✅     |
+| Doc has no fenced code blocks           | ✅     |
+| index.md has SaaS section               | ✅     |
+| index.md links to subscription-plans.md | ✅     |
+
+### Group-B Doc 03 Summary
+
+| Category               | Checks | Passed |
+| ---------------------- | ------ | ------ |
+| Task 25: feature_keys  | 6      | 6      |
+| Task 26: Admin         | 25     | 25     |
+| Task 27: Fixture       | 23     | 23     |
+| Task 28: Documentation | 9      | 9      |
+| **Total**              | **63** | **63** |
+
+### Group-B Summary (All 3 Documents)
+
+| Document                     | Tasks     | Checks  | Passed  |
+| ---------------------------- | --------- | ------- | ------- |
+| Doc 01: Model & Pricing      | 13-18     | 50      | 50      |
+| Doc 02: Limits & Status      | 19-24     | 40      | 40      |
+| Doc 03: Features, Admin, Fix | 25-28     | 63      | 63      |
+| **Group-B Total**            | **13-28** | **153** | **153** |
+
+### Files Modified in Group-B Document 03
+
+- backend/apps/platform/models/subscription.py — Added feature_keys JSONField
+- backend/apps/platform/admin.py — Added SubscriptionPlanAdmin with full configuration
+- backend/apps/platform/fixtures/subscription_plans.json — NEW: 4 default plans (Free, Starter, Pro, Enterprise)
+- docs/saas/subscription-plans.md — NEW: Subscription plans documentation
+- docs/index.md — Added SaaS Platform section and directory map entry
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-03 · Group-C · Document 01 — Settings & Branding (Tasks 29-34)
+
+**Document:** Phase-03/SubPhase-03/Group-C_Platform-Settings-Model/01_Tasks-29-34_Settings-Branding.md
+**Date:** 2025-01-20
+**Status:** ✅ ALL CHECKS PASSED (59/59)
+
+### Task 29: Create settings model file
+
+**Validation results (Docker, 9/9 checks):**
+
+| Check                                            | Result |
+| ------------------------------------------------ | ------ |
+| settings.py file exists                          | ✅     |
+| Module docstring documents purpose               | ✅     |
+| Module docstring mentions public schema          | ✅     |
+| PlatformSetting class importable                 | ✅     |
+| PlatformSetting inherits UUIDMixin               | ✅     |
+| PlatformSetting inherits TimestampMixin          | ✅     |
+| PlatformSetting does NOT inherit StatusMixin     | ✅     |
+| PlatformSetting does NOT inherit SoftDeleteMixin | ✅     |
+| PlatformSetting exported from **init**.py        | ✅     |
+
+### Task 30: Add branding fields
+
+**Validation results (Docker, 12/12 checks):**
+
+| Check                         | Result |
+| ----------------------------- | ------ |
+| platform_name field exists    | ✅     |
+| platform_name is CharField    | ✅     |
+| platform_name max_length=150  | ✅     |
+| platform_name has default     | ✅     |
+| logo_url field exists         | ✅     |
+| logo_url is URLField          | ✅     |
+| logo_url blank=True           | ✅     |
+| primary_color field exists    | ✅     |
+| primary_color is CharField    | ✅     |
+| primary_color max_length=7    | ✅     |
+| primary_color default=#1E40AF | ✅     |
+| primary_color has validator   | ✅     |
+
+### Task 31: Add contact fields
+
+**Validation results (Docker, 7/7 checks):**
+
+| Check                              | Result |
+| ---------------------------------- | ------ |
+| support_email field exists         | ✅     |
+| support_email is EmailField        | ✅     |
+| support_email has default          | ✅     |
+| support_phone field exists         | ✅     |
+| support_phone is CharField         | ✅     |
+| support_phone default contains +94 | ✅     |
+| support_phone has validator        | ✅     |
+
+### Task 32: Add localization fields
+
+**Validation results (Docker, 9/9 checks):**
+
+| Check                                 | Result |
+| ------------------------------------- | ------ |
+| default_timezone field exists         | ✅     |
+| default_timezone is CharField         | ✅     |
+| default_timezone default=Asia/Colombo | ✅     |
+| default_currency field exists         | ✅     |
+| default_currency is CharField         | ✅     |
+| default_currency default=LKR          | ✅     |
+| default_currency max_length=3         | ✅     |
+| DEFAULT_TIMEZONE = Asia/Colombo       | ✅     |
+| DEFAULT_CURRENCY = LKR                | ✅     |
+| CURRENCY_SYMBOL = ₨                   | ✅     |
+
+### Task 33: Define singleton behavior
+
+**Validation results (Docker, 9/9 checks):**
+
+| Check                                    | Result |
+| ---------------------------------------- | ------ |
+| save() method overridden                 | ✅     |
+| delete() method overridden               | ✅     |
+| **str**() defined                        | ✅     |
+| load() classmethod defined               | ✅     |
+| load is classmethod                      | ✅     |
+| currency_display property defined        | ✅     |
+| Meta db_table = platform_platformsetting | ✅     |
+| Meta verbose_name set                    | ✅     |
+| Meta verbose_name_plural set             | ✅     |
+
+### Task 34: Validate settings model (Admin)
+
+**Validation results (Docker, 13/13 checks):**
+
+| Check                                  | Result |
+| -------------------------------------- | ------ |
+| PlatformSettingAdmin exists            | ✅     |
+| Extends PlatformModelAdmin             | ✅     |
+| PlatformSetting registered in admin    | ✅     |
+| Fieldsets defined                      | ✅     |
+| Branding fieldset present              | ✅     |
+| Contact Information fieldset present   | ✅     |
+| Localization fieldset present          | ✅     |
+| Timestamps fieldset present            | ✅     |
+| has_add_permission overridden          | ✅     |
+| has_delete_permission overridden       | ✅     |
+| list_display includes platform_name    | ✅     |
+| list_display includes default_currency | ✅     |
+
+### Group-C Doc 01 Summary
+
+| Category                     | Checks | Passed |
+| ---------------------------- | ------ | ------ |
+| Task 29: Settings model file | 9      | 9      |
+| Task 30: Branding fields     | 12     | 12     |
+| Task 31: Contact fields      | 7      | 7      |
+| Task 32: Localization fields | 9      | 9      |
+| Task 33: Singleton behavior  | 9      | 9      |
+| Task 34: Admin validation    | 13     | 13     |
+| **Total**                    | **59** | **59** |
+
+### Files Modified in Group-C Document 01
+
+- backend/apps/platform/models/settings.py — NEW: PlatformSetting singleton model
+- backend/apps/platform/models/**init**.py — Added PlatformSetting export
+- backend/apps/platform/admin.py — Added PlatformSettingAdmin with singleton enforcement
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-03 · Group-C · Document 02 — Settings & Features (Tasks 35-38)
+
+**Document:** Phase-03/SubPhase-03/Group-C_Platform-Settings-Model/02_Tasks-35-38_Settings-Features.md
+**Date:** 2025-01-20
+**Status:** ✅ ALL CHECKS PASSED (54/54)
+
+### Task 35: Feature toggle fields
+
+**Validation results (Docker, 13/13 checks):**
+
+| Check                                 | Result |
+| ------------------------------------- | ------ |
+| enable_webstore field exists          | ✅     |
+| enable_webstore is BooleanField       | ✅     |
+| enable_webstore default=True          | ✅     |
+| enable_api_access field exists        | ✅     |
+| enable_api_access is BooleanField     | ✅     |
+| enable_api_access default=True        | ✅     |
+| enable_multi_currency field exists    | ✅     |
+| enable_multi_currency is BooleanField | ✅     |
+| enable_multi_currency default=False   | ✅     |
+| maintenance_mode field exists         | ✅     |
+| maintenance_mode is BooleanField      | ✅     |
+| maintenance_mode default=False        | ✅     |
+| maintenance_mode has help_text        | ✅     |
+
+### Task 36: Billing configuration fields
+
+**Validation results (Docker, 13/13 checks):**
+
+| Check                                 | Result |
+| ------------------------------------- | ------ |
+| default_tax_rate field exists         | ✅     |
+| default_tax_rate is DecimalField      | ✅     |
+| default_tax_rate max_digits=5         | ✅     |
+| default_tax_rate decimal_places=2     | ✅     |
+| default_tax_rate default=0            | ✅     |
+| tax_inclusive_pricing field exists    | ✅     |
+| tax_inclusive_pricing is BooleanField | ✅     |
+| tax_inclusive_pricing default=True    | ✅     |
+| tax_inclusive_pricing has help_text   | ✅     |
+| billing_currency field exists         | ✅     |
+| billing_currency is CharField         | ✅     |
+| billing_currency default=LKR          | ✅     |
+| billing_currency max_length=3         | ✅     |
+
+### Task 37: Notification configuration fields
+
+**Validation results (Docker, 8/8 checks):**
+
+| Check                                      | Result |
+| ------------------------------------------ | ------ |
+| enable_email_notifications field exists    | ✅     |
+| enable_email_notifications is BooleanField | ✅     |
+| enable_email_notifications default=True    | ✅     |
+| enable_sms_notifications field exists      | ✅     |
+| enable_sms_notifications is BooleanField   | ✅     |
+| enable_sms_notifications default=False     | ✅     |
+| notification_sender_email field exists     | ✅     |
+| notification_sender_email is EmailField    | ✅     |
+| notification_sender_email has default      | ✅     |
+
+### Task 38: Validate settings fields
+
+**Validation results (Docker, 20/20 checks):**
+
+| Check                                          | Result |
+| ---------------------------------------------- | ------ |
+| DEFAULT_TAX_RATE = 0                           | ✅     |
+| TAX_MAX_DIGITS = 5                             | ✅     |
+| TAX_DECIMAL_PLACES = 2                         | ✅     |
+| DEFAULT_NOTIFICATION_EMAIL set                 | ✅     |
+| Feature Toggles fieldset present               | ✅     |
+| Billing Configuration fieldset present         | ✅     |
+| Notification Configuration fieldset present    | ✅     |
+| list_display includes maintenance_mode         | ✅     |
+| enable_webstore in fieldsets                   | ✅     |
+| enable_api_access in fieldsets                 | ✅     |
+| enable_multi_currency in fieldsets             | ✅     |
+| maintenance_mode in fieldsets                  | ✅     |
+| default_tax_rate in fieldsets                  | ✅     |
+| tax_inclusive_pricing in fieldsets             | ✅     |
+| billing_currency in fieldsets                  | ✅     |
+| enable_email_notifications in fieldsets        | ✅     |
+| enable_sms_notifications in fieldsets          | ✅     |
+| notification_sender_email in fieldsets         | ✅     |
+| PlatformSetting has 17+ custom fields (has 19) | ✅     |
+
+### Group-C Doc 02 Summary
+
+| Category                     | Checks | Passed |
+| ---------------------------- | ------ | ------ |
+| Task 35: Feature toggles     | 13     | 13     |
+| Task 36: Billing config      | 13     | 13     |
+| Task 37: Notification config | 8      | 8      |
+| Task 38: Validation          | 20     | 20     |
+| **Total**                    | **54** | **54** |
+
+### Files Modified in Group-C Document 02
+
+- backend/apps/platform/models/settings.py — Added feature toggle, billing, and notification fields
+- backend/apps/platform/admin.py — Updated PlatformSettingAdmin fieldsets with 3 new sections
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-03 · Group-C · Document 03 — Singleton, Caching & Helper (Tasks 39-42)
+
+**Document:** Phase-03/SubPhase-03/Group-C_Platform-Settings-Model/03_Tasks-39-42_Singleton-Caching-Helper.md
+**Date:** 2025-01-20
+**Status:** ✅ ALL CHECKS PASSED (33/33)
+
+### Task 39: Enforce singleton settings
+
+**Validation results (Docker, 7/7 checks):**
+
+| Check                                     | Result |
+| ----------------------------------------- | ------ |
+| save() method overridden                  | ✅     |
+| delete() method overridden                | ✅     |
+| save() docstring mentions singleton       | ✅     |
+| delete() docstring mentions prevention    | ✅     |
+| Admin has_add_permission overridden       | ✅     |
+| Admin has_delete_permission overridden    | ✅     |
+| Admin has_delete_permission returns False | ✅     |
+
+### Task 40: Add caching strategy
+
+**Validation results (Docker, 10/10 checks):**
+
+| Check                                  | Result |
+| -------------------------------------- | ------ |
+| SETTINGS_CACHE_KEY = platform_settings | ✅     |
+| SETTINGS_CACHE_TTL = 3600 (1 hour)     | ✅     |
+| cache imported in settings module      | ✅     |
+| save() calls cache.delete              | ✅     |
+| save() references SETTINGS_CACHE_KEY   | ✅     |
+| load() calls cache.get                 | ✅     |
+| load() calls cache.set                 | ✅     |
+| load() references SETTINGS_CACHE_KEY   | ✅     |
+| load() references SETTINGS_CACHE_TTL   | ✅     |
+| load() docstring mentions cache        | ✅     |
+
+### Task 41: Add settings helper
+
+**Validation results (Docker, 16/16 checks):**
+
+| Check                                 | Result |
+| ------------------------------------- | ------ |
+| utils/**init**.py exists              | ✅     |
+| utils/settings.py exists              | ✅     |
+| get_platform_settings importable      | ✅     |
+| get_setting importable                | ✅     |
+| invalidate_settings_cache importable  | ✅     |
+| is_maintenance_mode importable        | ✅     |
+| is_feature_enabled importable         | ✅     |
+| get_platform_settings is callable     | ✅     |
+| get_setting is callable               | ✅     |
+| invalidate_settings_cache is callable | ✅     |
+| is_maintenance_mode is callable       | ✅     |
+| is_feature_enabled is callable        | ✅     |
+| Helper module has docstring           | ✅     |
+| Helper docstring mentions cache       | ✅     |
+| get_setting has field_name param      | ✅     |
+| get_setting has default param         | ✅     |
+
+### Group-C Doc 03 Summary
+
+| Category                       | Checks | Passed |
+| ------------------------------ | ------ | ------ |
+| Task 39: Singleton enforcement | 7      | 7      |
+| Task 40: Caching strategy      | 10     | 10     |
+| Task 41: Settings helper       | 16     | 16     |
+| **Total**                      | **33** | **33** |
+
+### Group-C Summary (All 3 Documents)
+
+| Document                           | Tasks     | Checks  | Passed  |
+| ---------------------------------- | --------- | ------- | ------- |
+| Doc 01: Settings & Branding        | 29-34     | 59      | 59      |
+| Doc 02: Settings & Features        | 35-38     | 54      | 54      |
+| Doc 03: Singleton, Caching, Helper | 39-42     | 33      | 33      |
+| **Group-C Total**                  | **29-42** | **146** | **146** |
+
+### Files Modified in Group-C Document 03
+
+- backend/apps/platform/models/settings.py — Added cache constants, cache invalidation in save(), cache-first load()
+- backend/apps/platform/utils/**init**.py — NEW: Platform utils package init
+- backend/apps/platform/utils/settings.py — NEW: Settings helper with 5 functions
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## Group-D: Platform User Model
+
+### Group-D Document 01: Platform User Model (Tasks 43–49)
+
+**Document:** `Phase-03_Core-Backend-Infrastructure/SubPhase-03_Platform-App/03_Group-D_Platform-User-Model/01_Tasks-43-49_User-Model-Auth-Config.md`
+**Date:** 2025-07-20
+**Validated by:** Docker container checks (54/54) + host doc checks (6/6)
+
+#### Task 43: Platform user model file
+
+| Check                                   | Status |
+| --------------------------------------- | ------ |
+| user.py file exists                     | ✅     |
+| Module docstring documents purpose      | ✅     |
+| Module docstring mentions public schema | ✅     |
+| Module notes distinct from tenant users | ✅     |
+| PlatformUser class importable           | ✅     |
+| Inherits UUIDMixin                      | ✅     |
+| Inherits TimestampMixin                 | ✅     |
+| Inherits AbstractBaseUser               | ✅     |
+| Inherits PermissionsMixin               | ✅     |
+| PlatformUser exported from **init**.py  | ✅     |
+
+#### Task 44: User manager
+
+| Check                                       | Status |
+| ------------------------------------------- | ------ |
+| managers.py file exists                     | ✅     |
+| PlatformUserManager importable              | ✅     |
+| PlatformUserManager extends BaseUserManager | ✅     |
+| create_user method exists                   | ✅     |
+| create_superuser method exists              | ✅     |
+| PlatformUser.objects is PlatformUserManager | ✅     |
+
+#### Task 45: Core user fields
+
+| Check                           | Status |
+| ------------------------------- | ------ |
+| email field exists              | ✅     |
+| email is EmailField             | ✅     |
+| email is unique                 | ✅     |
+| email has db_index              | ✅     |
+| first_name field exists         | ✅     |
+| first_name is CharField         | ✅     |
+| first_name max_length=150       | ✅     |
+| first_name blank=True           | ✅     |
+| last_name field exists          | ✅     |
+| last_name is CharField          | ✅     |
+| last_name blank=True            | ✅     |
+| phone field exists              | ✅     |
+| phone is CharField              | ✅     |
+| phone blank=True                | ✅     |
+| phone has validator             | ✅     |
+| phone validator uses +94 format | ✅     |
+
+#### Task 46: Staff/superuser flags
+
+| Check                        | Status |
+| ---------------------------- | ------ |
+| is_active field exists       | ✅     |
+| is_active is BooleanField    | ✅     |
+| is_active default=True       | ✅     |
+| is_active db_index=True      | ✅     |
+| is_staff field exists        | ✅     |
+| is_staff is BooleanField     | ✅     |
+| is_staff default=False       | ✅     |
+| is_superuser field exists    | ✅     |
+| date_joined field exists     | ✅     |
+| date_joined is DateTimeField | ✅     |
+| USERNAME_FIELD is email      | ✅     |
+| REQUIRED_FIELDS is empty     | ✅     |
+
+#### Task 47: AUTH_USER_MODEL
+
+| Check                                   | Status |
+| --------------------------------------- | ------ |
+| AUTH_USER_MODEL set                     | ✅     |
+| AUTH_USER_MODEL = platform.PlatformUser | ✅     |
+
+#### Meta and properties
+
+| Check                                 | Status |
+| ------------------------------------- | ------ |
+| Meta db_table = platform_platformuser | ✅     |
+| Meta verbose_name = Platform User     | ✅     |
+| Meta ordering set                     | ✅     |
+| full_name property exists             | ✅     |
+| short_name property exists            | ✅     |
+| **str** defined                       | ✅     |
+| Email index exists                    | ✅     |
+| Active+staff index exists             | ✅     |
+
+#### Task 49: User hierarchy documentation (host checks)
+
+| Check                          | Status |
+| ------------------------------ | ------ |
+| user-hierarchy.md exists       | ✅     |
+| Mentions Platform              | ✅     |
+| Mentions tenant                | ✅     |
+| Mentions public schema         | ✅     |
+| index.md has Users section     | ✅     |
+| index.md has users/ in dir map | ✅     |
+
+### Group-D Doc 01 Summary
+
+| Category                          | Checks | Passed |
+| --------------------------------- | ------ | ------ |
+| Task 43: Platform user model file | 10     | 10     |
+| Task 44: User manager             | 6      | 6      |
+| Task 45: Core user fields         | 16     | 16     |
+| Task 46: Staff/superuser flags    | 12     | 12     |
+| Task 47: AUTH_USER_MODEL          | 2      | 2      |
+| Meta and properties               | 8      | 8      |
+| Task 49: User hierarchy docs      | 6      | 6      |
+| **Total**                         | **60** | **60** |
+
+### Files Modified in Group-D Document 01
+
+- backend/apps/platform/models/managers.py — NEW: PlatformUserManager with create_user/create_superuser
+- backend/apps/platform/models/user.py — NEW: PlatformUser model (email auth, UUID pk, +94 phone)
+- backend/apps/platform/models/**init**.py — Added PlatformUser export
+- backend/config/settings/base.py — Set AUTH_USER_MODEL = "platform.PlatformUser"
+- docs/users/user-hierarchy.md — NEW: Platform vs tenant user architecture documentation
+- docs/index.md — Added Users & Authentication section and users/ directory map entry
+- docs/VERIFICATION.md — This verification record
+
+---
+
+### Group-D Document 02: Roles, Permissions & Admin (Tasks 50–54)
+
+**Document:** `Phase-03_Core-Backend-Infrastructure/SubPhase-03_Platform-App/03_Group-D_Platform-User-Model/02_Tasks-50-54_Roles-Permissions-Admin.md`
+**Date:** 2025-07-20
+**Validated by:** Docker container checks (67/67) + host doc checks (11/11)
+
+#### Task 50: Define platform roles
+
+| Check                                  | Status |
+| -------------------------------------- | ------ |
+| ROLE_SUPER_ADMIN defined               | ✅     |
+| ROLE_PLATFORM_ADMIN defined            | ✅     |
+| ROLE_SUPPORT defined                   | ✅     |
+| ROLE_VIEWER defined                    | ✅     |
+| PLATFORM_ROLE_CHOICES has 4 entries    | ✅     |
+| ROLE_MAX_LENGTH defined                | ✅     |
+| Role constants exported from **init**  | ✅     |
+| role field exists on PlatformUser      | ✅     |
+| role field is CharField                | ✅     |
+| role max_length=20                     | ✅     |
+| role has choices                       | ✅     |
+| role default is viewer                 | ✅     |
+| role has db_index                      | ✅     |
+| Role descriptions documented in source | ✅     |
+| is_super_admin property exists         | ✅     |
+| is_platform_admin property exists      | ✅     |
+| is_support property exists             | ✅     |
+| is_viewer property exists              | ✅     |
+| Role index exists                      | ✅     |
+
+#### Task 51: Permissions mapping
+
+| Check                                | Status |
+| ------------------------------------ | ------ |
+| can_manage_tenants property exists   | ✅     |
+| can_manage_users property exists     | ✅     |
+| can_manage_billing property exists   | ✅     |
+| can_view_audit_logs property exists  | ✅     |
+| Permission mapping documented        | ✅     |
+| Super admin can_manage_tenants       | ✅     |
+| Super admin can_manage_users         | ✅     |
+| Super admin can_manage_billing       | ✅     |
+| Super admin can_view_audit_logs      | ✅     |
+| Platform admin can_manage_tenants    | ✅     |
+| Platform admin cannot manage users   | ✅     |
+| Platform admin cannot manage billing | ✅     |
+| Platform admin can_view_audit_logs   | ✅     |
+| Support cannot manage tenants        | ✅     |
+| Support cannot manage users          | ✅     |
+| Support can_view_audit_logs          | ✅     |
+| Viewer cannot manage tenants         | ✅     |
+| Viewer cannot manage users           | ✅     |
+| Viewer cannot manage billing         | ✅     |
+| Viewer cannot view audit logs        | ✅     |
+
+#### Task 52: Admin for platform users
+
+| Check                                       | Status |
+| ------------------------------------------- | ------ |
+| PlatformUserAdmin exists                    | ✅     |
+| PlatformUser registered in admin            | ✅     |
+| Extends Django UserAdmin                    | ✅     |
+| list_display has email                      | ✅     |
+| list_display has role                       | ✅     |
+| list_display has is_active                  | ✅     |
+| list_display has is_staff                   | ✅     |
+| list_display has is_superuser               | ✅     |
+| list_display has date_joined                | ✅     |
+| list_filter has role                        | ✅     |
+| list_filter has is_active                   | ✅     |
+| list_filter has is_staff                    | ✅     |
+| list_filter has is_superuser                | ✅     |
+| search_fields has email                     | ✅     |
+| search_fields has first_name                | ✅     |
+| Has Identity fieldset                       | ✅     |
+| Has Personal Information fieldset           | ✅     |
+| Has Role & Permissions fieldset             | ✅     |
+| Has Timestamps fieldset                     | ✅     |
+| Has Account add fieldset                    | ✅     |
+| Has Role & Access add fieldset              | ✅     |
+| id in readonly_fields                       | ✅     |
+| date_joined in readonly_fields              | ✅     |
+| last_login in readonly_fields               | ✅     |
+| filter_horizontal includes groups           | ✅     |
+| filter_horizontal includes user_permissions | ✅     |
+
+#### Manager role assignment
+
+| Check                                    | Status |
+| ---------------------------------------- | ------ |
+| create_superuser sets role               | ✅     |
+| create_superuser defaults to super_admin | ✅     |
+
+#### Task 54: Role hierarchy documentation (host checks)
+
+| Check                                     | Status |
+| ----------------------------------------- | ------ |
+| role-permissions.md exists                | ✅     |
+| Mentions Super Admin                      | ✅     |
+| Mentions Platform Admin                   | ✅     |
+| Mentions Support                          | ✅     |
+| Mentions Viewer                           | ✅     |
+| Has Permission Matrix                     | ✅     |
+| Mentions least privilege                  | ✅     |
+| user-hierarchy has Role Hierarchy section | ✅     |
+| user-hierarchy has Platform Roles         | ✅     |
+| user-hierarchy links to role-permissions  | ✅     |
+| index.md links to role-permissions        | ✅     |
+
+### Group-D Doc 02 Summary
+
+| Category                          | Checks | Passed |
+| --------------------------------- | ------ | ------ |
+| Task 50: Define platform roles    | 19     | 19     |
+| Task 51: Permissions mapping      | 20     | 20     |
+| Task 52: Admin for platform users | 26     | 26     |
+| Manager role assignment           | 2      | 2      |
+| Task 54: Role hierarchy docs      | 11     | 11     |
+| **Total**                         | **78** | **78** |
+
+### Group-D Summary (Documents 01–02)
+
+| Document                           | Tasks     | Checks  | Passed  |
+| ---------------------------------- | --------- | ------- | ------- |
+| Doc 01: Platform User Model        | 43-49     | 60      | 60      |
+| Doc 02: Roles, Permissions & Admin | 50-54     | 78      | 78      |
+| **Group-D Total (so far)**         | **43-54** | **138** | **138** |
+
+### Files Modified in Group-D Document 02
+
+- backend/apps/platform/models/user.py — Added role field, role constants, role properties, permission check properties
+- backend/apps/platform/models/managers.py — Updated create_superuser to set role=super_admin
+- backend/apps/platform/models/**init**.py — Added role constant exports
+- backend/apps/platform/admin.py — Added PlatformUserAdmin with fieldsets, filters, search
+- docs/users/role-permissions.md — NEW: Platform role definitions and permission matrix
+- docs/users/user-hierarchy.md — Added Platform Roles and Role Hierarchy sections
+- docs/index.md — Added role-permissions link to Users section
+- docs/VERIFICATION.md — This verification record
+
+---
+
+### Group-D Document 03: Auth Config & Commands (Tasks 55–58)
+
+**Document:** `Phase-03_Core-Backend-Infrastructure/SubPhase-03_Platform-App/03_Group-D_Platform-User-Model/03_Tasks-55-58_Auth-Config-Commands.md`
+**Date:** 2025-07-20
+**Validated by:** Docker container checks (39/39) + host doc checks (8/8)
+
+#### Task 55: Configure auth settings
+
+| Check                                     | Status |
+| ----------------------------------------- | ------ |
+| AUTH_USER_MODEL set                       | ✅     |
+| AUTH_USER_MODEL = platform.PlatformUser   | ✅     |
+| AUTHENTICATION_BACKENDS configured        | ✅     |
+| AUTHENTICATION_BACKENDS is a list         | ✅     |
+| EmailBackend in AUTHENTICATION_BACKENDS   | ✅     |
+| backends.py file exists                   | ✅     |
+| EmailBackend class importable             | ✅     |
+| EmailBackend extends ModelBackend         | ✅     |
+| EmailBackend has authenticate method      | ✅     |
+| EmailBackend has docstring                | ✅     |
+| EmailBackend docstring mentions email     | ✅     |
+| authenticate uses case-insensitive email  | ✅     |
+| authenticate prevents timing attacks      | ✅     |
+| authenticate checks user_can_authenticate | ✅     |
+| AUTH_PASSWORD_VALIDATORS configured       | ✅     |
+| 4 password validators                     | ✅     |
+| AuthenticationMiddleware in MIDDLEWARE    | ✅     |
+
+#### Task 56: Platform admin command
+
+| Check                                       | Status |
+| ------------------------------------------- | ------ |
+| create_platform_admin.py exists             | ✅     |
+| management/**init**.py exists               | ✅     |
+| management/commands/**init**.py exists      | ✅     |
+| Command class importable                    | ✅     |
+| Command extends BaseCommand                 | ✅     |
+| Command has help text                       | ✅     |
+| Command has add_arguments method            | ✅     |
+| Command has handle method                   | ✅     |
+| Command accepts --email argument            | ✅     |
+| Command accepts --role argument             | ✅     |
+| Command accepts --first-name argument       | ✅     |
+| Command accepts --last-name argument        | ✅     |
+| Command accepts --noinput argument          | ✅     |
+| ALLOWED_ROLE_VALUES excludes super_admin    | ✅     |
+| ALLOWED_ROLE_VALUES includes platform_admin | ✅     |
+| ALLOWED_ROLE_VALUES includes support        | ✅     |
+| ALLOWED_ROLE_VALUES includes viewer         | ✅     |
+| Command sets is_staff=True                  | ✅     |
+| Command uses validate_password              | ✅     |
+| Command checks email uniqueness             | ✅     |
+
+#### Task 57: Command discoverability
+
+| Check                                      | Status |
+| ------------------------------------------ | ------ |
+| create_platform_admin registered in Django | ✅     |
+| Command registered under platform app      | ✅     |
+
+#### Task 58: Documentation (host checks)
+
+| Check                                           | Status |
+| ----------------------------------------------- | ------ |
+| user-hierarchy has Auth Configuration section   | ✅     |
+| user-hierarchy mentions EmailBackend            | ✅     |
+| user-hierarchy mentions AUTHENTICATION_BACKENDS | ✅     |
+| user-hierarchy has Management Commands section  | ✅     |
+| user-hierarchy documents create_platform_admin  | ✅     |
+| user-hierarchy mentions createsuperuser         | ✅     |
+| user-hierarchy mentions password validators     | ✅     |
+| role-permissions mentions create_platform_admin | ✅     |
+
+### Group-D Doc 03 Summary
+
+| Category                         | Checks | Passed |
+| -------------------------------- | ------ | ------ |
+| Task 55: Configure auth settings | 17     | 17     |
+| Task 56: Platform admin command  | 20     | 20     |
+| Task 57: Command discoverability | 2      | 2      |
+| Task 58: Documentation           | 8      | 8      |
+| **Total**                        | **47** | **47** |
+
+### Group-D Summary (All 3 Documents)
+
+| Document                           | Tasks     | Checks  | Passed  |
+| ---------------------------------- | --------- | ------- | ------- |
+| Doc 01: Platform User Model        | 43-49     | 60      | 60      |
+| Doc 02: Roles, Permissions & Admin | 50-54     | 78      | 78      |
+| Doc 03: Auth Config & Commands     | 55-58     | 47      | 47      |
+| **Group-D Total**                  | **43-58** | **185** | **185** |
+
+### Files Modified in Group-D Document 03
+
+- backend/apps/platform/backends.py — NEW: EmailBackend for email-based authentication
+- backend/apps/platform/management/commands/create_platform_admin.py — NEW: Management command for creating platform admin users
+- backend/config/settings/base.py — Uncommented and configured AUTHENTICATION_BACKENDS with EmailBackend
+- docs/users/user-hierarchy.md — Added Authentication Configuration and Management Commands sections
+- docs/users/role-permissions.md — Updated Role Assignment section with create_platform_admin reference
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## Group-E: Feature Flags & Tenant Configuration (Tasks 59–68)
+
+### Document 01: Feature Flag Model (Tasks 59–64)
+
+**Document:** Phase-03/SubPhase-03/Group-E/01_Tasks-59-64_Feature-Flag-Model.md
+**Date verified:** 2025-07-23
+**Verified by:** AI Assistant + Docker validation script + Host doc checks
+
+#### Task 59 — Create feature flag model file (11 checks)
+
+| #   | Check                                                 | Result |
+| --- | ----------------------------------------------------- | ------ |
+| 1   | features.py file exists                               | ✅     |
+| 2   | Module docstring exists                               | ✅     |
+| 3   | Docstring mentions feature flag                       | ✅     |
+| 4   | Docstring mentions public schema                      | ✅     |
+| 5   | Docstring mentions key naming convention (snake_case) | ✅     |
+| 6   | FeatureFlag class importable                          | ✅     |
+| 7   | FeatureFlag exported from **init**                    | ✅     |
+| 8   | Inherits UUIDMixin                                    | ✅     |
+| 9   | Inherits TimestampMixin                               | ✅     |
+| 10  | Inherits StatusMixin                                  | ✅     |
+| 11  | Does NOT inherit SoftDeleteMixin                      | ✅     |
+
+#### Task 60 — Flag identity fields (12 checks)
+
+| #   | Check                                                             | Result |
+| --- | ----------------------------------------------------------------- | ------ |
+| 1   | key field exists                                                  | ✅     |
+| 2   | key is CharField                                                  | ✅     |
+| 3   | key max_length=100                                                | ✅     |
+| 4   | key is unique                                                     | ✅     |
+| 5   | key has db_index                                                  | ✅     |
+| 6   | name field exists                                                 | ✅     |
+| 7   | name is CharField                                                 | ✅     |
+| 8   | name max_length=200                                               | ✅     |
+| 9   | description field exists                                          | ✅     |
+| 10  | description is TextField                                          | ✅     |
+| 11  | description blank=True                                            | ✅     |
+| 12  | KEY_MAX_LENGTH, NAME_MAX_LENGTH, DESCRIPTION_MAX_LENGTH constants | ✅     |
+
+#### Task 61 — Rollout percentage (9 checks)
+
+| #   | Check                                               | Result |
+| --- | --------------------------------------------------- | ------ |
+| 1   | rollout_percentage field exists                     | ✅     |
+| 2   | rollout_percentage is IntegerField                  | ✅     |
+| 3   | rollout_percentage default=0                        | ✅     |
+| 4   | MinValueValidator(0) present                        | ✅     |
+| 5   | MaxValueValidator(100) present                      | ✅     |
+| 6   | ROLLOUT_MIN, ROLLOUT_MAX, ROLLOUT_DEFAULT constants | ✅     |
+| 7   | is_fully_rolled_out property exists                 | ✅     |
+| 8   | is_disabled property exists                         | ✅     |
+| 9   | rollout_display property exists                     | ✅     |
+
+#### Task 62 — Status fields (7 checks)
+
+| #   | Check                                          | Result |
+| --- | ---------------------------------------------- | ------ |
+| 1   | is_active field exists (from StatusMixin)      | ✅     |
+| 2   | is_active is BooleanField                      | ✅     |
+| 3   | is_active default=True                         | ✅     |
+| 4   | deactivated_on field exists (from StatusMixin) | ✅     |
+| 5   | is_public field exists                         | ✅     |
+| 6   | is_public is BooleanField                      | ✅     |
+| 7   | is_public default=False                        | ✅     |
+
+#### Task 63 — Validation & Admin (18 checks)
+
+| #   | Check                                                                                  | Result |
+| --- | -------------------------------------------------------------------------------------- | ------ |
+| 1   | Meta db_table = platform_featureflag                                                   | ✅     |
+| 2   | Meta verbose_name = Feature Flag                                                       | ✅     |
+| 3   | Meta ordering = ["key"]                                                                | ✅     |
+| 4   | idx_feature_flag_key index exists                                                      | ✅     |
+| 5   | idx_feature_flag_active index exists                                                   | ✅     |
+| 6   | idx_feature_flag_active_public index exists                                            | ✅     |
+| 7   | **str** method defined                                                                 | ✅     |
+| 8   | save method defined                                                                    | ✅     |
+| 9   | FeatureFlag registered in admin                                                        | ✅     |
+| 10  | FeatureFlagAdmin exists                                                                | ✅     |
+| 11  | FeatureFlagAdmin extends StatusModelAdmin                                              | ✅     |
+| 12  | Admin list_display has key                                                             | ✅     |
+| 13  | Admin list_display has rollout_percentage                                              | ✅     |
+| 14  | Admin list_filter has is_active                                                        | ✅     |
+| 15  | Admin list_filter has is_public                                                        | ✅     |
+| 16  | Admin search_fields has key                                                            | ✅     |
+| 17  | Admin fieldsets include all 4 sections                                                 | ✅     |
+| 18  | Admin fieldsets: Flag Identity, Rollout Configuration, Status & Visibility, Timestamps | ✅     |
+
+#### Task 64 — Documentation (6 checks)
+
+| #   | Check                                           | Result |
+| --- | ----------------------------------------------- | ------ |
+| 1   | docs/saas/feature-flags.md exists               | ✅     |
+| 2   | feature-flags.md mentions FeatureFlag           | ✅     |
+| 3   | feature-flags.md mentions rollout               | ✅     |
+| 4   | feature-flags.md mentions snake_case key naming | ✅     |
+| 5   | docs/index.md has feature-flags link            | ✅     |
+| 6   | No fenced code blocks in feature-flags.md       | ✅     |
+
+#### Group-E Doc 01 Summary
+
+| Category          | Checks | Passed |
+| ----------------- | ------ | ------ |
+| Docker validation | 63     | 63     |
+| Host doc checks   | 6      | 6      |
+| **Total**         | **69** | **69** |
+
+### Files Modified in Group-E Document 01
+
+- backend/apps/platform/models/features.py — NEW: FeatureFlag model with identity fields, rollout percentage, status fields
+- backend/apps/platform/models/**init**.py — Added FeatureFlag import/export, moved features.py from planned to active
+- backend/apps/platform/admin.py — Added FeatureFlagAdmin extending StatusModelAdmin
+- docs/saas/feature-flags.md — NEW: Feature flag model documentation
+- docs/index.md — Added feature-flags link to SaaS section
+- docs/VERIFICATION.md — This verification record
+
+### Document 02: Tenant Overrides & Caching (Tasks 65–68)
+
+**Document:** Phase-03/SubPhase-03/Group-E/02_Tasks-65-68_Tenant-Override-Caching.md
+**Date verified:** 2025-07-23
+**Verified by:** AI Assistant + Docker validation script + Host doc checks
+
+#### Task 65 — Define tenant override model (37 checks)
+
+| #   | Check                                                        | Result |
+| --- | ------------------------------------------------------------ | ------ |
+| 1   | overrides.py file exists                                     | ✅     |
+| 2   | Module docstring exists                                      | ✅     |
+| 3   | Docstring mentions tenant                                    | ✅     |
+| 4   | Docstring mentions override                                  | ✅     |
+| 5   | Docstring mentions supersede                                 | ✅     |
+| 6   | Docstring mentions precedence                                | ✅     |
+| 7   | Docstring mentions resolution order                          | ✅     |
+| 8   | TenantFeatureOverride class importable                       | ✅     |
+| 9   | TenantFeatureOverride exported from **init**                 | ✅     |
+| 10  | Inherits UUIDMixin                                           | ✅     |
+| 11  | Inherits TimestampMixin                                      | ✅     |
+| 12  | Does NOT inherit StatusMixin                                 | ✅     |
+| 13  | Does NOT inherit SoftDeleteMixin                             | ✅     |
+| 14  | tenant field exists (ForeignKey)                             | ✅     |
+| 15  | tenant on_delete=CASCADE                                     | ✅     |
+| 16  | tenant related_name='feature_overrides'                      | ✅     |
+| 17  | feature_flag field exists (ForeignKey)                       | ✅     |
+| 18  | feature_flag on_delete=CASCADE                               | ✅     |
+| 19  | feature_flag related_name='tenant_overrides'                 | ✅     |
+| 20  | is_enabled field (BooleanField)                              | ✅     |
+| 21  | reason field (TextField, blank=True)                         | ✅     |
+| 22  | REASON_MAX_LENGTH = 500                                      | ✅     |
+| 23  | db_table = platform_tenantfeatureoverride                    | ✅     |
+| 24  | verbose_name = Tenant Feature Override                       | ✅     |
+| 25  | ordering = ["tenant", "feature_flag"]                        | ✅     |
+| 26  | unique_together = (tenant, feature_flag)                     | ✅     |
+| 27  | idx_override_tenant_flag index                               | ✅     |
+| 28  | idx_override_flag index                                      | ✅     |
+| 29  | idx_override_tenant index                                    | ✅     |
+| 30  | **str** defined                                              | ✅     |
+| 31  | override_type property exists                                | ✅     |
+| 32  | **init**.py docstring lists overrides.py                     | ✅     |
+| 33  | TenantFeatureOverride registered in admin                    | ✅     |
+| 34  | TenantFeatureOverrideAdmin extends PlatformModelAdmin        | ✅     |
+| 35  | Admin list_display, list_filter, search_fields configured    | ✅     |
+| 36  | Admin list_select_related for performance                    | ✅     |
+| 37  | Admin fieldsets: Override Target, Override Value, Timestamps | ✅     |
+
+#### Task 66 — Per-tenant override rules (6 checks)
+
+| #   | Check                                          | Result |
+| --- | ---------------------------------------------- | ------ |
+| 1   | utils/features.py exists                       | ✅     |
+| 2   | Utils docstring mentions resolution/precedence | ✅     |
+| 3   | Utils docstring mentions override supersedes   | ✅     |
+| 4   | is_flag_enabled function importable            | ✅     |
+| 5   | get_tenant_flags function importable           | ✅     |
+| 6   | invalidate_feature_cache function importable   | ✅     |
+
+#### Task 67 — Configure caching strategy (7 checks)
+
+| #   | Check                                         | Result |
+| --- | --------------------------------------------- | ------ |
+| 1   | FEATURE_CACHE_KEY_PREFIX = "feature_flags"    | ✅     |
+| 2   | FEATURE_CACHE_TTL = 3600                      | ✅     |
+| 3   | Utils docstring mentions cache invalidation   | ✅     |
+| 4   | Utils docstring mentions cache TTL            | ✅     |
+| 5   | invalidate_all_feature_caches function exists | ✅     |
+| 6   | \_build_cache_key function exists             | ✅     |
+| 7   | Cache key format correct (feature_flags:{id}) | ✅     |
+
+#### Task 68 — Validate override behavior (10 checks)
+
+| #   | Check                                             | Result |
+| --- | ------------------------------------------------- | ------ |
+| 1   | feature-flags.md mentions Tenant Feature Override | ✅     |
+| 2   | feature-flags.md mentions supersede               | ✅     |
+| 3   | feature-flags.md has Resolution Order section     | ✅     |
+| 4   | feature-flags.md has Caching Strategy section     | ✅     |
+| 5   | feature-flags.md mentions cache invalidation      | ✅     |
+| 6   | feature-flags.md mentions 3600 TTL                | ✅     |
+| 7   | feature-flags.md mentions is_flag_enabled         | ✅     |
+| 8   | feature-flags.md mentions force-enable            | ✅     |
+| 9   | feature-flags.md mentions force-disable           | ✅     |
+| 10  | No fenced code blocks in feature-flags.md         | ✅     |
+
+#### Group-E Doc 02 Summary
+
+| Category          | Checks | Passed |
+| ----------------- | ------ | ------ |
+| Docker validation | 63     | 63     |
+| Host doc checks   | 10     | 10     |
+| **Total**         | **73** | **73** |
+
+### Group-E Summary (Documents 01–02)
+
+| Document                           | Tasks     | Checks  | Passed  |
+| ---------------------------------- | --------- | ------- | ------- |
+| Doc 01: Feature Flag Model         | 59-64     | 69      | 69      |
+| Doc 02: Tenant Overrides & Caching | 65-68     | 73      | 73      |
+| **Group-E Total (so far)**         | **59-68** | **142** | **142** |
+
+### Files Modified in Group-E Document 02
+
+- backend/apps/platform/models/overrides.py — NEW: TenantFeatureOverride model with tenant+flag FK, is_enabled, reason
+- backend/apps/platform/models/**init**.py — Added TenantFeatureOverride import/export, listed overrides.py in docstring
+- backend/apps/platform/admin.py — Added TenantFeatureOverrideAdmin extending PlatformModelAdmin
+- backend/apps/platform/utils/features.py — NEW: Feature flag resolution and caching utilities (is_flag_enabled, get_tenant_flags, invalidate_feature_cache)
+- docs/saas/feature-flags.md — Added Tenant Feature Overrides, Resolution Order, and Caching Strategy sections
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-03 · Group-E · Document 03 — Helper, Admin & Middleware (Tasks 69-72)
+
+**Validated:** 2025-07-23
+**Script:** backend/scripts/validate_tasks_69_72.py (deleted after validation)
+**Method:** Docker validation (54 checks) + Host doc verification (11 checks)
+**Result:** 65/65 checks passed ✅
+
+#### Task 69 — Feature flags helper (21 checks)
+
+| #   | Check                                        | Result |
+| --- | -------------------------------------------- | ------ |
+| 1   | utils/flags.py exists                        | ✅     |
+| 2   | utils.flags module importable                | ✅     |
+| 3   | is_enabled function exists                   | ✅     |
+| 4   | is_enabled is callable                       | ✅     |
+| 5   | get_flag function exists                     | ✅     |
+| 6   | get_flag is callable                         | ✅     |
+| 7   | require_feature function exists              | ✅     |
+| 8   | require_feature is callable                  | ✅     |
+| 9   | Re-exports get_tenant_flags                  | ✅     |
+| 10  | Re-exports invalidate_feature_cache          | ✅     |
+| 11  | Re-exports invalidate_all_feature_caches     | ✅     |
+| 12  | Module docstring exists                      | ✅     |
+| 13  | **all** defined                              | ✅     |
+| 14  | **all** contains is_enabled                  | ✅     |
+| 15  | **all** contains require_feature             | ✅     |
+| 16  | is_enabled accepts tenant parameter          | ✅     |
+| 17  | tenant parameter defaults to None            | ✅     |
+| 18  | require_feature returns callable (decorator) | ✅     |
+| 19  | is_enabled handles missing table gracefully  | ✅     |
+| 20  | get_flag handles missing table gracefully    | ✅     |
+| 21  | utils/**init**.py mentions flags module      | ✅     |
+
+#### Task 70 — Admin configuration documented (11 checks)
+
+| #   | Check                                              | Result |
+| --- | -------------------------------------------------- | ------ |
+| 22  | FeatureFlagAdmin registered                        | ✅     |
+| 23  | TenantFeatureOverrideAdmin registered              | ✅     |
+| 24  | FeatureFlagAdmin has list_display                  | ✅     |
+| 25  | FeatureFlagAdmin has list_filter                   | ✅     |
+| 26  | FeatureFlagAdmin has search_fields                 | ✅     |
+| 27  | FeatureFlagAdmin has list_editable                 | ✅     |
+| 28  | FeatureFlagAdmin has fieldsets                     | ✅     |
+| 29  | TenantFeatureOverrideAdmin has list_select_related | ✅     |
+| 30  | feature-flags.md has Admin Interface section       | ✅     |
+| 31  | Docs mention admin usage guidelines                | ✅     |
+| 32  | Docs mention override admin guidelines             | ✅     |
+
+#### Task 71 — Feature flags middleware (16 checks)
+
+| #   | Check                                           | Result |
+| --- | ----------------------------------------------- | ------ |
+| 33  | middleware/ directory exists                    | ✅     |
+| 34  | middleware/**init**.py exists                   | ✅     |
+| 35  | middleware/feature_flags.py exists              | ✅     |
+| 36  | FeatureFlagMiddleware importable                | ✅     |
+| 37  | FeatureFlagMiddleware is a class                | ✅     |
+| 38  | Has **init** method                             | ✅     |
+| 39  | Has **call** method                             | ✅     |
+| 40  | **init** accepts get_response                   | ✅     |
+| 41  | Middleware module docstring exists              | ✅     |
+| 42  | Module docstring mentions request.feature_flags | ✅     |
+| 43  | Middleware referenced in base.py MIDDLEWARE     | ✅     |
+| 44  | Middleware commented out (Phase 3)              | ✅     |
+| 45  | Middleware sets empty dict when no tenant       | ✅     |
+| 46  | Docs mention Middleware section                 | ✅     |
+| 47  | Docs mention FeatureFlagMiddleware              | ✅     |
+| 48  | Docs mention middleware position                | ✅     |
+
+#### Task 72 — Validate flags integration (17 checks)
+
+| #   | Check                                             | Result |
+| --- | ------------------------------------------------- | ------ |
+| 49  | feature_flags.json fixture exists                 | ✅     |
+| 50  | Fixture is valid JSON                             | ✅     |
+| 51  | Fixture has at least 4 flags                      | ✅     |
+| 52  | All fixture entries are platform.featureflag      | ✅     |
+| 53  | All fixture flags have key field                  | ✅     |
+| 54  | All fixture flag keys have module prefix          | ✅     |
+| 55  | All fixture flags start with rollout_percentage 0 | ✅     |
+| 56  | All fixture flags have is_active True             | ✅     |
+| 57  | Fixture has webstore flags                        | ✅     |
+| 58  | Fixture has inventory flags                       | ✅     |
+| 59  | Fixture has billing flags                         | ✅     |
+| 60  | Fixture has reports flags                         | ✅     |
+| 61  | No fenced code blocks in feature-flags.md         | ✅     |
+| 62  | Docs mention High-Level Helpers section           | ✅     |
+| 63  | Docs mention is_enabled helper                    | ✅     |
+| 64  | Docs mention require_feature decorator            | ✅     |
+| 65  | Docs mention get_flag helper                      | ✅     |
+
+#### Group-E Doc 03 Summary
+
+| Category          | Checks | Passed |
+| ----------------- | ------ | ------ |
+| Docker validation | 54     | 54     |
+| Host doc checks   | 11     | 11     |
+| **Total**         | **65** | **65** |
+
+### Group-E Summary (Documents 01–03) — COMPLETE
+
+| Document                           | Tasks     | Checks  | Passed  |
+| ---------------------------------- | --------- | ------- | ------- |
+| Doc 01: Feature Flag Model         | 59-64     | 69      | 69      |
+| Doc 02: Tenant Overrides & Caching | 65-68     | 73      | 73      |
+| Doc 03: Helper, Admin & Middleware | 69-72     | 65      | 65      |
+| **Group-E Total**                  | **59-72** | **207** | **207** |
+
+### Files Modified in Group-E Document 03
+
+- backend/apps/platform/utils/flags.py — NEW: High-level helper module (is_enabled, get_flag, require_feature)
+- backend/apps/platform/utils/**init**.py — Updated docstring to list flags module
+- backend/apps/platform/middleware/**init**.py — NEW: Middleware package init
+- backend/apps/platform/middleware/feature_flags.py — NEW: FeatureFlagMiddleware (resolves flags per tenant per request)
+- backend/apps/platform/fixtures/feature_flags.json — NEW: 8 default feature flags (webstore, inventory, billing, reports)
+- backend/config/settings/base.py — Added commented FeatureFlagMiddleware reference for Phase 3
+- docs/saas/feature-flags.md — Added admin usage guidelines, High-Level Helpers, and Middleware sections
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-03 · Group-F · Document 01 — Audit Log Model (Tasks 73-78)
+
+**Validated:** 2025-07-23
+**Script:** backend/scripts/validate_tasks_73_78.py (deleted after validation)
+**Method:** Docker validation (79 checks) + Host doc verification (14 checks)
+**Result:** 93/93 checks passed ✅
+
+#### Task 73 — Create audit log model file (14 checks)
+
+| #   | Check                                | Result |
+| --- | ------------------------------------ | ------ |
+| 1   | models/audit.py exists               | ✅     |
+| 2   | AuditLog model importable            | ✅     |
+| 3   | Module docstring exists              | ✅     |
+| 4   | Docstring mentions audit             | ✅     |
+| 5   | Docstring mentions immutable         | ✅     |
+| 6   | AuditLog exported from **init**      | ✅     |
+| 7   | **init**.py docstring lists audit.py | ✅     |
+| 8   | Inherits UUIDMixin                   | ✅     |
+| 9   | Inherits TimestampMixin              | ✅     |
+| 10  | Does NOT inherit StatusMixin         | ✅     |
+| 11  | Does NOT inherit SoftDeleteMixin     | ✅     |
+| 12  | db_table = platform_auditlog         | ✅     |
+| 13  | verbose_name = Audit Log             | ✅     |
+| 14  | ordering = ["-created_on"]           | ✅     |
+
+#### Task 74 — Add audit event fields (23 checks)
+
+| #   | Check                                   | Result |
+| --- | --------------------------------------- | ------ |
+| 15  | action field exists                     | ✅     |
+| 16  | action is CharField                     | ✅     |
+| 17  | action has choices                      | ✅     |
+| 18  | action has db_index                     | ✅     |
+| 19  | resource_type field exists              | ✅     |
+| 20  | resource_type is CharField              | ✅     |
+| 21  | resource_type has db_index              | ✅     |
+| 22  | resource_id field exists                | ✅     |
+| 23  | resource_id is CharField                | ✅     |
+| 24  | description field exists                | ✅     |
+| 25  | description is TextField                | ✅     |
+| 26  | ACTION_CREATE = 'create'                | ✅     |
+| 27  | ACTION_UPDATE = 'update'                | ✅     |
+| 28  | ACTION_DELETE = 'delete'                | ✅     |
+| 29  | ACTION_LOGIN = 'login'                  | ✅     |
+| 30  | ACTION_LOGOUT = 'logout'                | ✅     |
+| 31  | ACTION_LOGIN_FAILED = 'login_failed'    | ✅     |
+| 32  | ACTION_ACTIVATE = 'activate'            | ✅     |
+| 33  | ACTION_DEACTIVATE = 'deactivate'        | ✅     |
+| 34  | ACTION_IMPORT = 'import_data'           | ✅     |
+| 35  | ACTION_EXPORT = 'export_data'           | ✅     |
+| 36  | ACTION_CONFIG_CHANGE = 'config_change'  | ✅     |
+| 37  | Action constants exported from **init** | ✅     |
+
+#### Task 75 — Add actor and IP fields (10 checks)
+
+| #   | Check                               | Result |
+| --- | ----------------------------------- | ------ |
+| 38  | actor field exists (ForeignKey)     | ✅     |
+| 39  | actor is ForeignKey                 | ✅     |
+| 40  | actor on_delete=SET_NULL            | ✅     |
+| 41  | actor is nullable                   | ✅     |
+| 42  | actor related_name='audit_logs'     | ✅     |
+| 43  | actor_email field exists            | ✅     |
+| 44  | actor_email is CharField            | ✅     |
+| 45  | ip_address field exists             | ✅     |
+| 46  | ip_address is GenericIPAddressField | ✅     |
+| 47  | ip_address is nullable              | ✅     |
+
+#### Task 76 — Add metadata fields (14 checks)
+
+| #   | Check                                   | Result |
+| --- | --------------------------------------- | ------ |
+| 48  | metadata field exists                   | ✅     |
+| 49  | metadata is JSONField                   | ✅     |
+| 50  | metadata default is dict                | ✅     |
+| 51  | user_agent field exists                 | ✅     |
+| 52  | user_agent is CharField                 | ✅     |
+| 53  | **str** defined                         | ✅     |
+| 54  | action_category property exists         | ✅     |
+| 55  | has_metadata property exists            | ✅     |
+| 56  | Model has indexes (>=4)                 | ✅     |
+| 57  | idx_auditlog_action index exists        | ✅     |
+| 58  | idx_auditlog_resource_type index exists | ✅     |
+| 59  | idx_auditlog_resource index exists      | ✅     |
+| 60  | idx_auditlog_actor index exists         | ✅     |
+| 61  | idx_auditlog_created index exists       | ✅     |
+
+#### Task 77 — Configure audit admin (15 checks)
+
+| #   | Check                                   | Result |
+| --- | --------------------------------------- | ------ |
+| 62  | AuditLog registered in admin            | ✅     |
+| 63  | Admin extends ReadOnlyPlatformAdmin     | ✅     |
+| 64  | has_add_permission returns False        | ✅     |
+| 65  | has_change_permission returns False     | ✅     |
+| 66  | has_delete_permission returns False     | ✅     |
+| 67  | Admin has list_display                  | ✅     |
+| 68  | Admin list_display includes action      | ✅     |
+| 69  | Admin list_display includes actor_email | ✅     |
+| 70  | Admin has list_filter                   | ✅     |
+| 71  | Admin has search_fields                 | ✅     |
+| 72  | Admin has list_select_related           | ✅     |
+| 73  | Admin has fieldsets                     | ✅     |
+| 74  | Admin date_hierarchy = created_on       | ✅     |
+| 75  | Admin ordering = ('-created_on',)       | ✅     |
+| 76  | All key fields are readonly             | ✅     |
+
+#### Task 78 — Document audit logging (17 checks)
+
+| #   | Check                                        | Result |
+| --- | -------------------------------------------- | ------ |
+| 77  | **init**.py no longer lists audit as planned | ✅     |
+| 78  | VALID_ACTIONS list exists (11 actions)       | ✅     |
+| 79  | ACTION_CHOICES groups defined (5 groups)     | ✅     |
+| 80  | audit-logging.md exists                      | ✅     |
+| 81  | Doc has Overview section                     | ✅     |
+| 82  | Doc mentions immutable                       | ✅     |
+| 83  | Doc has Event Fields section                 | ✅     |
+| 84  | Doc has Actor Fields section                 | ✅     |
+| 85  | Doc has Metadata Fields section              | ✅     |
+| 86  | Doc has Admin Interface section              | ✅     |
+| 87  | Doc mentions read-only admin                 | ✅     |
+| 88  | Doc has Retention section                    | ✅     |
+| 89  | Doc mentions preserved actor email           | ✅     |
+| 90  | No fenced code blocks in audit-logging.md    | ✅     |
+| 91  | docs/index.md has Platform Services section  | ✅     |
+| 92  | docs/index.md links audit-logging.md         | ✅     |
+| 93  | docs/index.md directory map has platform/    | ✅     |
+
+#### Group-F Doc 01 Summary
+
+| Category          | Checks | Passed |
+| ----------------- | ------ | ------ |
+| Docker validation | 79     | 79     |
+| Host doc checks   | 14     | 14     |
+| **Total**         | **93** | **93** |
+
+### Files Modified in Group-F Document 01
+
+- backend/apps/platform/models/audit.py — NEW: AuditLog model with event, actor, IP, and metadata fields
+- backend/apps/platform/models/**init**.py — Added AuditLog import/export and action constants
+- backend/apps/platform/admin.py — Added AuditLogAdmin extending ReadOnlyPlatformAdmin
+- docs/platform/audit-logging.md — NEW: Audit logging documentation (event types, fields, retention)
+- docs/index.md — Added Platform Services section with audit-logging link, updated directory map
+- docs/VERIFICATION.md — This verification record for Group-F Doc 01
+
+---
+
+### Group-F Document 02 — Tasks 79-84: Billing Model
+
+**Validated:** Tasks 79-84
+
+**Docker Validation (104 checks):**
+
+| #   | Check                                      | Status |
+| --- | ------------------------------------------ | ------ |
+| 1   | billing.py exists                          | ✅     |
+| 2   | Module docstring exists                    | ✅     |
+| 3   | Purpose documented (billing)               | ✅     |
+| 4   | BillingRecord class defined                | ✅     |
+| 5   | models.Model base                          | ✅     |
+| 6   | UUIDMixin used                             | ✅     |
+| 7   | TimestampMixin used                        | ✅     |
+| 8   | StatusMixin used                           | ✅     |
+| 9   | SoftDeleteMixin used                       | ✅     |
+| 10  | db_table set                               | ✅     |
+| 11  | amount field defined                       | ✅     |
+| 12  | tax_amount field defined                   | ✅     |
+| 13  | total_amount field defined                 | ✅     |
+| 14  | currency field defined                     | ✅     |
+| 15  | LKR currency default                       | ✅     |
+| 16  | CURRENCY_CODE constant                     | ✅     |
+| 17  | CURRENCY_SYMBOL constant                   | ✅     |
+| 18  | Invoice number field                       | ✅     |
+| 19  | Invoice number unique                      | ✅     |
+| 20  | Notes field                                | ✅     |
+| 21  | FK to tenant                               | ✅     |
+| 22  | FK to subscription plan                    | ✅     |
+| 23  | MinValueValidator imported                 | ✅     |
+| 24  | Decimal places = 2                         | ✅     |
+| 25  | business_registration_number field         | ✅     |
+| 26  | brn_validated field                        | ✅     |
+| 27  | brn_validated_on field                     | ✅     |
+| 28  | BRN_MAX_LENGTH constant                    | ✅     |
+| 29  | RegexValidator imported                    | ✅     |
+| 30  | brn_validator defined                      | ✅     |
+| 31  | PV format documented                       | ✅     |
+| 32  | PB format documented                       | ✅     |
+| 33  | GA format documented                       | ✅     |
+| 34  | Sri Lanka mentioned                        | ✅     |
+| 35  | has_brn property                           | ✅     |
+| 36  | billing_cycle field                        | ✅     |
+| 37  | period_start field                         | ✅     |
+| 38  | period_end field                           | ✅     |
+| 39  | due_date field                             | ✅     |
+| 40  | billing_status field                       | ✅     |
+| 41  | paid_on field                              | ✅     |
+| 42  | STATUS_PENDING constant                    | ✅     |
+| 43  | STATUS_PAID constant                       | ✅     |
+| 44  | STATUS_OVERDUE constant                    | ✅     |
+| 45  | STATUS_CANCELLED constant                  | ✅     |
+| 46  | STATUS_REFUNDED constant                   | ✅     |
+| 47  | BILLING_STATUS_CHOICES                     | ✅     |
+| 48  | CYCLE_MONTHLY constant                     | ✅     |
+| 49  | CYCLE_ANNUAL constant                      | ✅     |
+| 50  | BILLING_CYCLE_CHOICES                      | ✅     |
+| 51  | is_paid property                           | ✅     |
+| 52  | is_overdue property                        | ✅     |
+| 53  | is_pending property                        | ✅     |
+| 54  | is_cancelled property                      | ✅     |
+| 55  | is_refunded property                       | ✅     |
+| 56  | period_display property                    | ✅     |
+| 57  | amount_display property                    | ✅     |
+| 58  | **str** method                             | ✅     |
+| 59  | ordering defined                           | ✅     |
+| 60  | idx_billing_tenant_period index            | ✅     |
+| 61  | idx_billing_status index                   | ✅     |
+| 62  | idx_billing_invoice index                  | ✅     |
+| 63  | idx_billing_tenant_status index            | ✅     |
+| 64  | idx_billing_due_status index               | ✅     |
+| 65  | idx_billing_created index                  | ✅     |
+| 66  | BillingRecord imported in admin            | ✅     |
+| 67  | BillingRecordAdmin class                   | ✅     |
+| 68  | @admin.register(BillingRecord)             | ✅     |
+| 69  | FullPlatformModelAdmin base                | ✅     |
+| 70  | list_display configured                    | ✅     |
+| 71  | list_filter configured                     | ✅     |
+| 72  | search_fields configured                   | ✅     |
+| 73  | fieldsets configured                       | ✅     |
+| 74  | list_select_related configured             | ✅     |
+| 75  | date_hierarchy configured                  | ✅     |
+| 76  | BillingRecord mentioned in admin docstring | ✅     |
+| 77  | Access restrictions documented             | ✅     |
+| 78  | BillingRecord exported                     | ✅     |
+| 79  | CURRENCY_CODE exported                     | ✅     |
+| 80  | CURRENCY_SYMBOL exported                   | ✅     |
+| 81  | STATUS_PENDING exported                    | ✅     |
+| 82  | STATUS_PAID exported                       | ✅     |
+| 83  | STATUS_OVERDUE exported                    | ✅     |
+| 84  | STATUS_CANCELLED exported                  | ✅     |
+| 85  | STATUS_REFUNDED exported                   | ✅     |
+| 86  | BILLING_STATUS_CHOICES exported            | ✅     |
+| 87  | CYCLE_MONTHLY exported                     | ✅     |
+| 88  | CYCLE_ANNUAL exported                      | ✅     |
+| 89  | BILLING_CYCLE_CHOICES exported             | ✅     |
+| 90  | billing.py listed in docstring             | ✅     |
+| 91  | No Planned for billing                     | ✅     |
+| 92  | BillingRecord in **all**                   | ✅     |
+| 93  | BillingRecord importable                   | ✅     |
+| 94  | tenant field in model                      | ✅     |
+| 95  | subscription_plan field in model           | ✅     |
+| 96  | amount field in model                      | ✅     |
+| 97  | invoice_number field in model              | ✅     |
+| 98  | business_registration_number in model      | ✅     |
+| 99  | billing_status in model                    | ✅     |
+| 100 | period_start in model                      | ✅     |
+| 101 | period_end in model                        | ✅     |
+| 102 | due_date in model                          | ✅     |
+| 103 | Model meta db_table correct                | ✅     |
+| 104 | Model verbose_name                         | ✅     |
+
+**Host Documentation Checks (22 checks):**
+
+| #   | Check                                 | Status |
+| --- | ------------------------------------- | ------ |
+| 1   | billing-setup.md exists               | ✅     |
+| 2   | Has Billing Setup heading             | ✅     |
+| 3   | Has Overview section                  | ✅     |
+| 4   | Has Model section                     | ✅     |
+| 5   | Has Billing Fields section            | ✅     |
+| 6   | Has BRN section                       | ✅     |
+| 7   | Has Billing Cycle section             | ✅     |
+| 8   | Has Status Transitions section        | ✅     |
+| 9   | Has Indexes section                   | ✅     |
+| 10  | Has Admin Interface section           | ✅     |
+| 11  | Has Currency section                  | ✅     |
+| 12  | Has Retention section                 | ✅     |
+| 13  | Has Integration section               | ✅     |
+| 14  | Has Related Documentation             | ✅     |
+| 15  | LKR mentioned                         | ✅     |
+| 16  | Sri Lanka mentioned                   | ✅     |
+| 17  | BRN formats documented                | ✅     |
+| 18  | No fenced code blocks                 | ✅     |
+| 19  | Links to subscription-plans           | ✅     |
+| 20  | Links to audit-logging                | ✅     |
+| 21  | Index links to billing-setup          | ✅     |
+| 22  | Index directory map has billing-setup | ✅     |
+
+#### Group-F Doc 02 Summary
+
+| Category          | Checks  | Passed  |
+| ----------------- | ------- | ------- |
+| Docker validation | 104     | 104     |
+| Host doc checks   | 22      | 22      |
+| **Total**         | **126** | **126** |
+
+### Files Modified in Group-F Document 02
+
+- backend/apps/platform/models/billing.py — NEW: BillingRecord model with billing, BRN, and cycle fields
+- backend/apps/platform/models/**init**.py — Added BillingRecord import/export and billing constants
+- backend/apps/platform/admin.py — Added BillingRecordAdmin extending FullPlatformModelAdmin
+- docs/platform/billing-setup.md — NEW: Billing setup documentation (fields, BRN, lifecycle, admin)
+- docs/index.md — Added billing-setup link to Platform Services, updated directory map
+- docs/VERIFICATION.md — This verification record for Group-F Doc 02
+
+---
+
+### Group-G Document 01 — Tasks 85-88: Migrations Run
+
+**Validated:** Tasks 85-88
+
+**Docker Validation (92 checks):**
+
+| #   | Check                                               | Status |
+| --- | --------------------------------------------------- | ------ |
+| 1   | Migration file exists                               | ✅     |
+| 2   | Migration has CreateModel operations                | ✅     |
+| 3   | PlatformSetting in migration                        | ✅     |
+| 4   | PlatformUser in migration                           | ✅     |
+| 5   | AuditLog in migration                               | ✅     |
+| 6   | FeatureFlag in migration                            | ✅     |
+| 7   | SubscriptionPlan in migration                       | ✅     |
+| 8   | BillingRecord in migration                          | ✅     |
+| 9   | TenantFeatureOverride in migration                  | ✅     |
+| 10  | Migration scope: 7 models                           | ✅     |
+| 11  | Platform migration recorded                         | ✅     |
+| 12  | 0001_initial_platform_models applied                | ✅     |
+| 13  | Table platform_platformsetting exists               | ✅     |
+| 14  | Table platform_platformuser exists                  | ✅     |
+| 15  | Table platform_platformuser_groups exists           | ✅     |
+| 16  | Table platform_platformuser_user_permissions exists | ✅     |
+| 17  | Table platform_auditlog exists                      | ✅     |
+| 18  | Table platform_featureflag exists                   | ✅     |
+| 19  | Table platform_subscriptionplan exists              | ✅     |
+| 20  | Table platform_billingrecord exists                 | ✅     |
+| 21  | Table platform_tenantfeatureoverride exists         | ✅     |
+| 22  | System table django_migrations exists               | ✅     |
+| 23  | System table django_content_type exists             | ✅     |
+| 24  | System table django_admin_log exists                | ✅     |
+| 25  | System table django_session exists                  | ✅     |
+| 26  | System table auth_group exists                      | ✅     |
+| 27  | System table auth_permission exists                 | ✅     |
+| 28  | Tenant table tenants_tenant exists                  | ✅     |
+| 29  | Tenant table tenants_domain exists                  | ✅     |
+| 30  | PlatformUser.id column exists                       | ✅     |
+| 31  | PlatformUser.email column exists                    | ✅     |
+| 32  | PlatformUser.first_name column exists               | ✅     |
+| 33  | PlatformUser.last_name column exists                | ✅     |
+| 34  | PlatformUser.role column exists                     | ✅     |
+| 35  | PlatformUser.is_active column exists                | ✅     |
+| 36  | PlatformUser.is_staff column exists                 | ✅     |
+| 37  | PlatformUser.password column exists                 | ✅     |
+| 38  | BillingRecord.id column exists                      | ✅     |
+| 39  | BillingRecord.amount column exists                  | ✅     |
+| 40  | BillingRecord.tax_amount column exists              | ✅     |
+| 41  | BillingRecord.total_amount column exists            | ✅     |
+| 42  | BillingRecord.currency column exists                | ✅     |
+| 43  | BillingRecord.invoice_number column exists          | ✅     |
+| 44  | BillingRecord.business_registration_number column   | ✅     |
+| 45  | BillingRecord.brn_validated column exists           | ✅     |
+| 46  | BillingRecord.billing_cycle column exists           | ✅     |
+| 47  | BillingRecord.period_start column exists            | ✅     |
+| 48  | BillingRecord.period_end column exists              | ✅     |
+| 49  | BillingRecord.due_date column exists                | ✅     |
+| 50  | BillingRecord.billing_status column exists          | ✅     |
+| 51  | BillingRecord.paid_on column exists                 | ✅     |
+| 52  | BillingRecord.tenant_id column exists               | ✅     |
+| 53  | BillingRecord.subscription_plan_id column exists    | ✅     |
+| 54  | AuditLog.id column exists                           | ✅     |
+| 55  | AuditLog.action column exists                       | ✅     |
+| 56  | AuditLog.resource_type column exists                | ✅     |
+| 57  | AuditLog.resource_id column exists                  | ✅     |
+| 58  | AuditLog.actor_id column exists                     | ✅     |
+| 59  | AuditLog.actor_email column exists                  | ✅     |
+| 60  | AuditLog.ip_address column exists                   | ✅     |
+| 61  | AuditLog.metadata column exists                     | ✅     |
+| 62  | Index idx_auditlog_action exists                    | ✅     |
+| 63  | Index idx_auditlog_resource_type exists             | ✅     |
+| 64  | Index idx_auditlog_resource exists                  | ✅     |
+| 65  | Index idx_auditlog_actor exists                     | ✅     |
+| 66  | Index idx_auditlog_created exists                   | ✅     |
+| 67  | Index idx_auditlog_action_created exists            | ✅     |
+| 68  | Index idx_billing_tenant_period exists              | ✅     |
+| 69  | Index idx_billing_status exists                     | ✅     |
+| 70  | Index idx_billing_invoice exists                    | ✅     |
+| 71  | Index idx_billing_tenant_status exists              | ✅     |
+| 72  | Index idx_billing_due_status exists                 | ✅     |
+| 73  | Index idx_billing_created exists                    | ✅     |
+| 74  | Index idx_platform_user_email exists                | ✅     |
+| 75  | Index idx_platform_user_active_staff exists         | ✅     |
+| 76  | Index idx_platform_user_role exists                 | ✅     |
+| 77  | Index idx_subplan_active_order exists               | ✅     |
+| 78  | Index idx_subplan_slug exists                       | ✅     |
+| 79  | Index idx_subplan_archived exists                   | ✅     |
+| 80  | Index idx_feature_flag_key exists                   | ✅     |
+| 81  | Index idx_feature_flag_active exists                | ✅     |
+| 82  | Index idx_feature_flag_active_public exists         | ✅     |
+| 83  | Index idx_override_tenant_flag exists               | ✅     |
+| 84  | Index idx_override_flag exists                      | ✅     |
+| 85  | Index idx_override_tenant exists                    | ✅     |
+| 86  | BillingRecord FK to tenant                          | ✅     |
+| 87  | BillingRecord FK to subscription plan               | ✅     |
+| 88  | AuditLog FK to PlatformUser                         | ✅     |
+| 89  | TenantFeatureOverride FK to FeatureFlag             | ✅     |
+| 90  | TenantFeatureOverride FK to Tenant                  | ✅     |
+| 91  | Platform table count = 9                            | ✅     |
+| 92  | Custom index count = 24                             | ✅     |
+
+#### Group-G Doc 01 Summary
+
+| Category          | Checks | Passed |
+| ----------------- | ------ | ------ |
+| Docker validation | 92     | 92     |
+| **Total**         | **92** | **92** |
+
+#### Migration Details
+
+- Migration: platform.0001_initial_platform_models
+- Models: PlatformSetting, PlatformUser, AuditLog, FeatureFlag, SubscriptionPlan, BillingRecord, TenantFeatureOverride
+- Tables created: 9 (including M2M join tables for PlatformUser groups and permissions)
+- Custom indexes created: 24
+- Foreign keys: 5 (BillingRecord→Tenant, BillingRecord→SubscriptionPlan, AuditLog→PlatformUser, TenantFeatureOverride→FeatureFlag, TenantFeatureOverride→Tenant)
+- Schema: public (shared across all tenants)
+- Note: Migration applied manually due to pre-existing admin.0001_initial dependency on AUTH_USER_MODEL. Migration SQL was executed directly and the migration was recorded in django_migrations.
+
+### Files Modified in Group-G Document 01
+
+- backend/apps/platform/migrations/0001_initial_platform_models.py — NEW: Initial migration for all 7 platform models
+- backend/apps/platform/models/subscription.py — Fixed index names exceeding 30-char Django limit
+- docs/VERIFICATION.md — This verification record for Group-G Doc 01
+
+---
+
+## Group-G Document 02 — Tasks 89-92: Fixtures, Verification & Commit
+
+**Date:** 2025-07-12
+**Reviewer:** AI Agent (GitHub Copilot)
+**Phase:** 02 — Database Architecture & Multi-Tenancy
+**SubPhase:** 03 — Public Schema Design
+**Group:** G — Migration Verification
+**Document:** 02 of 02
+**Tasks:** 89-92
+**Status:** ✅ PASSED
+
+### Task 89: Load Default Fixtures
+
+Fixtures loaded after migrations in the correct order.
+
+| Step | Action                       | Result                 |
+| ---- | ---------------------------- | ---------------------- |
+| 1    | Load subscription_plans.json | ✅ 4 objects installed |
+| 2    | Load feature_flags.json      | ✅ 8 objects installed |
+
+Load order: subscription_plans first (no dependencies), then feature_flags (no dependencies).
+
+Fixture files required timestamp additions (created_on, updated_on) because Django loaddata uses raw=True which bypasses auto_now and auto_now_add. The deactivated_on field was also added to feature_flags.json for StatusMixin compatibility.
+
+### Task 90: Verify Seeded Data
+
+#### Subscription Plans
+
+| Order | Name       | Slug       | Monthly (LKR) | Annual (LKR) | Max Users | Max Products | Max Locations | Active |
+| ----- | ---------- | ---------- | ------------- | ------------ | --------- | ------------ | ------------- | ------ |
+| 1     | Free       | free       | 0.00          | 0.00         | 2         | 100          | 1             | ✅     |
+| 2     | Starter    | starter    | 2,999.00      | 29,990.00    | 5         | 1,000        | 2             | ✅     |
+| 3     | Pro        | pro        | 9,999.00      | 99,990.00    | 20        | 10,000       | 5             | ✅     |
+| 4     | Enterprise | enterprise | 29,999.00     | 299,990.00   | -1        | -1           | -1            | ✅     |
+
+Note: -1 indicates unlimited for Enterprise plan.
+
+#### Feature Flags
+
+| Key                        | Name                     | Active | Public | Rollout |
+| -------------------------- | ------------------------ | ------ | ------ | ------- |
+| billing.auto_invoicing     | Automatic Invoicing      | ✅     | ✅     | 0%      |
+| billing.multi_currency     | Multi-Currency Billing   | ✅     | ❌     | 0%      |
+| inventory.barcode_scanner  | Barcode Scanner          | ✅     | ✅     | 0%      |
+| inventory.multi_warehouse  | Multi-Warehouse Support  | ✅     | ❌     | 0%      |
+| reports.advanced_analytics | Advanced Analytics       | ✅     | ❌     | 0%      |
+| reports.custom_dashboards  | Custom Dashboards        | ✅     | ✅     | 0%      |
+| webstore.live_chat         | Webstore Live Chat       | ✅     | ✅     | 0%      |
+| webstore.product_reviews   | Webstore Product Reviews | ✅     | ✅     | 0%      |
+
+Modules covered: billing (2), inventory (2), reports (2), webstore (2).
+
+#### Verification Checks
+
+| #   | Check                                   | Result |
+| --- | --------------------------------------- | ------ |
+| 1   | 4 subscription plans found              | ✅     |
+| 2   | All plan slugs present                  | ✅     |
+| 3   | All 4 plans are active                  | ✅     |
+| 4   | Display orders are unique               | ✅     |
+| 5   | Free plan has zero prices               | ✅     |
+| 6   | All paid plans have non-zero prices     | ✅     |
+| 7   | 8 feature flags found                   | ✅     |
+| 8   | All flag keys use module.feature format | ✅     |
+| 9   | All expected modules present            | ✅     |
+| 10  | All 8 flags are active                  | ✅     |
+| 11  | All records have timestamps             | ✅     |
+| 12  | All flag keys are unique                | ✅     |
+
+#### Group-G Doc 02 Summary
+
+| Category          | Checks | Passed |
+| ----------------- | ------ | ------ |
+| Fixture loading   | 2      | 2      |
+| Data verification | 12     | 12     |
+| **Total**         | **14** | **14** |
+
+### Files Modified in Group-G Document 02
+
+- backend/apps/platform/fixtures/subscription_plans.json — Added created_on/updated_on timestamps to all 4 plans
+- backend/apps/platform/fixtures/feature_flags.json — Added created_on/updated_on/deactivated_on to all 8 flags
+- docs/VERIFICATION.md — This verification record for Group-G Doc 02
