@@ -16,3 +16,7 @@ class TenantsConfig(AppConfig):
     name = "apps.tenants"
     label = "tenants"
     verbose_name = "Multi-Tenancy"
+
+    def ready(self):
+        """Import signal handlers when the app is ready."""
+        import apps.tenants.signals  # noqa: F401

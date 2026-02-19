@@ -4212,3 +4212,1338 @@ Modules covered: billing (2), inventory (2), reports (2), webstore (2).
 - backend/apps/platform/fixtures/subscription_plans.json — Added created_on/updated_on timestamps to all 4 plans
 - backend/apps/platform/fixtures/feature_flags.json — Added created_on/updated_on/deactivated_on to all 8 flags
 - docs/VERIFICATION.md — This verification record for Group-G Doc 02
+
+---
+
+## SubPhase-04: Tenant Model & Domain Model
+
+### Group-A Document 01 — Tasks 01-06: Tenant Model Core
+
+**Date:** 2025-07-12
+**Reviewer:** AI Agent (GitHub Copilot)
+**Phase:** 02 — Database Architecture & Multi-Tenancy
+**SubPhase:** 04 — Tenant Model & Domain Model
+**Group:** A — Tenant Model Foundation
+**Document:** 01 of 03
+**Tasks:** 01-06
+**Status:** ✅ PASSED
+
+Note: The Tenant model was already fully implemented in backend/apps/tenants/models.py during earlier SubPhase work. Tasks 01-05 are confirmed as pre-existing. Task 06 validates the complete core model.
+
+#### Verification Checks
+
+| #   | Check                                            | Result |
+| --- | ------------------------------------------------ | ------ |
+| 1   | Tenant model module exists                       | ✅     |
+| 2   | Tenant inherits TenantMixin                      | ✅     |
+| 3   | name field exists (max_length=255)               | ✅     |
+| 4   | slug field exists (unique, max_length=63)        | ✅     |
+| 5   | slug has RegexValidator                          | ✅     |
+| 6   | schema_name field exists (unique, max_length=63) | ✅     |
+| 7   | schema*name derived as tenant*<slug>             | ✅     |
+| 8   | auto_create_schema = True                        | ✅     |
+| 9   | auto_drop_schema = False                         | ✅     |
+| 10  | paid_until field exists                          | ✅     |
+| 11  | on_trial field exists                            | ✅     |
+| 12  | status field with 3 choices and db_index         | ✅     |
+| 13  | settings JSONField exists                        | ✅     |
+| 14  | created_on auto_now_add exists                   | ✅     |
+| 15  | updated_on auto_now exists                       | ✅     |
+| 16  | is_active property exists                        | ✅     |
+| 17  | is_suspended property exists                     | ✅     |
+| 18  | is_public property exists                        | ✅     |
+| 19  | Domain inherits DomainMixin                      | ✅     |
+| 20  | Domain has domain, tenant, is_primary fields     | ✅     |
+| 21  | TENANT_MODEL = tenants.Tenant                    | ✅     |
+| 22  | TENANT_DOMAIN_MODEL = tenants.Domain             | ✅     |
+| 23  | Tenants exist in database (3 found)              | ✅     |
+
+#### Group-A Doc 01 Summary
+
+| Category         | Checks | Passed |
+| ---------------- | ------ | ------ |
+| Model validation | 23     | 23     |
+| **Total**        | **23** | **23** |
+
+### Files Modified in Group-A Document 01
+
+- No code changes required — Tenant model was already fully implemented
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-A Doc 01
+
+---
+
+### Group-A Document 02 — Tasks 07-12: Status, Schema & Meta
+
+**Date:** 2025-07-12
+**Reviewer:** AI Agent (GitHub Copilot)
+**Phase:** 02 — Database Architecture & Multi-Tenancy
+**SubPhase:** 04 — Tenant Model & Domain Model
+**Group:** A — Tenant Model Foundation
+**Document:** 02 of 03
+**Tasks:** 07-12
+**Status:** ✅ PASSED
+
+Tasks 07, 08, and 11 were already partially implemented. Tasks 09 (onboarding fields), 10 (schema metadata), and index additions in Task 11 were newly implemented.
+
+New fields added: onboarding_step (PositiveSmallIntegerField), onboarding_completed (BooleanField), schema_version (CharField). New indexes: idx_tenant_status_created, idx_tenant_onboarding. New properties: is_onboarded, needs_onboarding. Migration: tenants.0002_add_onboarding_schema_metadata.
+
+#### Verification Checks
+
+| #   | Check                                                         | Result |
+| --- | ------------------------------------------------------------- | ------ |
+| 1   | status field (CharField, 3 choices, db_index, default=active) | ✅     |
+| 2   | paid_until (DateField, nullable)                              | ✅     |
+| 3   | on_trial (BooleanField, default=True)                         | ✅     |
+| 4   | onboarding_step (PositiveSmallIntegerField, default=0)        | ✅     |
+| 5   | onboarding_completed (BooleanField, default=False)            | ✅     |
+| 6   | is_onboarded property exists                                  | ✅     |
+| 7   | needs_onboarding property exists                              | ✅     |
+| 8   | schema_version (CharField, max_length=50, default=1.0.0)      | ✅     |
+| 9   | Meta ordering = ['name']                                      | ✅     |
+| 10  | verbose_name = Tenant                                         | ✅     |
+| 11  | idx_tenant_status_created defined in Meta                     | ✅     |
+| 12  | idx_tenant_onboarding defined in Meta                         | ✅     |
+| 13  | onboarding_step column exists in DB                           | ✅     |
+| 14  | onboarding_completed column exists in DB                      | ✅     |
+| 15  | schema_version column exists in DB                            | ✅     |
+| 16  | idx_tenant_status_created index exists in DB                  | ✅     |
+| 17  | idx_tenant_onboarding index exists in DB                      | ✅     |
+| 18  | All 3 tenants have correct defaults                           | ✅     |
+| 19  | Migration 0002_add_onboarding_schema_metadata.py exists       | ✅     |
+
+#### Group-A Doc 02 Summary
+
+| Category         | Checks | Passed |
+| ---------------- | ------ | ------ |
+| Model validation | 12     | 12     |
+| DB verification  | 7      | 7      |
+| **Total**        | **19** | **19** |
+
+### Files Modified in Group-A Document 02
+
+- backend/apps/tenants/models.py — Added onboarding_step, onboarding_completed, schema_version fields, is_onboarded and needs_onboarding properties, Meta indexes
+- backend/apps/tenants/migrations/0002_add_onboarding_schema_metadata.py — NEW: Migration for new fields and indexes
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-A Doc 02
+
+---
+
+### Group-A Document 03 — Tasks 13-16: Manager & Querysets
+
+**Date:** 2025-07-12
+**Reviewer:** AI Agent (GitHub Copilot)
+**Phase:** 02 — Database Architecture & Multi-Tenancy
+**SubPhase:** 04 — Tenant Model & Domain Model
+**Group:** A — Tenant Model Foundation
+**Document:** 03 of 03
+**Tasks:** 13-16
+**Status:** ✅ PASSED
+
+Created TenantManager and TenantQuerySet in backend/apps/tenants/managers.py. The manager provides chainable queryset methods for filtering tenants by lifecycle status (active, suspended, archived), billing state (on_trial, paid, expired), onboarding progress (onboarded, needs_onboarding), and tenant type (business, public_only). The manager is wired into the Tenant model as objects = TenantManager().
+
+#### Verification Checks
+
+| #   | Check                                        | Result |
+| --- | -------------------------------------------- | ------ |
+| 1   | TenantManager class importable               | ✅     |
+| 2   | TenantQuerySet class importable              | ✅     |
+| 3   | Tenant.objects is TenantManager              | ✅     |
+| 4   | active() method exists                       | ✅     |
+| 5   | suspended() method exists                    | ✅     |
+| 6   | archived() method exists                     | ✅     |
+| 7   | not_archived() method exists                 | ✅     |
+| 8   | active() returns QuerySet                    | ✅     |
+| 9   | business() method exists                     | ✅     |
+| 10  | business() excludes public tenant            | ✅     |
+| 11  | on_trial() method exists                     | ✅     |
+| 12  | not_on_trial() method exists                 | ✅     |
+| 13  | paid() method exists                         | ✅     |
+| 14  | expired() method exists                      | ✅     |
+| 15  | onboarded() method exists                    | ✅     |
+| 16  | needs_onboarding() method exists             | ✅     |
+| 17  | public_only() method exists                  | ✅     |
+| 18  | on_trial() returns QuerySet                  | ✅     |
+| 19  | paid() returns QuerySet                      | ✅     |
+| 20  | expired() returns QuerySet                   | ✅     |
+| 21  | Chaining works (active().paid().onboarded()) | ✅     |
+| 22  | All tenants returned by objects.all()        | ✅     |
+| 23  | Active tenants count valid                   | ✅     |
+| 24  | Exactly 1 public tenant                      | ✅     |
+| 25  | Public tenant schema_name=public             | ✅     |
+| 26  | needs_onboarding + onboarded = total         | ✅     |
+
+#### Group-A Doc 03 Summary
+
+| Category           | Checks | Passed |
+| ------------------ | ------ | ------ |
+| Manager validation | 26     | 26     |
+| **Total**          | **26** | **26** |
+
+### Files Modified in Group-A Document 03
+
+- backend/apps/tenants/managers.py — NEW: TenantManager and TenantQuerySet with lifecycle, billing, onboarding, and type filters
+- backend/apps/tenants/models.py — Added TenantManager import and objects = TenantManager()
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-A Doc 03
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-A Doc 02
+
+---
+
+## SubPhase-04 Group-B: Tenant Business Information
+
+### Group-B Document 01 — Tasks 17-21: Business Type & Contact
+
+Verified: 47/47 checks passed ✅
+
+#### Task 17 — Business Type Field (6 checks)
+
+| #   | Check                                  | Status |
+| --- | -------------------------------------- | ------ |
+| 1   | business_type field exists             | ✅     |
+| 2   | business_type max_length=30            | ✅     |
+| 3   | business_type default='other'          | ✅     |
+| 4   | business_type has 7 choices            | ✅     |
+| 5   | BUSINESS_TYPE_CHOICES has correct keys | ✅     |
+| 6   | business_type allows blank=True        | ✅     |
+
+#### Task 18 — Industry Field (5 checks)
+
+| #   | Check                             | Status |
+| --- | --------------------------------- | ------ |
+| 7   | industry field exists             | ✅     |
+| 8   | industry max_length=30            | ✅     |
+| 9   | industry default='other'          | ✅     |
+| 10  | industry has 13 choices           | ✅     |
+| 11  | INDUSTRY_CHOICES has correct keys | ✅     |
+
+#### Task 19 — Business Registration Number (8 checks)
+
+| #   | Check                                      | Status |
+| --- | ------------------------------------------ | ------ |
+| 12  | business_registration_number field exists  | ✅     |
+| 13  | business_registration_number max_length=20 | ✅     |
+| 14  | business_registration_number blank=True    | ✅     |
+| 15  | business_registration_number has validator | ✅     |
+| 16  | brn_validator accepts 'PV12345'            | ✅     |
+| 17  | brn_validator accepts 'PB 1234'            | ✅     |
+| 18  | brn_validator accepts 'GA123456'           | ✅     |
+| 19  | brn_validator accepts '123456789'          | ✅     |
+| 20  | brn_validator rejects 'XX12345'            | ✅     |
+| 21  | brn_validator rejects 'INVALID'            | ✅     |
+
+#### Task 20 — Contact Fields (12 checks)
+
+| #   | Check                                     | Status |
+| --- | ----------------------------------------- | ------ |
+| 22  | contact_name field exists                 | ✅     |
+| 23  | contact_name max_length=255               | ✅     |
+| 24  | contact_name blank=True                   | ✅     |
+| 25  | contact_email field exists                | ✅     |
+| 26  | contact_email is EmailField               | ✅     |
+| 27  | contact_email blank=True                  | ✅     |
+| 28  | contact_phone field exists                | ✅     |
+| 29  | contact_phone max_length=20               | ✅     |
+| 30  | contact_phone blank=True                  | ✅     |
+| 31  | contact_phone has validator               | ✅     |
+| 32  | phone_validator accepts '+94771234567'    | ✅     |
+| 33  | phone_validator accepts '0771234567'      | ✅     |
+| 34  | phone_validator accepts '+94 77 123 4567' | ✅     |
+
+#### Task 21 — Properties & Integration (7 checks)
+
+| #   | Check                                        | Status |
+| --- | -------------------------------------------- | ------ |
+| 35  | has_brn property exists                      | ✅     |
+| 36  | has_brn returns False when empty             | ✅     |
+| 37  | has_brn returns True when set                | ✅     |
+| 38  | has_contact property exists                  | ✅     |
+| 39  | has_contact returns False when empty         | ✅     |
+| 40  | has_contact returns True when name+email set | ✅     |
+
+#### Database Columns (6 checks)
+
+| #   | Check                                           | Status |
+| --- | ----------------------------------------------- | ------ |
+| 41  | DB column 'business_type' exists                | ✅     |
+| 42  | DB column 'industry' exists                     | ✅     |
+| 43  | DB column 'business_registration_number' exists | ✅     |
+| 44  | DB column 'contact_name' exists                 | ✅     |
+| 45  | DB column 'contact_email' exists                | ✅     |
+| 46  | DB column 'contact_phone' exists                | ✅     |
+
+#### Migration (1 check)
+
+| #   | Check                 | Status |
+| --- | --------------------- | ------ |
+| 47  | Migration 0003 exists | ✅     |
+
+#### Group-B Doc 01 Summary
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Business Type Field      | 6      | 6      |
+| Industry Field           | 5      | 5      |
+| BRN Field & Validator    | 10     | 10     |
+| Contact Fields           | 12     | 12     |
+| Properties & Integration | 6      | 6      |
+| Database Columns         | 6      | 6      |
+| Migration                | 1      | 1      |
+| **Total**                | **47** | **47** |
+
+### Files Modified in Group-B Document 01
+
+- backend/apps/tenants/models.py — Added BUSINESS_TYPE_CHOICES (7 types), INDUSTRY_CHOICES (13 categories), brn_validator, phone_validator, business_type, industry, business_registration_number, contact_name, contact_email, contact_phone fields, has_brn and has_contact properties
+- backend/apps/tenants/migrations/0003_add_business_info_contact.py — NEW: Migration for business info and contact fields
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-B Doc 01
+
+---
+
+### Group-B Document 02 — Tasks 22-26: Address Fields
+
+Verified: 50/50 checks passed ✅
+
+#### Task 22 — Address Line Fields (8 checks)
+
+| #   | Check                         | Status |
+| --- | ----------------------------- | ------ |
+| 1   | address_line_1 field exists   | ✅     |
+| 2   | address_line_1 max_length=255 | ✅     |
+| 3   | address_line_1 blank=True     | ✅     |
+| 4   | address_line_1 default=''     | ✅     |
+| 5   | address_line_2 field exists   | ✅     |
+| 6   | address_line_2 max_length=255 | ✅     |
+| 7   | address_line_2 blank=True     | ✅     |
+| 8   | address_line_2 default=''     | ✅     |
+
+#### Task 23 — City and District Fields (8 checks)
+
+| #   | Check                   | Status |
+| --- | ----------------------- | ------ |
+| 9   | city field exists       | ✅     |
+| 10  | city max_length=100     | ✅     |
+| 11  | city blank=True         | ✅     |
+| 12  | city default=''         | ✅     |
+| 13  | district field exists   | ✅     |
+| 14  | district max_length=100 | ✅     |
+| 15  | district blank=True     | ✅     |
+| 16  | district default=''     | ✅     |
+
+#### Task 24 — Province Field (7 checks)
+
+| #   | Check                             | Status |
+| --- | --------------------------------- | ------ |
+| 17  | province field exists             | ✅     |
+| 18  | province max_length=30            | ✅     |
+| 19  | province blank=True               | ✅     |
+| 20  | province default=''               | ✅     |
+| 21  | province has 9 choices            | ✅     |
+| 22  | PROVINCE_CHOICES has correct keys | ✅     |
+| 23  | PROVINCE_CHOICES has 9 entries    | ✅     |
+
+#### Task 25 — Postal Code Field (11 checks)
+
+| #   | Check                                  | Status |
+| --- | -------------------------------------- | ------ |
+| 24  | postal_code field exists               | ✅     |
+| 25  | postal_code max_length=10              | ✅     |
+| 26  | postal_code blank=True                 | ✅     |
+| 27  | postal_code default=''                 | ✅     |
+| 28  | postal_code has validator              | ✅     |
+| 29  | postal_code_validator accepts '10100'  | ✅     |
+| 30  | postal_code_validator accepts '80000'  | ✅     |
+| 31  | postal_code_validator accepts '20000'  | ✅     |
+| 32  | postal_code_validator accepts '00100'  | ✅     |
+| 33  | postal_code_validator rejects '1010'   | ✅     |
+| 34  | postal_code_validator rejects '101000' | ✅     |
+| 35  | postal_code_validator rejects 'ABCDE'  | ✅     |
+
+#### Task 26 — Properties & Integration (9 checks)
+
+| #   | Check                                        | Status |
+| --- | -------------------------------------------- | ------ |
+| 36  | has_address property exists                  | ✅     |
+| 37  | has_address returns False when empty         | ✅     |
+| 38  | has_address returns True when line1+city set | ✅     |
+| 39  | full_address property exists                 | ✅     |
+| 40  | full_address contains address_line_1         | ✅     |
+| 41  | full_address contains city                   | ✅     |
+| 42  | full_address contains province display       | ✅     |
+| 43  | full_address contains postal_code            | ✅     |
+
+#### Database Columns (6 checks)
+
+| #   | Check                             | Status |
+| --- | --------------------------------- | ------ |
+| 44  | DB column 'address_line_1' exists | ✅     |
+| 45  | DB column 'address_line_2' exists | ✅     |
+| 46  | DB column 'city' exists           | ✅     |
+| 47  | DB column 'district' exists       | ✅     |
+| 48  | DB column 'province' exists       | ✅     |
+| 49  | DB column 'postal_code' exists    | ✅     |
+
+#### Migration (1 check)
+
+| #   | Check                 | Status |
+| --- | --------------------- | ------ |
+| 50  | Migration 0004 exists | ✅     |
+
+#### Group-B Doc 02 Summary
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Address Line Fields      | 8      | 8      |
+| City & District Fields   | 8      | 8      |
+| Province Field           | 7      | 7      |
+| Postal Code Field        | 11     | 11     |
+| Properties & Integration | 9      | 9      |
+| Database Columns         | 6      | 6      |
+| Migration                | 1      | 1      |
+| **Total**                | **50** | **50** |
+
+### Files Modified in Group-B Document 02
+
+- backend/apps/tenants/models.py — Added PROVINCE_CHOICES (9 Sri Lanka provinces), postal_code_validator, address_line_1, address_line_2, city, district, province, postal_code fields, has_address and full_address properties, updated docstring
+- backend/apps/tenants/migrations/0004_add_address_fields.py — NEW: Migration for address fields
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-B Doc 02
+
+---
+
+### Group-B Document 03 — Tasks 27-30: Branding & Localization
+
+Verified: 49/49 checks passed ✅
+
+#### Task 27 — Branding Fields (23 checks)
+
+| #   | Check                                 | Status |
+| --- | ------------------------------------- | ------ |
+| 1   | logo field exists                     | ✅     |
+| 2   | logo is ImageField                    | ✅     |
+| 3   | logo blank=True                       | ✅     |
+| 4   | logo null=True                        | ✅     |
+| 5   | logo has upload_to callable           | ✅     |
+| 6   | primary_color field exists            | ✅     |
+| 7   | primary_color max_length=7            | ✅     |
+| 8   | primary_color default='#1a73e8'       | ✅     |
+| 9   | primary_color blank=True              | ✅     |
+| 10  | primary_color has validator           | ✅     |
+| 11  | secondary_color field exists          | ✅     |
+| 12  | secondary_color max_length=7          | ✅     |
+| 13  | secondary_color default='#ffffff'     | ✅     |
+| 14  | secondary_color blank=True            | ✅     |
+| 15  | secondary_color has validator         | ✅     |
+| 16  | hex_color_validator accepts '#FF5733' | ✅     |
+| 17  | hex_color_validator accepts '#fff'    | ✅     |
+| 18  | hex_color_validator accepts '#1a73e8' | ✅     |
+| 19  | hex_color_validator accepts '#000000' | ✅     |
+| 20  | hex_color_validator rejects 'FF5733'  | ✅     |
+| 21  | hex_color_validator rejects '#GG5733' | ✅     |
+| 22  | hex_color_validator rejects '#12345'  | ✅     |
+| 23  | hex_color_validator rejects 'red'     | ✅     |
+
+#### Task 28 — Locale Preferences (10 checks)
+
+| #   | Check                                  | Status |
+| --- | -------------------------------------- | ------ |
+| 24  | language field exists                  | ✅     |
+| 25  | language max_length=5                  | ✅     |
+| 26  | language default='en'                  | ✅     |
+| 27  | language has 3 choices                 | ✅     |
+| 28  | LANGUAGE_CHOICES has correct keys      | ✅     |
+| 29  | timezone field exists                  | ✅     |
+| 30  | timezone max_length=50                 | ✅     |
+| 31  | timezone default='Asia/Colombo'        | ✅     |
+| 32  | timezone has choices                   | ✅     |
+| 33  | TIMEZONE_CHOICES includes Asia/Colombo | ✅     |
+
+#### Task 29 — Logo Storage Path (5 checks)
+
+| #   | Check                          | Status |
+| --- | ------------------------------ | ------ |
+| 34  | logo path function exists      | ✅     |
+| 35  | logo path contains schema_name | ✅     |
+| 36  | logo path contains 'branding'  | ✅     |
+| 37  | logo path contains filename    | ✅     |
+| 38  | logo path format correct       | ✅     |
+
+#### Task 30 — Properties & Integration (5 checks)
+
+| #   | Check                                       | Status |
+| --- | ------------------------------------------- | ------ |
+| 39  | has_branding property exists                | ✅     |
+| 40  | has_branding returns False with defaults    | ✅     |
+| 41  | has_branding returns True with custom color | ✅     |
+| 42  | logo_url property exists                    | ✅     |
+| 43  | logo_url returns None when no logo          | ✅     |
+
+#### Database Columns (5 checks)
+
+| #   | Check                              | Status |
+| --- | ---------------------------------- | ------ |
+| 44  | DB column 'logo' exists            | ✅     |
+| 45  | DB column 'primary_color' exists   | ✅     |
+| 46  | DB column 'secondary_color' exists | ✅     |
+| 47  | DB column 'language' exists        | ✅     |
+| 48  | DB column 'timezone' exists        | ✅     |
+
+#### Migration (1 check)
+
+| #   | Check                 | Status |
+| --- | --------------------- | ------ |
+| 49  | Migration 0005 exists | ✅     |
+
+#### Group-B Doc 03 Summary
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Branding Fields          | 23     | 23     |
+| Locale Preferences       | 10     | 10     |
+| Logo Storage Path        | 5      | 5      |
+| Properties & Integration | 5      | 5      |
+| Database Columns         | 5      | 5      |
+| Migration                | 1      | 1      |
+| **Total**                | **49** | **49** |
+
+### Files Modified in Group-B Document 03
+
+- backend/apps/tenants/models.py — Added LANGUAGE_CHOICES (en/si/ta), TIMEZONE_CHOICES, HEX_COLOR_REGEX, hex_color_validator, tenant_logo_upload_path function, logo (ImageField), primary_color, secondary_color, language, timezone fields, has_branding and logo_url properties, updated docstring
+- backend/apps/tenants/migrations/0005_add_branding_locale.py — NEW: Migration for branding and locale fields
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-B Doc 03
+
+---
+
+## SubPhase-04 Group-C: Domain Model Implementation
+
+### Group-C Document 01 — Tasks 31-36: Domain Model Core
+
+Verified: 32/32 checks passed ✅
+
+Note: The Domain model was already fully implemented in the initial tenants app setup, inheriting from DomainMixin. All tasks in this document validated existing implementation.
+
+#### Task 31 — Domain Model File (4 checks)
+
+| #   | Check                                         | Status |
+| --- | --------------------------------------------- | ------ |
+| 1   | Domain class exists in tenants app            | ✅     |
+| 2   | Domain is importable from apps.tenants.models | ✅     |
+| 3   | Domain defined in flat models.py              | ✅     |
+| 4   | Domain has docstring                          | ✅     |
+
+#### Task 32 — DomainMixin Base (2 checks)
+
+| #   | Check                            | Status |
+| --- | -------------------------------- | ------ |
+| 5   | Domain inherits from DomainMixin | ✅     |
+| 6   | DomainMixin is in Domain MRO     | ✅     |
+
+#### Task 33 — Domain Name Field (4 checks)
+
+| #   | Check                       | Status |
+| --- | --------------------------- | ------ |
+| 7   | domain field exists         | ✅     |
+| 8   | domain field is CharField   | ✅     |
+| 9   | domain field max_length=253 | ✅     |
+| 10  | domain field is unique      | ✅     |
+
+#### Task 34 — Primary Flag (3 checks)
+
+| #   | Check                      | Status |
+| --- | -------------------------- | ------ |
+| 11  | is_primary field exists    | ✅     |
+| 12  | is_primary is BooleanField | ✅     |
+| 13  | is_primary default=True    | ✅     |
+
+#### Task 35 — Domain-Tenant Link (4 checks)
+
+| #   | Check                         | Status |
+| --- | ----------------------------- | ------ |
+| 14  | tenant field exists           | ✅     |
+| 15  | tenant is ForeignKey          | ✅     |
+| 16  | tenant points to Tenant model | ✅     |
+| 17  | tenant related_name='domains' | ✅     |
+
+#### Task 36 — Validation & Integration (15 checks)
+
+| #   | Check                                             | Status |
+| --- | ------------------------------------------------- | ------ |
+| 18  | Domain **str** defined                            | ✅     |
+| 19  | Domain Meta exists                                | ✅     |
+| 20  | Domain Meta ordering=['domain']                   | ✅     |
+| 21  | Domain Meta verbose_name='Domain'                 | ✅     |
+| 22  | Domain Meta verbose_name_plural='Domains'         | ✅     |
+| 23  | Domain registered in admin                        | ✅     |
+| 24  | TENANT_DOMAIN_MODEL = 'tenants.Domain'            | ✅     |
+| 25  | DB column 'id' exists in tenants_domain           | ✅     |
+| 26  | DB column 'domain' exists in tenants_domain       | ✅     |
+| 27  | DB column 'is_primary' exists in tenants_domain   | ✅     |
+| 28  | DB column 'tenant_id' exists in tenants_domain    | ✅     |
+| 29  | Domains exist in database (3 found)               | ✅     |
+| 30  | Tenant 'LankaCommerce Cloud' has primary domain   | ✅     |
+| 31  | Tenant 'Test Isolation Tenant' has primary domain | ✅     |
+| 32  | Tenant 'Command Test Store' has primary domain    | ✅     |
+
+#### Group-C Doc 01 Summary
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Domain Model File        | 4      | 4      |
+| DomainMixin Base         | 2      | 2      |
+| Domain Name Field        | 4      | 4      |
+| Primary Flag             | 3      | 3      |
+| Domain-Tenant Link       | 4      | 4      |
+| Validation & Integration | 15     | 15     |
+| **Total**                | **32** | **32** |
+
+### Files Modified in Group-C Document 01
+
+- No code changes required — Domain model was already fully implemented
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-C Doc 01
+
+---
+
+### Group-C Document 02 — Tasks 37-42: Domain Type, SSL & Meta
+
+Verified: 57/57 checks passed ✅
+
+#### Task 37 — Domain Type Field (6 checks)
+
+| #   | Check                          | Status |
+| --- | ------------------------------ | ------ |
+| 1   | domain_type field exists       | ✅     |
+| 2   | domain_type max_length=20      | ✅     |
+| 3   | domain_type default='platform' | ✅     |
+| 4   | domain_type has 2 choices      | ✅     |
+| 5   | DOMAIN_TYPE_PLATFORM constant  | ✅     |
+| 6   | DOMAIN_TYPE_CUSTOM constant    | ✅     |
+
+#### Task 38 — Verification Fields (7 checks)
+
+| #   | Check                        | Status |
+| --- | ---------------------------- | ------ |
+| 7   | is_verified field exists     | ✅     |
+| 8   | is_verified is BooleanField  | ✅     |
+| 9   | is_verified default=False    | ✅     |
+| 10  | verified_at field exists     | ✅     |
+| 11  | verified_at is DateTimeField | ✅     |
+| 12  | verified_at null=True        | ✅     |
+| 13  | verified_at blank=True       | ✅     |
+
+#### Task 39 — SSL Tracking Fields (13 checks)
+
+| #   | Check                           | Status |
+| --- | ------------------------------- | ------ |
+| 14  | ssl_status field exists         | ✅     |
+| 15  | ssl_status max_length=20        | ✅     |
+| 16  | ssl_status default='none'       | ✅     |
+| 17  | ssl_status has 5 choices        | ✅     |
+| 18  | SSL_STATUS_NONE constant        | ✅     |
+| 19  | SSL_STATUS_PENDING constant     | ✅     |
+| 20  | SSL_STATUS_ACTIVE constant      | ✅     |
+| 21  | SSL_STATUS_EXPIRED constant     | ✅     |
+| 22  | SSL_STATUS_FAILED constant      | ✅     |
+| 23  | ssl_expires_at field exists     | ✅     |
+| 24  | ssl_expires_at is DateTimeField | ✅     |
+| 25  | ssl_expires_at null=True        | ✅     |
+| 26  | ssl_expires_at blank=True       | ✅     |
+
+#### Task 40 — Metadata Fields (6 checks)
+
+| #   | Check                        | Status |
+| --- | ---------------------------- | ------ |
+| 27  | metadata field exists        | ✅     |
+| 28  | metadata is JSONField        | ✅     |
+| 29  | metadata default=dict        | ✅     |
+| 30  | metadata blank=True          | ✅     |
+| 31  | created_on field exists      | ✅     |
+| 32  | created_on auto_now_add=True | ✅     |
+| 33  | updated_on field exists      | ✅     |
+| 34  | updated_on auto_now=True     | ✅     |
+
+#### Task 41 — Model Meta (4 checks)
+
+| #   | Check                                 | Status |
+| --- | ------------------------------------- | ------ |
+| 35  | Meta ordering=['domain']              | ✅     |
+| 36  | Meta verbose_name='Domain'            | ✅     |
+| 37  | idx_domain_type_verified index exists | ✅     |
+| 38  | idx_domain_ssl_status index exists    | ✅     |
+
+#### Task 42 — Properties & Integration (11 checks)
+
+| #   | Check                                         | Status |
+| --- | --------------------------------------------- | ------ |
+| 39  | is_platform_domain property exists            | ✅     |
+| 40  | is_platform_domain returns True for platform  | ✅     |
+| 41  | is_custom_domain property exists              | ✅     |
+| 42  | is_custom_domain returns True for custom      | ✅     |
+| 43  | needs_verification property exists            | ✅     |
+| 44  | needs_verification True for unverified custom | ✅     |
+| 45  | needs_verification False for verified custom  | ✅     |
+| 46  | has_ssl property exists                       | ✅     |
+| 47  | has_ssl True when ssl_status=active           | ✅     |
+| 48  | has_ssl False when ssl_status=none            | ✅     |
+
+#### Database Columns (8 checks)
+
+| #   | Check                             | Status |
+| --- | --------------------------------- | ------ |
+| 49  | DB column 'domain_type' exists    | ✅     |
+| 50  | DB column 'is_verified' exists    | ✅     |
+| 51  | DB column 'verified_at' exists    | ✅     |
+| 52  | DB column 'ssl_status' exists     | ✅     |
+| 53  | DB column 'ssl_expires_at' exists | ✅     |
+| 54  | DB column 'metadata' exists       | ✅     |
+| 55  | DB column 'created_on' exists     | ✅     |
+| 56  | DB column 'updated_on' exists     | ✅     |
+
+#### Migration (1 check)
+
+| #   | Check                 | Status |
+| --- | --------------------- | ------ |
+| 57  | Migration 0006 exists | ✅     |
+
+#### Group-C Doc 02 Summary
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Domain Type Field        | 6      | 6      |
+| Verification Fields      | 7      | 7      |
+| SSL Tracking Fields      | 13     | 13     |
+| Metadata Fields          | 8      | 8      |
+| Model Meta               | 4      | 4      |
+| Properties & Integration | 10     | 10     |
+| Database Columns         | 8      | 8      |
+| Migration                | 1      | 1      |
+| **Total**                | **57** | **57** |
+
+### Files Modified in Group-C Document 02
+
+- backend/apps/tenants/models.py — Enhanced Domain model with domain_type (platform/custom), is_verified, verified_at, ssl_status (5 states), ssl_expires_at, metadata (JSONField), created_on, updated_on fields, 2 indexes, 4 properties (is_platform_domain, is_custom_domain, needs_verification, has_ssl)
+- backend/apps/tenants/migrations/0006_add_domain_type_ssl_meta.py — NEW: Migration for domain type, SSL, verification, and metadata fields
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-C Doc 02
+
+---
+
+## SubPhase-04: Group-C Document 03 — Domain Manager & QuerySets (Tasks 43-46)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 55/55
+
+### Summary
+
+Implemented DomainQuerySet and DomainManager for the Domain model, providing chainable filter helpers for domain type, verification status, SSL certificate tracking, and tenant association. The manager follows the same pattern as the existing TenantQuerySet/TenantManager. Fixed a bug where timezone.timedelta was used instead of datetime.timedelta.
+
+### Task 43: DomainQuerySet Implementation
+
+DomainQuerySet class added to backend/apps/tenants/managers.py with 12 chainable methods:
+
+- platform() — Filter platform (system-assigned) domains
+- custom() — Filter custom (user-provided) domains
+- verified() — Filter verified domains
+- unverified() — Filter unverified domains
+- needs_verification() — Filter custom domains not yet verified
+- ssl_active() — Filter domains with active SSL certificates
+- ssl_expiring_soon(days=30) — Filter domains with SSL expiring within N days
+- ssl_expired() — Filter domains with expired SSL
+- ssl_pending() — Filter domains with pending SSL provisioning
+- active_domains() — Filter verified domains with active SSL
+- primary() — Filter primary domains only
+- for_tenant(tenant) — Filter domains for a specific tenant
+
+### Task 44: DomainManager Implementation
+
+DomainManager class added to backend/apps/tenants/managers.py. Extends models.Manager, overrides get_queryset() to return DomainQuerySet, and exposes all 12 queryset methods as manager-level shortcuts.
+
+### Task 45: DomainManager Wired Into Domain Model
+
+- Import updated: from apps.tenants.managers import DomainManager, TenantManager
+- Domain model now declares: objects = DomainManager()
+- Domain.objects.get_queryset() returns DomainQuerySet instance
+
+### Task 46: Functional Validation
+
+All 12 queryset methods tested for:
+
+- Correct return type (QuerySet instance)
+- Method chaining (platform().verified(), custom().unverified().primary(), ssl_active().primary())
+- Data correctness (3 existing domains all typed as platform, 3 primary domains)
+- Custom parameter support (ssl_expiring_soon(days=60))
+- for_tenant() with actual Tenant instance
+
+### Bug Fix Applied
+
+- Fixed timezone.timedelta (does not exist in django.utils.timezone) to datetime.timedelta
+- Added from datetime import timedelta import to managers.py
+
+### Validation Results
+
+| Category               | Checks | Passed |
+| ---------------------- | ------ | ------ |
+| DomainQuerySet Methods | 14     | 14     |
+| DomainManager Methods  | 15     | 15     |
+| Model Wiring           | 2      | 2      |
+| Functional Tests       | 16     | 16     |
+| Data Correctness       | 5      | 5      |
+| Import Structure       | 3      | 3      |
+| **Total**              | **55** | **55** |
+
+### Files Modified in Group-C Document 03
+
+- backend/apps/tenants/managers.py — Added DomainQuerySet (12 methods), DomainManager (12 shortcut methods), datetime.timedelta import, updated module docstring with Domain usage examples
+- backend/apps/tenants/models.py — Updated import to include DomainManager, added objects = DomainManager() to Domain model
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-C Doc 03
+
+---
+
+## SubPhase-04: Group-D Document 01 — TenantSettings Core (Tasks 47-52)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 54/54
+
+### Summary
+
+Created the TenantSettings model with OneToOneField to Tenant, theme color branding field, invoice and order prefix fields, and default tax rate field. The model stores per-tenant configuration settings that apply across ERP modules.
+
+### Task 47: TenantSettings Model
+
+- TenantSettings class created in backend/apps/tenants/models.py
+- Inherits from models.Model
+- verbose_name: "Tenant Settings"
+- verbose_name_plural: "Tenant Settings"
+- **str** returns "Settings for {tenant.name}"
+- created_on (auto_now_add) and updated_on (auto_now) timestamps
+
+### Task 48: Tenant OneToOne Relationship
+
+- tenant field: OneToOneField to tenants.Tenant
+- on_delete: CASCADE
+- related_name: "tenant_settings" (not "settings" due to conflict with existing Tenant.settings JSONField)
+- Reverse access via tenant.tenant_settings works correctly
+- UNIQUE constraint enforced at database level on tenant_id column
+
+### Task 49: Theme Color Field
+
+- theme_color: CharField, max_length=7, default="#1E40AF"
+- Uses hex_color_validator (existing module-level validator)
+- Validates correctly: accepts #1E40AF, #ffffff, #000000, #FF5733
+- Rejects invalid values: "invalid", "#GGG"
+
+### Task 50: Invoice Prefix Field
+
+- invoice_prefix: CharField, max_length=10, default="INV"
+- Used for generating invoice IDs (e.g. INV-0001)
+
+### Task 51: Order Prefix Field
+
+- order_prefix: CharField, max_length=10, default="ORD"
+- Used for generating order IDs (e.g. ORD-0001)
+
+### Task 52: Tax Rate Field
+
+- tax_rate: DecimalField, max_digits=5, decimal_places=2, default=0
+- Represents percentage (e.g. 8.00 for 8%)
+- CRUD tested: created with 0.00, updated to 8.00, verified via refresh_from_db
+
+### Design Decision
+
+- related_name changed from "settings" to "tenant_settings" because the Tenant model already has a JSONField named "settings" for per-tenant JSON configuration. Using "settings" would cause a reverse accessor clash.
+
+### Validation Results
+
+| Category              | Checks | Passed |
+| --------------------- | ------ | ------ |
+| Model Structure       | 9      | 9      |
+| OneToOne Relationship | 5      | 5      |
+| Theme Color Field     | 8      | 8      |
+| Invoice Prefix Field  | 4      | 4      |
+| Order Prefix Field    | 4      | 4      |
+| Tax Rate Field        | 5      | 5      |
+| Database Columns      | 9      | 9      |
+| CRUD Operations       | 9      | 9      |
+| Migration             | 1      | 1      |
+| **Total**             | **54** | **54** |
+
+### Files Modified in Group-D Document 01
+
+- backend/apps/tenants/models.py — Added TenantSettings model with OneToOneField to Tenant, theme_color, invoice_prefix, order_prefix, tax_rate, created_on, updated_on fields
+- backend/apps/tenants/migrations/0007_add_tenant_settings.py — NEW: Migration to create tenants_tenantsettings table
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-D Doc 01
+
+---
+
+## SubPhase-04: Group-D Document 02 — Text, JSON & Signal (Tasks 53-58)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 48/48
+
+### Summary
+
+Added footer text fields (invoice and receipt), three JSON settings fields (notification, feature, integration) with factory default functions, and a post_save signal for auto-creating TenantSettings when a new Tenant is created.
+
+### Task 53: Invoice Footer Field
+
+- invoice_footer: TextField, default="" (blank), blank=True
+- Used for payment terms, bank details, legal disclaimers on invoices
+
+### Task 54: Receipt Footer Field
+
+- receipt_footer: TextField, default="Thank you for your purchase!", blank=True
+- Used for thank-you messages, return policies on receipts
+
+### Task 55: Notification Settings
+
+- notification_settings: JSONField, default=default_notification_settings factory
+- Default keys: email_on_order (True), email_on_payment (True), sms_enabled (False), low_stock_alert (True)
+- Factory returns new dict each call (no shared mutable state)
+
+### Task 56: Feature Settings
+
+- feature_settings: JSONField, default=default_feature_settings factory
+- Default keys: webstore_enabled (True), pos_enabled (True), multi_location (False), advanced_reports (False)
+- Factory returns new dict each call (no shared mutable state)
+
+### Task 57: Integration Settings
+
+- integration_settings: JSONField, default=default_integration_settings factory
+- Default keys: payment_gateway (None), accounting_software (None), shipping_provider (None)
+- Factory returns new dict each call (no shared mutable state)
+
+### Task 58: Settings Signal
+
+- Created backend/apps/tenants/signals.py with create_tenant_settings receiver
+- Signal: post_save on Tenant model, fires only when created=True
+- Uses get_or_create to prevent duplicates
+- Updated TenantsConfig.ready() in apps.py to import signals module
+- Logging via logger.info on successful creation
+
+### Validation Results
+
+| Category              | Checks | Passed |
+| --------------------- | ------ | ------ |
+| Invoice Footer Field  | 4      | 4      |
+| Receipt Footer Field  | 4      | 4      |
+| Notification Settings | 6      | 6      |
+| Feature Settings      | 6      | 6      |
+| Integration Settings  | 6      | 6      |
+| Signal & Apps Config  | 6      | 6      |
+| Database Columns      | 5      | 5      |
+| CRUD Operations       | 5      | 5      |
+| Migration             | 1      | 1      |
+| **Total**             | **48** | **48** |
+
+### Files Modified in Group-D Document 02
+
+- backend/apps/tenants/models.py — Added invoice_footer, receipt_footer, notification_settings, feature_settings, integration_settings fields to TenantSettings; added default factory functions (default_notification_settings, default_feature_settings, default_integration_settings); updated model docstring
+- backend/apps/tenants/signals.py — NEW: Auto-create TenantSettings signal handler (create_tenant_settings)
+- backend/apps/tenants/apps.py — Added ready() method to TenantsConfig to import signals
+- backend/apps/tenants/migrations/0008_add_settings_text_json.py — NEW: Migration for text and JSON fields
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-D Doc 02
+
+---
+
+## SubPhase-04: Group-E Document 01 — Subscription Core (Tasks 59-65)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 79/79
+
+### Summary
+
+Created the TenantSubscription model with ForeignKey to Tenant and SubscriptionPlan, subscription lifecycle status field (5 states), billing cycle field (monthly/annual), started_at and expires_at date fields, 2 indexes, and 6 status properties. All monetary amounts stored in LKR.
+
+### Task 59: TenantSubscription Model
+
+- TenantSubscription class created in backend/apps/tenants/models.py
+- Inherits from models.Model
+- verbose_name: "Tenant Subscription"
+- verbose_name_plural: "Tenant Subscriptions"
+- ordering: ["-created_on"] (newest first)
+- **str**: "{tenant.name} - {plan.name} ({status_display})"
+- created_on (auto_now_add) and updated_on (auto_now) timestamps
+- 2 indexes: idx_subscription_tenant_status, idx_subscription_expires_at
+- Module-level constants: SUBSCRIPTION*STATUS*_ (5), BILLING*CYCLE*_ (2)
+
+### Task 60: Tenant FK
+
+- tenant: ForeignKey to tenants.Tenant, on_delete=CASCADE, related_name="subscriptions"
+- Allows multiple subscriptions per tenant (ForeignKey, not OneToOne)
+- Reverse access: tenant.subscriptions
+
+### Task 61: Plan FK
+
+- plan: ForeignKey to platform.SubscriptionPlan, on_delete=SET_NULL, null=True, blank=True
+- related_name: "tenant_subscriptions"
+- Nullable for legacy or migrated subscriptions
+- References existing SubscriptionPlan model in platform app (UUID primary key)
+
+### Task 62: Status Field
+
+- status: CharField, max_length=20, default="trial", db_index=True
+- 5 choices: trial, active, expired, cancelled, suspended
+- Documented state transitions in model docstring
+
+### Task 63: Billing Cycle Field
+
+- billing_cycle: CharField, max_length=20, default="monthly"
+- 2 choices: monthly, annual (~17% discount for annual)
+
+### Task 64: Started At Field
+
+- started_at: DateTimeField, null=True, blank=True
+- Set when subscription transitions to active or trial
+
+### Task 65: Expires At Field
+
+- expires_at: DateTimeField, null=True, blank=True
+- Computed from started_at + billing_cycle duration
+
+### Properties Added
+
+- is_active: status == "active"
+- is_trial: status == "trial"
+- is_active_or_trial: status in ("active", "trial")
+- is_expired: status == "expired"
+- is_cancelled: status == "cancelled"
+- is_suspended: status == "suspended"
+
+### Validation Results
+
+| Category            | Checks | Passed |
+| ------------------- | ------ | ------ |
+| Model Structure     | 21     | 21     |
+| Tenant FK           | 5      | 5      |
+| Plan FK             | 7      | 7      |
+| Status Field        | 6      | 6      |
+| Billing Cycle Field | 5      | 5      |
+| Started At Field    | 4      | 4      |
+| Expires At Field    | 4      | 4      |
+| Properties          | 6      | 6      |
+| Database Columns    | 10     | 10     |
+| CRUD Operations     | 10     | 10     |
+| Migration           | 1      | 1      |
+| **Total**           | **79** | **79** |
+
+### Files Modified in Group-E Document 01
+
+- backend/apps/tenants/models.py — Added TenantSubscription model with tenant FK, plan FK, status, billing_cycle, started_at, expires_at fields, 2 indexes, 6 properties, subscription status and billing cycle constants
+- backend/apps/tenants/migrations/0009_add_tenant_subscription.py — NEW: Migration to create tenants_tenantsubscription table
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-E Doc 01
+
+---
+
+## SubPhase-04: Group-E Document 02 — Billing & Manager (Tasks 66-72)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 77/77
+
+### Summary
+
+Added billing fields (trial_ends_at, next_billing_date, amount, payment_method, is_auto_renew) to TenantSubscription, and implemented SubscriptionQuerySet (15 methods) and SubscriptionManager (15 shortcut methods) for efficient subscription querying.
+
+### Task 66: Trial Ends At Field
+
+- trial_ends_at: DateTimeField, null=True, blank=True
+- Calculated from started_at + trial_days from SubscriptionPlan
+
+### Task 67: Next Billing Date
+
+- next_billing_date: DateTimeField, null=True, blank=True
+- Updated after each successful payment for recurring charge scheduling
+
+### Task 68: Amount Field
+
+- amount: DecimalField, max_digits=10, decimal_places=2, default=0
+- Current billing amount in LKR (₨)
+- Derived from plan price, may differ with discounts
+
+### Task 69: Payment Method
+
+- payment_method: CharField, max_length=30, default="", blank=True
+- Common values: card, bank_transfer, mobile_payment
+
+### Task 70: Is Auto Renew Field
+
+- is_auto_renew: BooleanField, default=True
+- Controls whether subscription auto-renews at billing cycle end
+
+### Task 71: Subscription Manager
+
+- SubscriptionQuerySet (15 methods): active, trial, active_or_trial, expired, cancelled, suspended, monthly, annual, auto_renew, no_auto_renew, expiring_soon(days=30), trial_ending_soon(days=7), billing_due(days=7), for_tenant, current_for_tenant
+- SubscriptionManager: wraps SubscriptionQuerySet, exposes all 15 methods
+- Wired into TenantSubscription model: objects = SubscriptionManager()
+- Import updated: from apps.tenants.managers import DomainManager, SubscriptionManager, TenantManager
+
+### Task 72: Active/Expired Querysets
+
+- active() filters status="active"
+- expired() filters status="expired"
+- active_or_trial() filters status\_\_in=["active", "trial"]
+- All methods tested with CRUD operations and chaining
+- billing_due(days=7) correctly identifies subscriptions with upcoming billing
+
+### Validation Results
+
+| Category                   | Checks | Passed |
+| -------------------------- | ------ | ------ |
+| Trial Ends At Field        | 4      | 4      |
+| Next Billing Date          | 4      | 4      |
+| Amount Field               | 5      | 5      |
+| Payment Method             | 5      | 5      |
+| Is Auto Renew              | 3      | 3      |
+| Manager/QuerySet Structure | 36     | 36     |
+| Functional Queryset Tests  | 14     | 14     |
+| Database Columns           | 5      | 5      |
+| Migration                  | 1      | 1      |
+| **Total**                  | **77** | **77** |
+
+### Files Modified in Group-E Document 02
+
+- backend/apps/tenants/models.py — Added trial_ends_at, next_billing_date, amount, payment_method, is_auto_renew fields; wired SubscriptionManager; updated import and model docstring
+- backend/apps/tenants/managers.py — Added SubscriptionQuerySet (15 methods), SubscriptionManager (15 shortcuts), updated module docstring with subscription usage examples
+- backend/apps/tenants/migrations/0010_add_billing_fields.py — NEW: Migration for billing fields
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-E Doc 02
+
+---
+
+## SubPhase-04: Group-F Document 01 — Tenant Admin (Tasks 73-79)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 122/122
+
+### Summary
+
+Enhanced TenantAdmin with comprehensive list display, filters, search fields, and 12 organized fieldsets covering all Tenant model fields. Added DomainInline (TabularInline), TenantSettingsInline (StackedInline, one-to-one), and TenantSubscriptionInline (TabularInline) to TenantAdmin. Enhanced DomainAdmin with domain_type, verification, SSL fields. Added standalone TenantSubscriptionAdmin for billing oversight.
+
+### Task 73: Create TenantAdmin
+
+- TenantAdmin class exists and is registered with admin.site
+- Extends admin.ModelAdmin
+- Comprehensive docstring documenting management capabilities, inlines, and security
+
+### Task 74: Add List Display
+
+- 8 fields: name, slug, schema_name, business_type, status, on_trial, paid_until, created_on
+- Covers identity, business type, lifecycle status, and dates
+
+### Task 75: Add List Filters
+
+- 6 filters: status, on_trial, business_type, industry, province, language
+- Enables filtering by lifecycle state, business classification, and locale
+
+### Task 76: Add Search Fields
+
+- 6 searchable fields: name, slug, schema_name, contact_email, contact_name, business_registration_number
+- Supports search by identity, contact info, and business registration
+
+### Task 77: Add Fieldsets
+
+- 12 fieldsets organized in logical sections:
+  - Identity (name, slug, schema_name)
+  - Business Information (business_type, industry, business_registration_number)
+  - Primary Contact (contact_name, contact_email, contact_phone)
+  - Address (6 fields, collapsible)
+  - Branding (logo, primary_color, secondary_color, collapsible)
+  - Locale Preferences (language, timezone, collapsible)
+  - Billing and Subscription (paid_until, on_trial)
+  - Lifecycle (status)
+  - Onboarding (onboarding_step, onboarding_completed, collapsible)
+  - Schema and Metadata (schema_version, collapsible)
+  - Configuration (settings JSONField, collapsible)
+  - Timestamps (created_on, updated_on, collapsible)
+- Read-only fields: schema_name, created_on, updated_on
+
+### Task 78: Add Inline Domains
+
+- DomainInline: TabularInline for Domain model
+- extra=0, show_change_link=True
+- Fields: domain, is_primary, domain_type, is_verified, verified_at, ssl_status, ssl_expires_at, created_on
+- Read-only: verified_at, ssl_expires_at, created_on
+- Registered in TenantAdmin.inlines
+
+### Task 79: Add Inline Settings
+
+- TenantSettingsInline: StackedInline for TenantSettings model
+- can_delete=False, extra=0, max_num=1 (enforces one-to-one)
+- Fields: theme_color, invoice_prefix, order_prefix, tax_rate, invoice_footer, receipt_footer, notification_settings, feature_settings, integration_settings, created_on, updated_on
+- Read-only: created_on, updated_on
+- Registered in TenantAdmin.inlines
+
+### Additional Enhancements
+
+- DomainAdmin: Enhanced list_display (6 fields), list_filter (4 filters), readonly_fields (4), fieldsets (5 sections: Domain, Verification, SSL, Metadata, Timestamps)
+- TenantSubscriptionAdmin: Standalone admin with list_display (9 fields), list_filter (3), search_fields (3), readonly_fields (2), fieldsets (4 sections), raw_id_fields for tenant and plan
+- TenantSubscriptionInline: TabularInline on TenantAdmin, extra=0, 11 fields, raw_id_fields for plan
+
+### Validation Results
+
+| Category                 | Checks  | Passed  |
+| ------------------------ | ------- | ------- |
+| Task 73: TenantAdmin     | 4       | 4       |
+| Task 74: List Display    | 10      | 10      |
+| Task 75: List Filters    | 6       | 6       |
+| Task 76: Search Fields   | 6       | 6       |
+| Task 77: Fieldsets       | 38      | 38      |
+| Task 78: Inline Domains  | 14      | 14      |
+| Task 79: Inline Settings | 15      | 15      |
+| DomainAdmin Enhancements | 12      | 12      |
+| TenantSubscriptionAdmin  | 16      | 16      |
+| Import Validation        | 1       | 1       |
+| **Total**                | **122** | **122** |
+
+### Files Modified in Group-F Document 01
+
+- backend/apps/tenants/admin.py — Complete rewrite: enhanced TenantAdmin (12 fieldsets, 3 inlines), enhanced DomainAdmin (5 fieldsets), added DomainInline, TenantSettingsInline, TenantSubscriptionInline, TenantSubscriptionAdmin
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-F Doc 01
+
+---
+
+## SubPhase-04: Group-F Document 02 — Domain Admin & Actions (Tasks 80-83)
+
+Date: 2025-07-22
+Status: PASSED
+Tests: 74/74
+
+### Summary
+
+Implemented admin bulk actions: verify_domains for DomainAdmin, suspend_tenants and activate_tenants for TenantAdmin, and export_tenants_csv for CSV export of all tenant fields. DomainAdmin was already comprehensive from Doc 01. All actions use @admin.action decorator, accept standard (modeladmin, request, queryset) signature, and provide user feedback via message_user.
+
+### Task 80: DomainAdmin
+
+- Already fully implemented in Group-F Doc 01
+- list_display: 6 fields (domain, tenant, is_primary, domain_type, is_verified, ssl_status)
+- list_filter: 4 filters (is_primary, domain_type, is_verified, ssl_status)
+- search_fields: domain, tenant**name, tenant**slug
+- readonly_fields: verified_at, ssl_expires_at, created_on, updated_on
+- 5 fieldsets: Domain, Verification, SSL, Metadata, Timestamps
+- raw_id_fields: tenant
+
+### Task 81: Domain Verification Action
+
+- verify_domains: bulk action on DomainAdmin
+- Marks unverified domains as verified (is_verified=True, verified_at=now)
+- Uses queryset.filter(is_verified=False).update() for efficiency
+- Displays confirmation message with count of newly verified domains
+
+### Task 82: Tenant Bulk Actions
+
+- suspend_tenants: sets status="suspended" for non-suspended tenants
+- activate_tenants: sets status="active" for non-active tenants
+- Both use queryset.exclude().update() for efficiency
+- Both registered in TenantAdmin.actions
+- Both display confirmation messages with affected count
+
+### Task 83: CSV Export Action
+
+- export_tenants_csv: exports selected tenants to downloadable CSV
+- Content-Type: text/csv with Content-Disposition attachment filename
+- 26 columns covering all tenant fields: ID, Name, Slug, Schema Name, Business Type, Industry, Business Registration Number, Contact Name, Contact Email, Contact Phone, Address Line 1, Address Line 2, City, District, Province, Postal Code, Language, Timezone, Status, On Trial, Paid Until, Onboarding Step, Onboarding Completed, Schema Version, Created On, Updated On
+- Uses queryset.iterator() for memory efficiency
+
+### Validation Results
+
+| Category                     | Checks | Passed |
+| ---------------------------- | ------ | ------ |
+| Task 80: DomainAdmin         | 28     | 28     |
+| Task 81: Verification Action | 8      | 8      |
+| Task 82: Tenant Bulk Actions | 10     | 10     |
+| Task 83: CSV Export Action   | 17     | 17     |
+| Functional: verify_domains   | 2      | 2      |
+| Functional: suspend/activate | 4      | 4      |
+| Functional: Export with data | 4      | 4      |
+| Import Validation            | 1      | 1      |
+| **Total**                    | **74** | **74** |
+
+### Files Modified in Group-F Document 02
+
+- backend/apps/tenants/admin.py — Added imports (csv, HttpResponse, timezone), Admin Actions section with verify_domains, suspend_tenants, activate_tenants, export_tenants_csv; wired actions into DomainAdmin and TenantAdmin; fixed field names (business_registration_number, address_line_1/2)
+- docs/VERIFICATION.md — This verification record for SubPhase-04 Group-F Doc 02
+
+---
+
+## SubPhase-04: Group-F Document 03 — Tasks 84-88: Migrations & Commit
+
+**Verified:** 2025-07-22
+**Document:** Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-04_Tenant-Model-Domain-Model/Group-F_Admin-Management/03_Tasks-84-88_Migrations-Commit.md
+
+### Task 84: Create Migrations
+
+- All 10 migrations exist in backend/apps/tenants/migrations/
+- 0001_initial.py — Core Tenant and Domain models (2 operations)
+- 0002_add_onboarding_schema_metadata.py — Onboarding fields + 2 indexes (5 operations)
+- 0003_add_business_info_contact.py — Business info and contact fields (6 operations)
+- 0004_add_address_fields.py — Sri Lanka address fields (6 operations)
+- 0005_add_branding_locale.py — Branding, language, timezone (4 operations)
+- 0006_add_domain_type_ssl_meta.py — Domain types, SSL, verification + 2 indexes (9 operations)
+- 0007_add_tenant_settings.py — TenantSettings model (1 operation)
+- 0008_add_settings_text_json.py — Footer text + JSON settings fields (5 operations)
+- 0009_add_tenant_subscription.py — TenantSubscription model with cross-app dependency on platform.0001 (1 operation)
+- 0010_add_billing_fields.py — Billing amount, payment method, auto-renew, trial (4 operations)
+- Total: 43 operations across 10 migrations
+- Linear dependency chain (0001 through 0010) with one cross-app dependency
+
+### Task 85: Review Migration SQL
+
+- All 10 migrations reviewed via sqlmigrate
+- 0001: CREATE TABLE tenants_tenant (BigAutoField PK, schema_name UNIQUE, name, slug UNIQUE, paid_until, on_trial, status, settings jsonb, timestamps) + CREATE TABLE tenants_domain (BigAutoField PK, domain UNIQUE, is_primary, tenant_id FK) + indexes
+- 0002: ALTER TABLE adds onboarding_completed (bool), onboarding_step (smallint CHECK >= 0), schema_version (varchar 50 default '1.0.0') + idx_tenant_status_created, idx_tenant_onboarding
+- 0003: ALTER TABLE adds business_registration_number, business_type (default 'other'), contact_email, contact_name, contact_phone, industry (default 'other')
+- 0004: ALTER TABLE adds address_line_1, address_line_2, city, district, postal_code, province + alters contact_phone
+- 0005: ALTER TABLE adds language (default 'en'), logo (nullable), primary_color (default '#1a73e8'), secondary_color (default '#ffffff'), timezone (default 'Asia/Colombo')
+- 0006: ALTER TABLE adds created_on, domain_type (default 'platform'), is_verified (default false), metadata (jsonb default '{}'), ssl_expires_at (nullable), ssl_status (default 'none'), updated_on, verified_at (nullable) + idx_domain_type_verified, idx_domain_ssl_status
+- 0007: CREATE TABLE tenants_tenantsettings (BigAutoField PK, theme_color, invoice_prefix, order_prefix, tax_rate decimal(5,2), timestamps, tenant_id UNIQUE FK)
+- 0008: ALTER TABLE adds feature_settings (jsonb with defaults), integration_settings (jsonb with defaults), invoice_footer (text), notification_settings (jsonb with defaults), receipt_footer (text default 'Thank you for your purchase!')
+- 0009: CREATE TABLE tenants_tenantsubscription (BigAutoField PK, status, billing_cycle, started_at, expires_at, timestamps, plan_id UUID FK to platform_subscriptionplan, tenant_id FK) + idx_subscription_tenant_status, idx_subscription_expires_at
+- 0010: ALTER TABLE adds amount (decimal 10,2 default 0), is_auto_renew (bool default true), next_billing_date (nullable), payment_method (varchar 30), trial_ends_at (nullable)
+- All SQL wrapped in BEGIN/COMMIT transaction blocks
+- Foreign keys use DEFERRABLE INITIALLY DEFERRED
+- Proper use of varchar_pattern_ops indexes for text lookups
+- No issues found in SQL review
+
+### Task 86: Run Shared Migrations
+
+- All 10 migrations applied to shared schema (public)
+- showmigrations confirms all marked with [X]
+- migrate_schemas --shared reports "No migrations to apply"
+- Tables verified: tenants_tenant, tenants_domain, tenants_tenantsettings, tenants_tenantsubscription
+
+### Task 87: Create Test Tenants
+
+- 3 tenants exist (exceeds minimum requirement of 2):
+  - ID=1: LankaCommerce Cloud (slug=public, schema=public, status=active)
+  - ID=2: Test Isolation Tenant (slug=test-isolation, schema=tenant_test_isolation, status=active)
+  - ID=3: Command Test Store (slug=cmd-test, schema=tenant_cmd_test, status=active)
+- 3 primary domains assigned:
+  - ID=1: localhost -> LankaCommerce Cloud (is_primary=True)
+  - ID=2: test-isolation.localhost -> Test Isolation Tenant (is_primary=True)
+  - ID=3: cmd-test.localhost -> Command Test Store (is_primary=True)
+- TenantSettings record exists for cmd-test tenant (auto-created by signal)
+
+### Task 88: Create Initial Commit
+
+- Commit message: feat: implement tenant and domain models
+- Files staged and committed (see Files Modified below)
+
+### Validation Results
+
+| Category                      | Checks | Passed |
+| ----------------------------- | ------ | ------ |
+| Task 84: Migrations Exist     | 10     | 10     |
+| Task 85: SQL Review           | 10     | 10     |
+| Task 86: Migrations Applied   | 10     | 10     |
+| Task 87: Test Tenants         | 3      | 3      |
+| Task 87: Primary Domains      | 3      | 3      |
+| Task 88: Git Commit           | 1      | 1      |
+| **Total**                     | **37** | **37** |
+
+### Files Modified/Added in Group-F Document 03
+
+- backend/apps/tenants/models.py — Tenant (28 fields), Domain (11 fields), TenantSettings (12 fields), TenantSubscription (13 fields), validators, constants, helper functions
+- backend/apps/tenants/managers.py — TenantQuerySet (12 methods), TenantManager, DomainQuerySet (12 methods), DomainManager, SubscriptionQuerySet (15 methods), SubscriptionManager
+- backend/apps/tenants/admin.py — TenantAdmin, DomainAdmin, TenantSubscriptionAdmin, 3 inlines, 4 admin actions
+- backend/apps/tenants/signals.py — create_tenant_settings post_save signal
+- backend/apps/tenants/apps.py — TenantsConfig with ready() importing signals
+- backend/apps/tenants/migrations/0001_initial.py through 0010_add_billing_fields.py — 10 migrations (43 total operations)
+- docs/VERIFICATION.md — This verification record
+- SESSION_HANDOVER.md — Updated session context

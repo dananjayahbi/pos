@@ -1,254 +1,157 @@
 # Session Handover Document
 
-> **Created:** 2025-07-23
-> **Purpose:** Context transfer for next AI coding session
-> **Project:** LankaCommerce Cloud - Multi-Tenant SaaS ERP
-> **Delete after use:** Yes (placed in project root for easy cleanup)
+## Date: 2025-07-22
+
+## Project Context
+
+LankaCommerce Cloud Multi-Tenant SaaS ERP — Phase 02: Database Architecture & Multi-Tenancy, SubPhase-04: Tenant Model & Domain Model.
+
+## Tech Stack
+
+- Django 5.2.11, django-tenants 3.10.0, PostgreSQL 15.16, Python 3.12
+- AUTH_USER_MODEL = "platform.PlatformUser"
+- TENANT_MODEL = "tenants.Tenant", TENANT_DOMAIN_MODEL = "tenants.Domain"
+- Currency: LKR (₨), PRICE_MAX_DIGITS=10, PRICE_DECIMAL_PLACES=2
+- Tenant model uses Django default AutoField PK (NOT UUID)
+- Tenants app uses flat models.py (NOT models/ package)
+
+## Critical Environment Info
 
----
+- PgBouncer UNAVAILABLE (port 6432 conflict)
+- ALL DB commands must use: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend ...`
+- For manage.py: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend manage.py <cmd>`
+- Validation scripts: create at `backend/scripts/<name>.py`, run via Docker `python -c "import os; os.chdir('/app'); exec(open('scripts/<name>.py').read())"`, delete after
+- Docs files on host filesystem only (not Docker-mounted)
+- flow.py path: `python E:\My_GitHub_Repos\flow\flow.py`
 
-## 1. Overall Progress Summary
+## Database State
 
-### Document-Series Phase-02, SubPhase-03: Public Schema Design
+- 3 tenants: public (ID=1, schema=public), test-isolation (ID=2), cmd-test (ID=3)
+- Each has 1 primary domain (3 total domains)
+- TenantSettings record exists for cmd-test tenant (created by Group-D signal)
+- SHARED_APPS includes apps.tenants, apps.platform, apps.core, apps.users
+- Use migrate_schemas --shared for public schema migrations
+
+## Current Progress — SubPhase-04 Complete Summary
+
+### All Groups A-F Status
 
-| Group | Name                              | Tasks | Status      | Validation |
-| ----- | --------------------------------- | ----- | ----------- | ---------- |
-| A     | Public Schema Planning            | 01-12 | ✅ COMPLETE | All passed |
-| B     | Subscription Plans Model          | 13-28 | ✅ COMPLETE | 153/153    |
-| C     | Platform Settings Model           | 29-42 | ✅ COMPLETE | 146/146    |
-| D     | Platform Users & Super Admin      | 43-58 | ✅ COMPLETE | 185/185    |
-| E     | Feature Flags System (Docs 01-02) | 59-68 | ✅ COMPLETE | 142/142    |
-| E     | Feature Flags System (Doc 03)     | 69-72 | ✅ COMPLETE | 65/65      |
-| F     | Platform Audit & Billing (Doc 01) | 73-78 | ✅ COMPLETE | 93/93      |
-| F     | Platform Audit & Billing (Doc 02) | 79-84 | ✅ COMPLETE | 126/126    |
-| G     | Migration & Verification (Doc 01) | 85-88 | ✅ COMPLETE | 92/92      |
-| G     | Migration & Verification (Doc 02) | 89-92 | ✅ COMPLETE | 14/14      |
+| Group                           | Documents   | Tasks       | Status                      |
+| ------------------------------- | ----------- | ----------- | --------------------------- |
+| Group-A: Tenant Core Fields     | 3 docs      | Tasks 01-16 | COMPLETE                    |
+| Group-B: Tenant Extended Fields | 3 docs      | Tasks 17-30 | COMPLETE                    |
+| Group-C: Domain Model           | 3 docs      | Tasks 31-46 | COMPLETE                    |
+| Group-D: Tenant Settings        | 2 docs      | Tasks 47-58 | COMPLETE                    |
+| Group-E: Tenant Subscription    | 2 docs      | Tasks 59-72 | COMPLETE                    |
+| Group-F: Admin & Management     | 2 of 3 docs | Tasks 73-83 | COMPLETE (Doc 03 REMAINING) |
 
-### Next Task
+### Validation Results Summary
 
-**SubPhase-03 is COMPLETE.** All 92 tasks (Groups A through G) have been implemented and validated.
+| Document                     | Tests   |
+| ---------------------------- | ------- |
+| Group-A Doc 01 (Tasks 01-06) | 23/23   |
+| Group-A Doc 02 (Tasks 07-12) | 19/19   |
+| Group-A Doc 03 (Tasks 13-16) | 26/26   |
+| Group-B Doc 01 (Tasks 17-21) | 47/47   |
+| Group-B Doc 02 (Tasks 22-26) | 50/50   |
+| Group-B Doc 03 (Tasks 27-30) | 49/49   |
+| Group-C Doc 01 (Tasks 31-36) | 32/32   |
+| Group-C Doc 02 (Tasks 37-42) | 57/57   |
+| Group-C Doc 03 (Tasks 43-46) | 55/55   |
+| Group-D Doc 01 (Tasks 47-52) | 54/54   |
+| Group-D Doc 02 (Tasks 53-58) | 48/48   |
+| Group-E Doc 01 (Tasks 59-65) | 79/79   |
+| Group-E Doc 02 (Tasks 66-72) | 77/77   |
+| Group-F Doc 01 (Tasks 73-79) | 122/122 |
+| Group-F Doc 02 (Tasks 80-83) | 74/74   |
+
+## What Remains — Group-F Doc 03 (Tasks 84-88)
+
+The FINAL document in SubPhase-04:
+
+File: `Document-Series\Phase-02_Database-Architecture-MultiTenancy\SubPhase-04_Tenant-Model-Domain-Model\Group-F_Admin-Management\03_Tasks-84-88_Migrations-Commit.md`
+
+Tasks:
+
+- Task 84: Create Migrations (already done — 10 migrations exist)
+- Task 85: Review Migration SQL
+- Task 86: Run Shared Migrations (already done — all applied)
+- Task 87: Create Test Tenants (3 already exist)
+- Task 88: Create Initial Commit
+
+NOTE: Most of these tasks may already be satisfied since migrations 0001-0010 all exist and are applied, and test tenants already exist. The document likely needs review of SQL, verification of existing state, and a git commit.
+
+## Files Modified in SubPhase-04 (not yet committed)
+
+### backend/apps/tenants/models.py (1,372 lines)
+
+- Tenant model: 28 fields (name, slug, schema_name, business_type, industry, business_registration_number, contact_name, contact_email, contact_phone, address_line_1, address_line_2, city, district, province, postal_code, logo, primary_color, secondary_color, language, timezone, paid_until, on_trial, status, onboarding_step, onboarding_completed, schema_version, settings, created_on, updated_on)
+- Domain model: 11 fields (domain, tenant, is_primary from DomainMixin + domain_type, is_verified, verified_at, ssl_status, ssl_expires_at, metadata, created_on, updated_on)
+- TenantSettings model: 12 fields (tenant OneToOne related_name="tenant_settings", theme_color, invoice_prefix, order_prefix, tax_rate, invoice_footer, receipt_footer, notification_settings, feature_settings, integration_settings, created_on, updated_on)
+- TenantSubscription model: 13 fields (tenant FK related_name="subscriptions", plan FK to platform.SubscriptionPlan related_name="tenant_subscriptions", status, billing_cycle, started_at, expires_at, trial_ends_at, next_billing_date, amount, payment_method, is_auto_renew, created_on, updated_on)
+- Module constants: TENANT*STATUS*_, BUSINESS*TYPE_CHOICES, INDUSTRY_CHOICES, PROVINCE_CHOICES, LANGUAGE_CHOICES, TIMEZONE_CHOICES, SUBSCRIPTION_STATUS*_, BILLING*CYCLE*\*
+- Validators: slug_validator, brn_validator, phone_validator, postal_code_validator, hex_color_validator
+- Functions: tenant_logo_upload_path, default_notification_settings, default_feature_settings, default_integration_settings
+
+### backend/apps/tenants/managers.py (526 lines)
+
+- TenantQuerySet: 12 methods (active, suspended, archived, not_archived, on_trial, not_on_trial, paid, expired, onboarded, needs_onboarding, business, public_only)
+- TenantManager: wraps TenantQuerySet, 12 shortcuts
+- DomainQuerySet: 12 methods (platform, custom, verified, unverified, needs_verification, ssl_active, ssl_expiring_soon, ssl_expired, ssl_pending, active_domains, primary, for_tenant)
+- DomainManager: wraps DomainQuerySet, 12 shortcuts
+- SubscriptionQuerySet: 15 methods (active, trial, active_or_trial, expired, cancelled, suspended, monthly, annual, auto_renew, no_auto_renew, expiring_soon, trial_ending_soon, billing_due, for_tenant, current_for_tenant)
+- SubscriptionManager: wraps SubscriptionQuerySet, 15 shortcuts
 
-Next step: Create the final commit for SubPhase-03 (Public Schema Design) and proceed to SubPhase-04 or the next phase as defined in the Document-Series.
+### backend/apps/tenants/admin.py (585 lines)
 
----
+- TenantAdmin: 8 list_display, 6 list_filter, 6 search_fields, 3 readonly_fields, 12 fieldsets, 3 inlines, 3 actions
+- DomainAdmin: 6 list_display, 4 list_filter, 3 search_fields, 4 readonly_fields, 5 fieldsets, 1 action
+- TenantSubscriptionAdmin: 9 list_display, 3 list_filter, 3 search_fields, 2 readonly_fields, 4 fieldsets
+- DomainInline (TabularInline): 8 fields, 3 readonly
+- TenantSettingsInline (StackedInline): 11 fields, 2 readonly, max_num=1, can_delete=False
+- TenantSubscriptionInline (TabularInline): 11 fields, 1 readonly
+- Actions: verify_domains, suspend_tenants, activate_tenants, export_tenants_csv
 
-## 2. Git State
+### backend/apps/tenants/signals.py (53 lines, NEW)
 
-- **Branch:** main
-- **Ahead of remote:** 4 commits (unpushed)
-- **SubPhase-02** (django-tenants) is committed as `feat: install and configure django-tenants`
-- **SubPhase-03** changes are ALL UNCOMMITTED
+- create_tenant_settings: post_save receiver on Tenant, auto-creates TenantSettings on first save
 
-### Uncommitted Changes
+### backend/apps/tenants/apps.py (24 lines)
 
-**Modified files:**
+- TenantsConfig with ready() method importing signals
 
-- backend/config/settings/base.py
-- backend/config/settings/database.py
-- docs/VERIFICATION.md
-- docs/index.md
+### Migrations (10 total, all applied)
 
-**New (untracked) directories:**
+- 0001_initial.py — Original Tenant/Domain
+- 0002_add_onboarding_schema_metadata.py — onboarding_step, onboarding_completed, schema_version, 2 indexes
+- 0003_add_business_info_contact.py — business_type, industry, BRN, contact fields
+- 0004_add_address_fields.py — address fields + altered contact_phone
+- 0005_add_branding_locale.py — logo, primary_color, secondary_color, language, timezone
+- 0006_add_domain_type_ssl_meta.py — domain_type, verification, SSL, metadata, timestamps, 2 indexes
+- 0007_add_tenant_settings.py — TenantSettings model creation
+- 0008_add_settings_text_json.py — footer text fields + 3 JSON settings fields
+- 0009_add_tenant_subscription.py — TenantSubscription model creation
+- 0010_add_billing_fields.py — trial_ends_at, next_billing_date, amount, payment_method, is_auto_renew
 
-- backend/apps/platform/ (entire app)
-- docs/database/naming-conventions.md
-- docs/database/public-schema-erd.md
-- docs/saas/ (subscription-plans.md, feature-flags.md)
-- docs/users/ (user-hierarchy.md, role-permissions.md)
+### docs/VERIFICATION.md (~6000+ lines)
 
----
+- Contains all verification records from SubPhase-03 through SubPhase-04 Group-F Doc 02
 
-## 3. Technical Stack
+## Git Status
 
-| Component               | Version/Value                                                                    |
-| ----------------------- | -------------------------------------------------------------------------------- |
-| Django                  | 5.2.11                                                                           |
-| django-tenants          | 3.10.0                                                                           |
-| PostgreSQL              | 15.16                                                                            |
-| Python                  | 3.12                                                                             |
-| AUTH_USER_MODEL         | "platform.PlatformUser"                                                          |
-| AUTHENTICATION_BACKENDS | ["apps.platform.backends.EmailBackend"]                                          |
-| DATABASE_ROUTERS        | ["apps.tenants.routers.TenantRouter", "django_tenants.routers.TenantSyncRouter"] |
-| SHARED_APPS             | 19 apps (includes apps.platform, apps.users)                                     |
-| TENANT_APPS             | 12 apps                                                                          |
-| Tenants in DB           | public (ID=1), test-isolation (ID=2), cmd-test (ID=3)                            |
+- SubPhase-03: FULLY COMMITTED (commit 0742eba)
+- SubPhase-04 Groups A-F (Docs 01-02): ALL COMPLETE, NOT YET COMMITTED
+- A commit should happen after Group-F Doc 03 (Task 88)
 
-### Docker Commands
+## Key Gotchas for Next Session
 
-**CRITICAL:** PgBouncer is UNAVAILABLE (port 6432 binding conflict). ALL DB commands must use:
-
-```
-docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend -c "<command>"
-```
-
-For validation scripts:
-
-```
-docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend -c "exec(open('scripts/<script_name>.py').read())"
-```
-
----
-
-## 4. File Inventory — Platform App
-
-### Models (backend/apps/platform/models/)
-
-| File            | Model/Purpose                                           | Mixins Used                           |
-| --------------- | ------------------------------------------------------- | ------------------------------------- |
-| mixins.py       | UUIDMixin, TimestampMixin, StatusMixin, SoftDeleteMixin | Abstract bases                        |
-| subscription.py | SubscriptionPlan — SaaS subscription tiers              | UUID+Timestamp+Status+SoftDelete      |
-| settings.py     | PlatformSetting — singleton config with caching         | UUID+Timestamp only                   |
-| user.py         | PlatformUser — AUTH_USER_MODEL with roles               | UUID+Timestamp+AbstractBaseUser       |
-| managers.py     | PlatformUserManager — create_user/create_superuser      | —                                     |
-| features.py     | FeatureFlag — global feature toggles                    | UUID+Timestamp+Status (NO SoftDelete) |
-| overrides.py    | TenantFeatureOverride — per-tenant flag overrides       | UUID+Timestamp only                   |
-| audit.py        | AuditLog — immutable audit log for platform actions     | UUID+Timestamp (NO Status/SoftDelete) |
-| billing.py      | BillingRecord — tenant subscription billing records     | UUID+Timestamp+Status+SoftDelete      |
-| **init**.py     | Package init — exports all models + constants           | —                                     |
-
-### Admin (backend/apps/platform/admin.py — ~831 lines)
-
-5 base admin classes:
-
-- PlatformModelAdmin — base with UUID/timestamp readonly
-- StatusModelAdmin — adds is_active/deactivated_on
-- SoftDeleteModelAdmin — adds is_deleted/deleted_on
-- FullPlatformModelAdmin — both status + soft delete
-- ReadOnlyPlatformAdmin — immutable records
-
-Registered model admins:
-
-- SubscriptionPlanAdmin (extends FullPlatformModelAdmin)
-- FeatureFlagAdmin (extends StatusModelAdmin)
-- TenantFeatureOverrideAdmin (extends PlatformModelAdmin)
-- AuditLogAdmin (extends ReadOnlyPlatformAdmin)
-- BillingRecordAdmin (extends FullPlatformModelAdmin)
-- PlatformSettingAdmin (extends PlatformModelAdmin, singleton guard)
-- PlatformUserAdmin (extends Django's BaseUserAdmin)
-
-### Auth (backend/apps/platform/backends.py)
-
-- EmailBackend — case-insensitive email authentication with timing attack prevention
-
-### Management Commands (backend/apps/platform/management/commands/)
-
-- create_platform_admin.py — Creates non-superuser platform staff (platform_admin/support/viewer roles)
-
-### Utilities (backend/apps/platform/utils/)
-
-- settings.py — get_platform_settings, get_setting, invalidate_settings_cache, is_maintenance_mode, is_feature_enabled
-- features.py — is_flag_enabled, get_tenant_flags, invalidate_feature_cache, invalidate_all_feature_caches
-
-### Fixtures (backend/apps/platform/fixtures/)
-
-- subscription_plans.json — 4 plans (Free, Starter, Pro, Enterprise) — LOADED
-- feature_flags.json — 8 flags across 4 modules (billing, inventory, reports, webstore) — LOADED
-
-### Migrations (backend/apps/platform/migrations/)
-
-- 0001_initial_platform_models.py — 7 models, 24 custom indexes, 5 FKs — APPLIED
-
----
-
-## 5. Key Model Details
-
-### PlatformUser Roles & Permissions
-
-| Role           | Value          | can_manage_tenants | can_manage_users | can_manage_billing | can_view_audit_logs |
-| -------------- | -------------- | ------------------ | ---------------- | ------------------ | ------------------- |
-| Super Admin    | super_admin    | ✅                 | ✅               | ✅                 | ✅                  |
-| Platform Admin | platform_admin | ✅                 | ❌               | ❌                 | ✅                  |
-| Support        | support        | ❌                 | ❌               | ❌                 | ✅                  |
-| Viewer         | viewer         | ❌                 | ❌               | ❌                 | ❌                  |
-
-### FeatureFlag Fields
-
-- key (CharField, unique, max 100, snake_case with module prefix)
-- name (CharField, max 200)
-- description (TextField, max 500, blank)
-- rollout_percentage (IntegerField, 0-100, validators, default 0)
-- is_active (from StatusMixin, default True)
-- is_public (BooleanField, default False)
-- Properties: is_fully_rolled_out, is_disabled, rollout_display
-
-### TenantFeatureOverride Fields
-
-- tenant (FK to tenants.Tenant, CASCADE)
-- feature_flag (FK to FeatureFlag, CASCADE)
-- is_enabled (BooleanField — force-enable/force-disable)
-- reason (TextField, max 500, blank)
-- unique_together: (tenant, feature_flag)
-
-### Feature Flag Resolution Order
-
-1. Check TenantFeatureOverride for tenant+flag pair
-2. If override exists, use is_enabled (authoritative)
-3. If no override, use global FeatureFlag state
-4. Default: disabled
-
-### Caching Strategy
-
-- Cache key: feature_flags:{tenant_id}
-- TTL: 3600 seconds (1 hour)
-- Flag changes → invalidate ALL tenant caches
-- Override changes → invalidate only affected tenant's cache
-
----
-
-## 6. Settings Configuration (base.py)
-
-- AUTH_USER_MODEL = "platform.PlatformUser" (~line 300)
-- AUTHENTICATION_BACKENDS = ["apps.platform.backends.EmailBackend"] (~lines 305-308)
-- 4 AUTH_PASSWORD_VALIDATORS (min_length=8)
-- AuthenticationMiddleware in MIDDLEWARE (line 121)
-- No CACHES in base.py (defined in production.py with Redis, test.py with LocMem)
-
----
-
-## 7. Documentation Files
-
-| File                                | Content                                                             |
-| ----------------------------------- | ------------------------------------------------------------------- |
-| docs/saas/subscription-plans.md     | Subscription plan tiers documentation                               |
-| docs/saas/feature-flags.md          | Feature flags, tenant overrides, resolution order, caching strategy |
-| docs/users/user-hierarchy.md        | Platform vs tenant users, auth config, roles, management commands   |
-| docs/users/role-permissions.md      | Role definitions, permission matrix, enforcement strategy           |
-| docs/database/naming-conventions.md | Database naming conventions                                         |
-| docs/database/public-schema-erd.md  | Public schema ERD                                                   |
-| docs/index.md                       | Main docs index with links to all above                             |
-| docs/VERIFICATION.md                | Complete verification record (~3600+ lines)                         |
-
----
-
-## 8. Standing Instructions for Next Session
-
-1. **Read the task document first** — each doc in Document-Series has specific tasks and verification checklists
-2. **Use subagents** to gather codebase context before implementing (manages context window)
-3. **Update todo list** for each task set
-4. **No fenced code blocks in documentation** — docs use plain prose only
-5. **Validation pattern:** Create temp script at `backend/scripts/validate_*.py`, run via Docker exec, delete after
-6. **Validation scripts must use os.getcwd() not **file\***\* — exec() does not define **file\*\*
-7. **Host doc checks** — docs/ directory is not mounted in Docker, verify docs on host via PowerShell
-8. **VERIFICATION.md** — update after each document's validation passes
-9. **When replacing in VERIFICATION.md** — use enough unique context to avoid multiple matches
-10. **flow.py** — run `python E:\My_GitHub_Repos\flow\flow.py` after every task completion for user review
-11. **Add flow.py to task list** — always include it as a todo item
-
----
-
-## 9. Next Steps (in order)
-
-1. **SubPhase-03 is COMPLETE** — All Groups A-G (Tasks 01-92) implemented and validated
-2. **Final commit** for SubPhase-03 Public Schema Design changes
-3. **Proceed to next SubPhase or Phase** as defined in the Document-Series
-
----
-
-## 10. Known Issues / Gotchas
-
-- **PgBouncer port conflict:** Always use `--no-deps -e DB_HOST=db -e DB_PORT=5432` for Docker commands
-- **ReadOnlyPlatformAdmin:** Had a crash with **dict** check — was fixed
-- **CACHES not in base.py:** Only in production.py (Redis) and test.py (LocMem). The `django.core.cache.cache` default backend works in dev with Django's default (locmem) cache
-- **3 tenants exist in DB:** public, test-isolation, cmd-test — created during earlier validation
-- **Feature flag admin already has FeatureFlagAdmin AND TenantFeatureOverrideAdmin** — both registered
-- **The is_feature_enabled in utils/settings.py** is for PlatformSetting toggles (enable_webstore etc.), NOT for FeatureFlag model. The FeatureFlag resolution is in utils/features.py (is_flag_enabled)
+1. Field name is `business_registration_number` (NOT `brn`) — the property `has_brn` exists but the field is the full name
+2. Field names are `address_line_1` and `address_line_2` (with underscores before the number)
+3. TenantSettings.tenant has related_name="tenant_settings" (NOT "settings") because Tenant model has a `settings` JSONField
+4. SubscriptionPlan is at `platform.SubscriptionPlan` with UUID primary key
+5. Phone validator pattern: `^(\+94|0)[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{4}$`
+6. Postal code validator: `^\d{5}$`
+7. SAVEPOINT commands don't work in Docker without explicit transaction blocks — use pg_indexes check instead
+8. `timezone.timedelta` doesn't exist — use `from datetime import timedelta`
+9. Always delete validation scripts after running them
+10. No fenced code blocks in documentation files
