@@ -288,6 +288,7 @@ TENANT_APPS: list[str] = [
     "apps.vendors",                      # Supplier management — tenant-specific vendors
     "apps.sales",                        # Orders, invoicing, POS — tenant-specific transactions
     "apps.customers",                    # Customer CRM — tenant-specific customer records
+    "apps.orders",                       # Order management — tenant-specific order records
     "apps.hr",                           # Human resources — tenant-specific employees & payroll
     "apps.accounting",                   # Accounting & finance — tenant-specific ledgers
     "apps.reports",                      # Reports & analytics — tenant-specific report data

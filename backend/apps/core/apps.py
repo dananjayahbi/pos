@@ -15,3 +15,9 @@ class CoreConfig(AppConfig):
     name = "apps.core"
     label = "core"
     verbose_name = "Core Framework"
+
+    def ready(self):
+        """Connect model signals when the app is ready."""
+        from apps.core.signals import connect_signals  # noqa: F401
+
+        connect_signals()

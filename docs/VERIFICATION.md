@@ -5527,15 +5527,15 @@ Implemented admin bulk actions: verify_domains for DomainAdmin, suspend_tenants 
 
 ### Validation Results
 
-| Category                      | Checks | Passed |
-| ----------------------------- | ------ | ------ |
-| Task 84: Migrations Exist     | 10     | 10     |
-| Task 85: SQL Review           | 10     | 10     |
-| Task 86: Migrations Applied   | 10     | 10     |
-| Task 87: Test Tenants         | 3      | 3      |
-| Task 87: Primary Domains      | 3      | 3      |
-| Task 88: Git Commit           | 1      | 1      |
-| **Total**                     | **37** | **37** |
+| Category                    | Checks | Passed |
+| --------------------------- | ------ | ------ |
+| Task 84: Migrations Exist   | 10     | 10     |
+| Task 85: SQL Review         | 10     | 10     |
+| Task 86: Migrations Applied | 10     | 10     |
+| Task 87: Test Tenants       | 3      | 3      |
+| Task 87: Primary Domains    | 3      | 3      |
+| Task 88: Git Commit         | 1      | 1      |
+| **Total**                   | **37** | **37** |
 
 ### Files Modified/Added in Group-F Document 03
 
@@ -5547,3 +5547,1509 @@ Implemented admin bulk actions: verify_domains for DomainAdmin, suspend_tenants 
 - backend/apps/tenants/migrations/0001_initial.py through 0010_add_billing_fields.py — 10 migrations (43 total operations)
 - docs/VERIFICATION.md — This verification record
 - SESSION_HANDOVER.md — Updated session context
+
+---
+
+## SubPhase-05: Group-A Document 01 — Tasks 01-05: Core Business Apps
+
+**Verified:** 2025-07-22
+**Document:** Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-A_Tenant-Apps-Structure/01_Tasks-01-05_Core-Business-Apps.md
+
+### Task 01: Create products App
+
+- App exists at backend/apps/products/
+- **init**.py: Module docstring describing product catalog management
+- apps.py: ProductsConfig with default_auto_field=BigAutoField, name="apps.products", label="products", verbose_name="Product Management"
+- Scope: Tenant-specific product data (definitions, variants, categories, pricing, media)
+- Pre-existing stub app from project scaffolding
+
+### Task 02: Create inventory App
+
+- App exists at backend/apps/inventory/
+- **init**.py: Module docstring describing inventory management
+- apps.py: InventoryConfig with default_auto_field=BigAutoField, name="apps.inventory", label="inventory", verbose_name="Inventory Management"
+- Scope: Tenant-specific stock records and warehouse management
+- Pre-existing stub app from project scaffolding
+
+### Task 03: Create customers App
+
+- App exists at backend/apps/customers/
+- **init**.py: Module docstring describing customer management
+- apps.py: CustomersConfig with default_auto_field=BigAutoField, name="apps.customers", label="customers", verbose_name="Customer Management"
+- Scope: Tenant-specific customer profiles and records
+- Pre-existing stub app from project scaffolding
+
+### Task 04: Create suppliers App
+
+- App exists at backend/apps/vendors/ (project uses "vendors" naming convention for suppliers)
+- **init**.py: Module docstring "Handles supplier relationship management" confirming scope
+- apps.py: VendorsConfig with default_auto_field=BigAutoField, name="apps.vendors", label="vendors", verbose_name="Vendor Management"
+- Scope: Tenant-specific supplier/vendor profiles, purchase orders, vendor performance
+- Pre-existing stub app from project scaffolding
+
+### Task 05: Create orders App
+
+- App created at backend/apps/orders/
+- **init**.py: Module docstring describing order management (creation, processing, tracking, history, returns)
+- apps.py: OrdersConfig with default_auto_field=BigAutoField, name="apps.orders", label="orders", verbose_name="Order Management"
+- Scope: Tenant-specific order records
+- Newly created following existing app pattern
+
+### Validation Results
+
+| Category                      | Checks | Passed |
+| ----------------------------- | ------ | ------ |
+| Task 01: products app exists  | 2      | 2      |
+| Task 02: inventory app exists | 2      | 2      |
+| Task 03: customers app exists | 2      | 2      |
+| Task 04: suppliers app exists | 2      | 2      |
+| Task 05: orders app created   | 2      | 2      |
+| **Total**                     | **10** | **10** |
+
+### Files Created in Group-A Document 01
+
+- backend/apps/orders/**init**.py — Orders app module with docstring
+- backend/apps/orders/apps.py — OrdersConfig AppConfig class
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-A Document 02 — Tasks 06-10: Support Apps & Config
+
+**Verified:** 2025-07-22
+**Document:** Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-A_Tenant-Apps-Structure/02_Tasks-06-10_Support-Apps-Config.md
+
+### Task 06: Create invoices App
+
+- Invoicing is covered by existing backend/apps/sales/ app (project naming convention)
+- sales/**init**.py explicitly lists "Invoicing and billing" in its scope
+- apps.py: SalesConfig with default_auto_field=BigAutoField, name="apps.sales", label="sales", verbose_name="Sales Management"
+- Scope: Sales orders, quotations, invoicing, billing, POS transactions, returns
+- Pre-existing stub app — follows current folder structure
+
+### Task 07: Create employees App
+
+- Employee management is covered by existing backend/apps/hr/ app (project naming convention)
+- hr/**init**.py explicitly lists "Employee records" in its scope
+- apps.py: HrConfig with default_auto_field=BigAutoField, name="apps.hr", label="hr", verbose_name="Human Resources"
+- Scope: Employee records, departments, positions, attendance, payroll
+- Pre-existing stub app — follows current folder structure
+
+### Task 08: Create accounting App
+
+- App exists at backend/apps/accounting/
+- **init**.py: Module docstring describing financial management
+- apps.py: AccountingConfig with default_auto_field=BigAutoField, name="apps.accounting", label="accounting", verbose_name="Accounting & Finance"
+- Scope: Chart of accounts, general ledger, AP/AR, financial reporting
+- Pre-existing stub app from project scaffolding
+
+### Task 09: Create pos App
+
+- POS functionality is covered by existing backend/apps/sales/ app (project naming convention)
+- sales/**init**.py explicitly lists "Point of Sale (POS) transactions" in its scope
+- apps.py: SalesConfig handles POS alongside other sales functions
+- Scope: POS transactions integrated within sales management
+- Pre-existing stub app — follows current folder structure
+
+### Task 10: Create App Config Classes
+
+All tenant apps have proper AppConfig classes:
+
+- ProductsConfig: name="apps.products", label="products", verbose_name="Product Management"
+- InventoryConfig: name="apps.inventory", label="inventory", verbose_name="Inventory Management"
+- CustomersConfig: name="apps.customers", label="customers", verbose_name="Customer Management"
+- VendorsConfig: name="apps.vendors", label="vendors", verbose_name="Vendor Management"
+- OrdersConfig: name="apps.orders", label="orders", verbose_name="Order Management"
+- SalesConfig: name="apps.sales", label="sales", verbose_name="Sales Management"
+- HrConfig: name="apps.hr", label="hr", verbose_name="Human Resources"
+- AccountingConfig: name="apps.accounting", label="accounting", verbose_name="Accounting & Finance"
+
+All use default_auto_field="django.db.models.BigAutoField" consistently.
+
+### App Naming Mapping (Document vs Implementation)
+
+| Document Name | Implemented As  | Reason                                 |
+| ------------- | --------------- | -------------------------------------- |
+| invoices      | apps.sales      | Sales app covers invoicing and billing |
+| employees     | apps.hr         | HR app covers employee records         |
+| accounting    | apps.accounting | Direct match                           |
+| pos           | apps.sales      | Sales app covers POS transactions      |
+| suppliers     | apps.vendors    | Vendors app covers supplier management |
+
+### Validation Results
+
+| Category                         | Checks | Passed |
+| -------------------------------- | ------ | ------ |
+| Task 06: invoices scope covered  | 2      | 2      |
+| Task 07: employees scope covered | 2      | 2      |
+| Task 08: accounting app exists   | 2      | 2      |
+| Task 09: pos scope covered       | 2      | 2      |
+| Task 10: AppConfig classes       | 8      | 8      |
+| **Total**                        | **16** | **16** |
+
+### Files Modified in Group-A Document 02
+
+- docs/VERIFICATION.md — This verification record
+- No new app files created (all apps already exist under current folder structure)
+
+---
+
+## SubPhase-05: Group-A Document 03 — Tasks 11-14: Registration & Mixins
+
+**Verified:** 2025-07-22
+**Document:** Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-A_Tenant-Apps-Structure/03_Tasks-11-14_Registration-Mixins.md
+
+### Task 11: Register in TENANT_APPS
+
+- TENANT_APPS updated in backend/config/settings/database.py
+- Added apps.orders to the tenant apps list (was the only missing app)
+- Total TENANT_APPS: 13 entries (2 Django framework + 11 business modules)
+- Full TENANT_APPS list: django.contrib.contenttypes, django.contrib.auth, apps.products, apps.inventory, apps.vendors, apps.sales, apps.customers, apps.orders, apps.hr, apps.accounting, apps.reports, apps.webstore, apps.integrations
+- Verified via Docker: apps.orders confirmed present in settings.TENANT_APPS
+
+### Task 12: Create Base Model Mixins
+
+- Created backend/apps/core/mixins.py (248 lines)
+- Location: apps.core (SHARED_APP) — importable from any tenant app
+- Mirrors platform mixins (apps.platform.models.mixins) for consistency
+- 5 abstract mixins defined: UUIDMixin, TimestampMixin, AuditMixin, StatusMixin, SoftDeleteMixin
+- Field naming convention: created_on / updated_on (NOT created_at / updated_at)
+- All mixins have comprehensive docstrings with field descriptions and usage examples
+
+### Task 13: Create UUID Mixin
+
+- UUIDMixin defined in backend/apps/core/mixins.py
+- Fields: id (UUIDField, primary_key=True, default=uuid.uuid4, editable=False)
+- Aligns with platform UUID pattern (apps.platform.models.mixins.UUIDMixin)
+- Abstract: True — no database table created
+- Verified via Docker: UUIDMixin.\_meta.get_fields() returns ['id']
+
+### Task 14: Create Audit Mixin
+
+- AuditMixin defined in backend/apps/core/mixins.py
+- Inherits from TimestampMixin (gets created_on, updated_on)
+- Additional fields: created_by (FK to AUTH_USER_MODEL, SET_NULL, nullable), updated_by (FK to AUTH_USER_MODEL, SET_NULL, nullable)
+- Related names use %(app*label)s*%(class)s pattern to avoid clashes
+- Abstract: True — no database table created
+- Verified via Docker: AuditMixin fields = ['created_on', 'updated_on', 'created_by', 'updated_by']
+- issubclass(AuditMixin, TimestampMixin) = True
+
+### Additional Mixins Created
+
+- TimestampMixin: created_on (default=timezone.now, editable=False), updated_on (auto_now=True)
+- StatusMixin: is_active (BooleanField, default=True, db_index=True), deactivated_on (DateTimeField, nullable)
+- SoftDeleteMixin: is_deleted (BooleanField, default=False, db_index=True), deleted_on (DateTimeField, nullable)
+
+### Validation Results
+
+| Category                     | Checks | Passed |
+| ---------------------------- | ------ | ------ |
+| Task 11: TENANT_APPS updated | 2      | 2      |
+| Task 12: Mixins file created | 5      | 5      |
+| Task 13: UUIDMixin fields    | 2      | 2      |
+| Task 14: AuditMixin fields   | 4      | 4      |
+| Import verification          | 1      | 1      |
+| **Total**                    | **14** | **14** |
+
+### Files Modified/Created in Group-A Document 03
+
+- backend/config/settings/database.py — Added apps.orders to TENANT_APPS
+- backend/apps/core/mixins.py — NEW: 5 abstract model mixins (UUIDMixin, TimestampMixin, AuditMixin, StatusMixin, SoftDeleteMixin)
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-B Document 01 — Tasks 15-20: Category Model
+
+**Verified:** 2025-07-22
+**Document:** Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-B_Product-Category-Models/01_Tasks-15-20_Category-Model.md
+
+### Task 15: Create Category Model
+
+- Category model created at backend/apps/products/models/category.py
+- Uses models/ package pattern (not single models.py) per Group B deliverables
+- Inherits from UUIDMixin (UUID v4 PK) and TimestampMixin (created_on, updated_on)
+- app_label: products, db_table: products_category
+- Ordering: ['sort_order', 'name']
+- 2 indexes: idx_category_active_sort (is_active, sort_order), idx_category_parent (parent)
+- **str** returns full category path (e.g., "Electronics > Phones")
+- save() auto-generates slug from name if not provided
+- Properties: is_root, depth
+
+### Task 16: Add Category Parent Field
+
+- parent: ForeignKey to "self", on_delete=CASCADE, null=True, blank=True
+- related_name="children" for reverse access
+- Root categories have parent=None
+- Supports unlimited nesting depth
+
+### Task 17: Add Category Name Field
+
+- name: CharField, max_length=255
+- verbose_name="Category Name"
+- Required field (no blank/null)
+
+### Task 18: Add Category Slug Field
+
+- slug: SlugField, max_length=255, unique=True
+- Unique per tenant schema (enforced by database per-schema isolation)
+- Auto-generated from name via save() override if not provided
+
+### Task 19: Add Category Image Field
+
+- image: ImageField, upload_to=category_image_upload_path function
+- Upload path: categories/{slug}/{filename}
+- Optional (null=True, blank=True)
+
+### Task 20: Add Category Active Field
+
+- is_active: BooleanField, default=True, db_index=True
+- Controls category visibility on storefront
+- Inactive categories hidden from storefront but accessible in admin
+
+### Additional Fields
+
+- description: TextField, blank=True, default="" — optional category description
+- sort_order: PositiveIntegerField, default=0 — controls display order
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 15: Model structure | 4      | 4      |
+| Task 16: Parent FK field | 2      | 2      |
+| Task 17: Name field      | 1      | 1      |
+| Task 18: Slug field      | 2      | 2      |
+| Task 19: Image field     | 1      | 1      |
+| Task 20: Active field    | 2      | 2      |
+| Import verification      | 1      | 1      |
+| **Total**                | **13** | **13** |
+
+### Files Created in Group-B Document 01
+
+- backend/apps/products/models/**init**.py — Models package with Category export
+- backend/apps/products/models/category.py — Category model with all fields
+- backend/apps/products/constants.py — Product status choices
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-B Document 02 — Tasks 21-26: Product Core
+
+**Verified:** 2025-07-22
+**Document:** Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-B_Product-Category-Models/02_Tasks-21-26_Product-Core.md
+
+### Task 21: Create Product Model
+
+- Product model created at backend/apps/products/models/product.py
+- Inherits from UUIDMixin (UUID v4 PK) and TimestampMixin (created_on, updated_on)
+- app_label: products, db_table: products_product
+- Ordering: ['-created_on']
+- 3 indexes: idx_product_status_created, idx_product_category_status, idx_product_sku
+- **str** returns "name (sku)" format
+- save() auto-generates slug from name if not provided
+- Properties: profit_margin, is_active
+- Exported from apps.products.models package
+
+### Task 22: Add Product Name Field
+
+- name: CharField, max_length=255
+- verbose_name="Product Name"
+- Required field (no blank/null)
+- slug: SlugField, max_length=255, unique=True (URL-friendly identifier)
+- description: TextField, blank=True, default="" (optional detailed description)
+
+### Task 23: Add Product SKU Field
+
+- sku: CharField, max_length=50, unique=True
+- Unique per tenant schema (enforced by database per-schema isolation)
+- Used for product search and identification
+
+### Task 24: Add Product Barcode Field
+
+- barcode: CharField, max_length=50, blank=True, default="", db_index=True
+- Supports EAN-13, UPC-A, and custom barcode formats
+- Optional field — not all products require barcodes
+
+### Task 25: Add Product Category FK
+
+- category: ForeignKey to "products.Category", on_delete=SET_NULL, null=True, blank=True
+- related_name="products" for reverse access from Category
+- SET_NULL on delete: products remain if category is deleted
+
+### Task 26: Add Product Pricing Fields
+
+- cost_price: DecimalField(max_digits=10, decimal_places=2, default=0, MinValueValidator(0))
+- selling_price: DecimalField(max_digits=10, decimal_places=2, default=0, MinValueValidator(0))
+- mrp: DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, MinValueValidator(0))
+- wholesale_price: DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, MinValueValidator(0))
+- All prices in LKR (Sri Lankan Rupee) with PRICE_MAX_DIGITS=10, PRICE_DECIMAL_PLACES=2
+- MRP (Maximum Retail Price) is common in Sri Lankan retail — optional field
+- Wholesale price for bulk purchases — optional field
+- profit_margin property calculates percentage margin from cost and selling price
+
+### Validation Results
+
+| Category                  | Checks | Passed |
+| ------------------------- | ------ | ------ |
+| Task 21: Model structure  | 4      | 4      |
+| Task 22: Name/slug fields | 2      | 2      |
+| Task 23: SKU field        | 2      | 2      |
+| Task 24: Barcode field    | 2      | 2      |
+| Task 25: Category FK      | 2      | 2      |
+| Task 26: Pricing fields   | 4      | 4      |
+| Import verification       | 1      | 1      |
+| **Total**                 | **17** | **17** |
+
+### Files Created/Modified in Group-B Document 02
+
+- backend/apps/products/models/product.py — NEW: Product model with all fields
+- backend/apps/products/models/**init**.py — Updated: Added Product export
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-B Document 03 — Product Extras (Tasks 27–30)
+
+**Document**: `Document-Series/Phase-04_ERP-Core-Modules-Part1/SubPhase-05_Core-Business-Models/Group-B_Product-Category-Models/03_Product-Extras.md`
+**Verified**: Via Docker (`docker compose run --rm --no-deps --entrypoint python backend scripts/verify_doc03.py`)
+
+### Task 27: Tax Fields on Product Model
+
+Added 3 tax-related fields to the existing `Product` model:
+
+| Field              | Type         | Default    | Purpose                              |
+| ------------------ | ------------ | ---------- | ------------------------------------ |
+| `tax_type`         | CharField    | `standard` | Tax category (from TAX_TYPE_CHOICES) |
+| `tax_rate`         | DecimalField | `18`       | Tax percentage (SRI_LANKA_VAT_RATE)  |
+| `is_tax_inclusive` | BooleanField | `False`    | Whether prices include tax           |
+
+**Tax Type Choices**: `none`, `standard`, `reduced`, `exempt`, `zero_rated`
+**SRI_LANKA_VAT_RATE** constant = 18 (defined in constants.py)
+
+✅ All 3 tax fields verified with correct types and defaults
+
+### Task 28: Status Field (Already Implemented)
+
+The `status` field was already created in Document 02 (Task 21) as part of the Product model core:
+
+- **Field**: `CharField`, max_length=20, default=`draft`
+- **Choices**: 4 options — `draft`, `active`, `inactive`, `discontinued`
+- **DB Index**: Included in `idx_product_status_created` composite index
+
+✅ Status field confirmed present — no additional work needed
+
+### Task 29: ProductImage Model
+
+Created new `ProductImage` model in `backend/apps/products/models/image.py`:
+
+| Field        | Type                 | Details                           |
+| ------------ | -------------------- | --------------------------------- |
+| `id`         | UUIDField (PK)       | Via UUIDMixin                     |
+| `created_on` | DateTimeField        | Via TimestampMixin (auto_now_add) |
+| `updated_on` | DateTimeField        | Via TimestampMixin (auto_now)     |
+| `product`    | ForeignKey → Product | CASCADE, related_name="images"    |
+| `image`      | ImageField           | upload_to="products/images/"      |
+| `alt_text`   | CharField            | max_length=255, blank=True        |
+| `is_primary` | BooleanField         | default=False                     |
+| `sort_order` | PositiveIntegerField | default=0                         |
+
+**Total Fields**: 8
+**Index**: `idx_prodimg_product_primary` on (product, is_primary)
+**Ordering**: `["sort_order", "created_on"]`
+
+✅ ProductImage model verified with all fields, index, and ordering
+
+### Task 30: ProductVariant Model
+
+Created new `ProductVariant` model in `backend/apps/products/models/variant.py`:
+
+| Field             | Type                 | Details                                          |
+| ----------------- | -------------------- | ------------------------------------------------ |
+| `id`              | UUIDField (PK)       | Via UUIDMixin                                    |
+| `created_on`      | DateTimeField        | Via TimestampMixin (auto_now_add)                |
+| `updated_on`      | DateTimeField        | Via TimestampMixin (auto_now)                    |
+| `product`         | ForeignKey → Product | CASCADE, related_name="variants"                 |
+| `attribute_type`  | CharField            | max_length=50, choices=VARIANT_ATTRIBUTE_CHOICES |
+| `attribute_value` | CharField            | max_length=100                                   |
+| `sku`             | CharField            | max_length=100, unique=True                      |
+| `barcode`         | CharField            | max_length=100, blank=True                       |
+| `price_override`  | DecimalField         | 10,2, null=True, blank=True                      |
+| `cost_override`   | DecimalField         | 10,2, null=True, blank=True                      |
+| `is_active`       | BooleanField         | default=True                                     |
+| `sort_order`      | PositiveIntegerField | default=0                                        |
+
+**Total Fields**: 12
+**Indexes**: `idx_variant_product_attr` (product, attribute_type), `idx_variant_sku` (sku)
+**Constraint**: `uq_variant_product_attr_value` — UniqueConstraint on (product, attribute_type, attribute_value)
+**Properties**: `effective_price` (returns price_override or product.selling_price), `effective_cost` (returns cost_override or product.cost_price)
+**Variant Attribute Choices**: `size`, `color`, `material`, `weight`, `custom`
+
+✅ ProductVariant model verified with all fields, indexes, constraint, and properties
+
+### Constants Updated (constants.py)
+
+Added to `backend/apps/products/constants.py`:
+
+| Constant                    | Values                                      |
+| --------------------------- | ------------------------------------------- |
+| `TAX_TYPE_CHOICES`          | none, standard, reduced, exempt, zero_rated |
+| `SRI_LANKA_VAT_RATE`        | 18                                          |
+| `VARIANT_ATTRIBUTE_CHOICES` | size, color, material, weight, custom       |
+
+### Models Package (**init**.py)
+
+Updated exports to include all 4 models:
+
+- `Category` (from .category)
+- `Product` (from .product)
+- `ProductImage` (from .image)
+- `ProductVariant` (from .variant)
+
+### Validation Results
+
+| Category                      | Checks | Passed |
+| ----------------------------- | ------ | ------ |
+| Task 27: Tax fields           | 3      | 3      |
+| Task 28: Status field         | 1      | 1      |
+| Task 29: ProductImage model   | 3      | 3      |
+| Task 30: ProductVariant model | 5      | 5      |
+| Constants verification        | 3      | 3      |
+| Package exports               | 1      | 1      |
+| **Total**                     | **16** | **16** |
+
+### Files Created/Modified in Group-B Document 03
+
+- backend/apps/products/models/product.py — MODIFIED: Added tax_type, tax_rate, is_tax_inclusive fields
+- backend/apps/products/models/image.py — NEW: ProductImage model
+- backend/apps/products/models/variant.py — NEW: ProductVariant model
+- backend/apps/products/constants.py — MODIFIED: Added TAX_TYPE_CHOICES, SRI_LANKA_VAT_RATE, VARIANT_ATTRIBUTE_CHOICES
+- backend/apps/products/models/**init**.py — MODIFIED: Updated exports for all 4 models
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-C Document 01 — Stock Location (Tasks 31–35)
+
+**Document**: `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-C_Inventory-Stock-Models/01_Tasks-31-35_Stock-Location.md`
+**Verified**: Via Docker (`docker compose run --rm --no-deps --entrypoint python backend scripts/verify_groupc_doc01.py`)
+
+### Task 31: Create StockLocation Model
+
+Created the `StockLocation` model in `backend/apps/inventory/models/location.py`:
+
+- **App label**: `inventory`
+- **DB table**: `inventory_stock_location`
+- **Mixins**: `UUIDMixin`, `TimestampMixin`
+- **Total fields**: 15
+- **Ordering**: `["name"]`
+- **Properties**: `is_physical` (True for warehouse/store), `full_address` (formatted address string)
+
+Converted inventory app from stub (no models) to models package pattern consistent with products app.
+
+✅ StockLocation model created and verified
+
+### Task 32: Location Name Field
+
+| Field  | Type      | Details                                |
+| ------ | --------- | -------------------------------------- |
+| `name` | CharField | max_length=255, unique=True per tenant |
+
+✅ Name field verified with uniqueness constraint
+
+### Task 33: Location Type Field
+
+| Field           | Type      | Details                      |
+| --------------- | --------- | ---------------------------- |
+| `location_type` | CharField | max_length=20, db_index=True |
+
+**Location Type Choices** (from `constants.py`):
+
+- `warehouse` — Central Warehouse
+- `store` — Retail Store
+- `transit` — In-Transit
+- `virtual` — Virtual / Dropship
+
+Default: `warehouse`
+
+✅ Location type field verified with 4 choices and db_index
+
+### Task 34: Location Address Fields
+
+| Field            | Type       | Details                             |
+| ---------------- | ---------- | ----------------------------------- |
+| `address_line_1` | CharField  | max_length=255, blank=True          |
+| `address_line_2` | CharField  | max_length=255, blank=True          |
+| `city`           | CharField  | max_length=100, blank=True          |
+| `state_province` | CharField  | max_length=100, blank=True          |
+| `postal_code`    | CharField  | max_length=20, blank=True           |
+| `country`        | CharField  | max_length=100, default="Sri Lanka" |
+| `phone`          | CharField  | max_length=30, blank=True           |
+| `email`          | EmailField | blank=True                          |
+
+All address fields are optional (blank=True) for non-physical location types (transit, virtual).
+
+✅ All 8 address/contact fields verified
+
+### Task 35: Location Active Field
+
+| Field       | Type         | Details                     |
+| ----------- | ------------ | --------------------------- |
+| `is_active` | BooleanField | default=True, db_index=True |
+
+Inactive locations retain existing stock records but cannot receive new stock or be used for transfers.
+
+✅ Active field verified with default and db_index
+
+### Additional Deliverables
+
+**Index**: `idx_location_type_active` on (location_type, is_active)
+**Notes field**: TextField, blank=True — for internal notes about the location
+**Constants file**: `backend/apps/inventory/constants.py` created with `LOCATION_TYPE_CHOICES` and `DEFAULT_LOCATION_TYPE`
+
+### Validation Results
+
+| Category                     | Checks | Passed |
+| ---------------------------- | ------ | ------ |
+| Task 31: Model structure     | 4      | 4      |
+| Task 32: Name field          | 2      | 2      |
+| Task 33: Location type field | 4      | 4      |
+| Task 34: Address fields      | 8      | 8      |
+| Task 35: Active field        | 2      | 2      |
+| Properties & extras          | 3      | 3      |
+| **Total**                    | **23** | **23** |
+
+### Files Created/Modified in Group-C Document 01
+
+- backend/apps/inventory/constants.py — NEW: LOCATION_TYPE_CHOICES, DEFAULT_LOCATION_TYPE
+- backend/apps/inventory/models/**init**.py — NEW: Package init exporting StockLocation
+- backend/apps/inventory/models/location.py — NEW: StockLocation model with all fields
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-C Document 02 — Stock Levels (Tasks 36–40)
+
+**Document**: `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-C_Inventory-Stock-Models/02_Tasks-36-40_Stock-Levels.md`
+**Verified**: Via Docker (`docker compose run --rm --no-deps --entrypoint python backend scripts/verify_groupc_doc02.py`)
+
+### Task 36: Create Stock Model
+
+Created the `Stock` model in `backend/apps/inventory/models/stock.py`:
+
+- **App label**: `inventory`
+- **DB table**: `inventory_stock`
+- **Mixins**: `UUIDMixin`, `TimestampMixin`
+- **Total fields**: 8
+- **Ordering**: `["product", "location"]`
+- **Constraint**: `uq_stock_product_location` — UniqueConstraint on (product, location)
+- **Index**: `idx_stock_product_location` on (product, location)
+
+✅ Stock model created with unique constraint on (product, location)
+
+### Task 37: Stock Product FK
+
+| Field     | Type                 | Details                              |
+| --------- | -------------------- | ------------------------------------ |
+| `product` | ForeignKey → Product | CASCADE, related_name="stock_levels" |
+
+✅ Product FK verified — links to products.Product
+
+### Task 38: Stock Location FK
+
+| Field      | Type                       | Details                              |
+| ---------- | -------------------------- | ------------------------------------ |
+| `location` | ForeignKey → StockLocation | CASCADE, related_name="stock_levels" |
+
+✅ Location FK verified — links to inventory.StockLocation
+
+### Task 39: Stock Quantity Field
+
+| Field      | Type         | Details                                    |
+| ---------- | ------------ | ------------------------------------------ |
+| `quantity` | DecimalField | max_digits=12, decimal_places=3, default=0 |
+
+Supports fractional units (e.g. kilograms). Adjusted exclusively via StockMovement records for full audit trail.
+
+✅ Quantity field verified
+
+### Task 40: Stock Reorder Level
+
+| Field           | Type         | Details                                    |
+| --------------- | ------------ | ------------------------------------------ |
+| `reorder_level` | DecimalField | max_digits=12, decimal_places=3, default=0 |
+
+**Properties**:
+
+- `is_low_stock` — Returns True when quantity < reorder_level (disabled when reorder_level ≤ 0)
+- `needs_reorder` — Semantic alias for `is_low_stock`
+
+**Additional field**: `last_counted` (DateTimeField, null=True) — timestamp of last physical stock count.
+
+✅ Reorder level verified with low-stock properties
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 36: Model structure | 4      | 4      |
+| Task 37: Product FK      | 3      | 3      |
+| Task 38: Location FK     | 3      | 3      |
+| Task 39: Quantity field  | 2      | 2      |
+| Task 40: Reorder level   | 3      | 3      |
+| Properties & extras      | 3      | 3      |
+| **Total**                | **18** | **18** |
+
+### Files Created/Modified in Group-C Document 02
+
+- backend/apps/inventory/models/stock.py — NEW: Stock model with all fields
+- backend/apps/inventory/models/**init**.py — MODIFIED: Added Stock export
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-C Document 03 — Stock Movement (Tasks 41–44)
+
+**Document**: `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-C_Inventory-Stock-Models/03_Tasks-41-44_Stock-Movement.md`
+**Verified**: Via Docker (`docker compose run --rm --no-deps --entrypoint python backend scripts/verify_groupc_doc03.py`)
+
+### Task 41: Create StockMovement Model
+
+Created the `StockMovement` model in `backend/apps/inventory/models/movement.py`:
+
+- **App label**: `inventory`
+- **DB table**: `inventory_stock_movement`
+- **Mixins**: `UUIDMixin`, `TimestampMixin`
+- **Total fields**: 11
+- **Ordering**: `["-created_on"]` (newest first)
+- **Properties**: `is_inbound`, `is_outbound`, `is_transfer`
+
+Every stock change creates a movement record for full audit traceability. Movements are immutable — corrections are made via new adjustment/return movements.
+
+✅ StockMovement model created and verified
+
+### Task 42: Movement Type Field
+
+| Field           | Type      | Details                      |
+| --------------- | --------- | ---------------------------- |
+| `movement_type` | CharField | max_length=20, db_index=True |
+
+**Movement Type Choices** (from `constants.py`):
+
+- `in` — Stock Received
+- `out` — Stock Sold / Consumed
+- `transfer` — Transfer Between Locations
+- `adjustment` — Manual Adjustment
+- `return` — Customer Return
+
+Default: `in`
+
+✅ Movement type field verified with 5 choices
+
+### Task 43: Movement Quantity Field
+
+| Field      | Type         | Details                         |
+| ---------- | ------------ | ------------------------------- |
+| `quantity` | DecimalField | max_digits=12, decimal_places=3 |
+
+Always positive — direction is inferred from the movement_type (in/return = inbound, out = outbound, transfer = both).
+
+✅ Quantity field verified
+
+### Task 44: Movement Reference Field
+
+| Field       | Type      | Details                                   |
+| ----------- | --------- | ----------------------------------------- |
+| `reference` | CharField | max_length=255, blank=True, db_index=True |
+
+Links movements to source documents (order numbers, invoice IDs, purchase orders, adjustment reasons).
+
+✅ Reference field verified with db_index
+
+### Additional Fields & Structure
+
+| Field                  | Type                       | Details                                          |
+| ---------------------- | -------------------------- | ------------------------------------------------ |
+| `product`              | ForeignKey → Product       | CASCADE, related_name="stock_movements"          |
+| `location`             | ForeignKey → StockLocation | CASCADE, related_name="movements_from"           |
+| `destination_location` | ForeignKey → StockLocation | SET_NULL, null=True, related_name="movements_to" |
+| `notes`                | TextField                  | blank=True                                       |
+| `performed_by`         | ForeignKey → PlatformUser  | SET_NULL, null=True                              |
+
+**Indexes**:
+
+- `idx_movement_product_type` on (product, movement_type)
+- `idx_movement_location_type` on (location, movement_type)
+- `idx_movement_created` on (-created_on)
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 41: Model structure | 4      | 4      |
+| Task 42: Movement type   | 4      | 4      |
+| Task 43: Quantity field  | 2      | 2      |
+| Task 44: Reference field | 2      | 2      |
+| FKs & indexes            | 5      | 5      |
+| Properties               | 3      | 3      |
+| **Total**                | **20** | **20** |
+
+### Files Created/Modified in Group-C Document 03
+
+- backend/apps/inventory/models/movement.py — NEW: StockMovement model with all fields
+- backend/apps/inventory/constants.py — MODIFIED: Added MOVEMENT_TYPE_CHOICES
+- backend/apps/inventory/models/**init**.py — MODIFIED: Added StockMovement export
+- docs/VERIFICATION.md — This verification record
+
+### Group-C Complete Summary
+
+All 3 documents in Group-C (Inventory & Stock Models) are now complete:
+
+| Document | Tasks | Model         | Fields |
+| -------- | ----- | ------------- | ------ |
+| Doc 01   | 31–35 | StockLocation | 15     |
+| Doc 02   | 36–40 | Stock         | 8      |
+| Doc 03   | 41–44 | StockMovement | 11     |
+
+**Inventory app structure**:
+
+```
+backend/apps/inventory/
+├── __init__.py
+├── apps.py
+├── constants.py        (LOCATION_TYPE_CHOICES, MOVEMENT_TYPE_CHOICES)
+└── models/
+    ├── __init__.py     (exports StockLocation, Stock, StockMovement)
+    ├── location.py     (StockLocation)
+    ├── stock.py        (Stock)
+    └── movement.py     (StockMovement)
+```
+
+---
+
+## SubPhase-05: Group-D Document 01 — Customer Model (Tasks 45–50)
+
+**Document**: `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-D_Customer-Supplier-Models/01_Tasks-45-50_Customer-Model.md`
+**Verified**: Via Docker (`docker compose run --rm --no-deps --entrypoint python backend scripts/verify_groupd_doc01.py`)
+
+### Task 45: Create Customer Model
+
+Created the `Customer` model in `backend/apps/customers/models/customer.py`:
+
+- **App label**: `customers`
+- **DB table**: `customers_customer`
+- **Mixins**: `UUIDMixin`, `TimestampMixin`, `SoftDeleteMixin`
+- **Total fields**: 29
+- **Ordering**: `["first_name", "last_name", "business_name"]`
+- **Properties**: `full_name`, `display_name`, `has_credit`, `available_credit`
+
+Converted customers app from stub to models package pattern.
+
+✅ Customer model created and verified
+
+### Task 46: Customer Name Fields
+
+| Field           | Type      | Details                    |
+| --------------- | --------- | -------------------------- |
+| `first_name`    | CharField | max_length=100, blank=True |
+| `last_name`     | CharField | max_length=100, blank=True |
+| `business_name` | CharField | max_length=255, blank=True |
+
+Individual customers use first/last name; business customers use business_name.
+
+✅ Name fields verified
+
+### Task 47: Customer Contact Fields
+
+| Field    | Type       | Details                                |
+| -------- | ---------- | -------------------------------------- |
+| `email`  | EmailField | blank=True                             |
+| `phone`  | CharField  | max_length=30, blank=True (+94 format) |
+| `mobile` | CharField  | max_length=30, blank=True              |
+
+✅ Contact fields verified
+
+### Task 48: Customer Address Fields
+
+**Billing Address** (6 fields):
+
+- `billing_address_line_1`, `billing_address_line_2`, `billing_city`, `billing_state_province`, `billing_postal_code`, `billing_country` (default: "Sri Lanka")
+
+**Shipping Address** (6 fields):
+
+- `shipping_address_line_1`, `shipping_address_line_2`, `shipping_city`, `shipping_state_province`, `shipping_postal_code`, `shipping_country` (default: "Sri Lanka")
+
+All address fields are optional (blank=True) except country defaults.
+
+✅ All 12 address fields verified (6 billing + 6 shipping)
+
+### Task 49: Customer Type Field
+
+| Field           | Type      | Details                      |
+| --------------- | --------- | ---------------------------- |
+| `customer_type` | CharField | max_length=20, db_index=True |
+
+**Customer Type Choices** (from `constants.py`):
+
+- `individual` — Individual
+- `business` — Business / Corporate
+- `wholesale` — Wholesale Buyer
+- `vip` — VIP Customer
+
+Default: `individual`
+
+✅ Customer type field verified with 4 choices
+
+### Task 50: Customer Credit Limit
+
+| Field             | Type         | Details                                    |
+| ----------------- | ------------ | ------------------------------------------ |
+| `credit_limit`    | DecimalField | max_digits=10, decimal_places=2, default=0 |
+| `current_balance` | DecimalField | max_digits=10, decimal_places=2, default=0 |
+
+Currency: LKR (₨). `has_credit` property returns True if credit_limit > 0. `available_credit` returns remaining credit.
+
+Additional field: `tax_id` (CharField, max_length=50) for business registration.
+
+✅ Credit limit verified with LKR currency properties
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 45: Model structure | 4      | 4      |
+| Task 46: Name fields     | 3      | 3      |
+| Task 47: Contact fields  | 3      | 3      |
+| Task 48: Address fields  | 12     | 12     |
+| Task 49: Customer type   | 4      | 4      |
+| Task 50: Credit limit    | 4      | 4      |
+| Properties & extras      | 5      | 5      |
+| **Total**                | **35** | **35** |
+
+### Files Created/Modified in Group-D Document 01
+
+- backend/apps/customers/constants.py — NEW: CUSTOMER_TYPE_CHOICES, DEFAULT_CUSTOMER_TYPE
+- backend/apps/customers/models/**init**.py — NEW: Package init exporting Customer
+- backend/apps/customers/models/customer.py — NEW: Customer model with all fields
+- docs/VERIFICATION.md — This verification record
+
+---
+
+## SubPhase-05: Group-D Document 02 — Supplier Model (Tasks 51–56)
+
+**Document**: `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-05_Tenant-Schema-Template/Group-D_Customer-Supplier-Models/02_Tasks-51-56_Supplier-Model.md`
+**Verified**: Via Docker (`docker compose run --rm --no-deps --entrypoint python backend scripts/verify_groupd_doc02.py`)
+**Note**: Document refers to "suppliers" app — project uses `vendors` app (same purpose).
+
+### Task 51: Create Supplier Model
+
+Created the `Supplier` model in `backend/apps/vendors/models/supplier.py`:
+
+- **App label**: `vendors`
+- **DB table**: `vendors_supplier`
+- **Mixins**: `UUIDMixin`, `TimestampMixin`, `SoftDeleteMixin`
+- **Total fields**: 22
+- **Ordering**: `["name"]`
+- **Property**: `full_address` (formatted address string)
+
+Converted vendors app from stub to models package pattern.
+
+✅ Supplier model created and verified
+
+### Task 52: Supplier Name Field
+
+| Field            | Type      | Details                     |
+| ---------------- | --------- | --------------------------- |
+| `name`           | CharField | max_length=255, unique=True |
+| `contact_person` | CharField | max_length=255, blank=True  |
+
+✅ Name fields verified with uniqueness constraint
+
+### Task 53: Supplier Contact Fields
+
+| Field     | Type       | Details                                |
+| --------- | ---------- | -------------------------------------- |
+| `email`   | EmailField | blank=True                             |
+| `phone`   | CharField  | max_length=30, blank=True (+94 format) |
+| `mobile`  | CharField  | max_length=30, blank=True              |
+| `website` | URLField   | blank=True                             |
+
+✅ Contact fields verified (4 fields including website)
+
+### Task 54: Supplier Address Fields
+
+| Field            | Type      | Details                             |
+| ---------------- | --------- | ----------------------------------- |
+| `address_line_1` | CharField | max_length=255, blank=True          |
+| `address_line_2` | CharField | max_length=255, blank=True          |
+| `city`           | CharField | max_length=100, blank=True          |
+| `state_province` | CharField | max_length=100, blank=True          |
+| `postal_code`    | CharField | max_length=20, blank=True           |
+| `country`        | CharField | max_length=100, default="Sri Lanka" |
+
+✅ All 6 address fields verified
+
+### Task 55: Supplier Tax ID Field
+
+| Field        | Type      | Details                      |
+| ------------ | --------- | ---------------------------- |
+| `tax_id`     | CharField | max_length=50, db_index=True |
+| `vat_number` | CharField | max_length=50, blank=True    |
+
+Sri Lankan business registration number (BRN) or tax identification number (TIN).
+
+✅ Tax ID verified with db_index
+
+### Task 56: Supplier Payment Terms
+
+| Field           | Type      | Details       |
+| --------------- | --------- | ------------- |
+| `payment_terms` | CharField | max_length=20 |
+
+**Payment Terms Choices** (from `constants.py`):
+
+- `immediate` — Immediate
+- `net_15` — Net 15 Days
+- `net_30` — Net 30 Days
+- `net_60` — Net 60 Days
+- `cod` — Cash on Delivery
+
+Default: `net_30`
+
+✅ Payment terms verified with 5 choices
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 51: Model structure | 4      | 4      |
+| Task 52: Name fields     | 2      | 2      |
+| Task 53: Contact fields  | 4      | 4      |
+| Task 54: Address fields  | 6      | 6      |
+| Task 55: Tax ID          | 2      | 2      |
+| Task 56: Payment terms   | 3      | 3      |
+| Properties & extras      | 3      | 3      |
+| **Total**                | **24** | **24** |
+
+### Files Created/Modified in Group-D Document 02
+
+- backend/apps/vendors/constants.py — NEW: PAYMENT_TERMS_CHOICES, DEFAULT_PAYMENT_TERMS
+- backend/apps/vendors/models/**init**.py — NEW: Package init exporting Supplier
+- backend/apps/vendors/models/supplier.py — NEW: Supplier model with all fields
+- docs/VERIFICATION.md — This verification record
+
+### Group-D Complete Summary
+
+Both documents in Group-D (Customer & Supplier Models) are now complete:
+
+| Document | Tasks | Model    | App       | Fields |
+| -------- | ----- | -------- | --------- | ------ |
+| Doc 01   | 45–50 | Customer | customers | 29     |
+| Doc 02   | 51–56 | Supplier | vendors   | 22     |
+
+**App name mapping**: Document says "suppliers" → project uses "vendors"
+
+---
+
+## Group-E: Order & Invoice Models
+
+### Document 01 — Order Model (Tasks 57–62)
+
+- **Verified**: Docker `--no-deps` model introspection
+- **Command**: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend scripts/verify_groupe_doc01.py`
+- **Result**: ALL TASKS 57–62 VERIFIED SUCCESSFULLY
+
+### Task 57: Order Model Structure
+
+- Model: Order (UUIDMixin + TimestampMixin + SoftDeleteMixin)
+- App label: orders
+- DB table: orders_order
+- Total fields: 15 (id, created_on, updated_on, is_deleted, deleted_on, order_number, customer, status, order_date, subtotal, tax_amount, discount_amount, total_amount, notes, created_by)
+- Ordering: ['-order_date']
+
+### Task 58: Order Number
+
+- order_number: CharField, max_length=50, unique=True, db_index=True
+- Used as human-readable identifier for orders
+
+### Task 59: Customer FK
+
+- customer: ForeignKey → Customer (on_delete=PROTECT)
+- related_name: orders
+- Prevents deletion of customers with existing orders
+
+### Task 60: Status Field
+
+- status: CharField, max_length=20, db_index=True
+- choices: pending, confirmed, processing, shipped, delivered, cancelled, returned (7 statuses)
+- default: pending
+
+### Task 61: Order Date
+
+- order_date: DateTimeField, default=timezone.now, db_index=True
+- Indexed for date-range queries
+
+### Task 62: Total Fields
+
+- subtotal: DecimalField, max_digits=10, decimal_places=2, default=0
+- tax_amount: DecimalField, max_digits=10, decimal_places=2, default=0
+- discount_amount: DecimalField, max_digits=10, decimal_places=2, default=0
+- total_amount: DecimalField, max_digits=10, decimal_places=2, default=0
+
+### Additional Checks
+
+- 3 indexes: idx_order_status_date, idx_order_customer_status, idx_order_date_desc
+- Properties: is_editable, is_completed, is_cancelled
+- Method: calculate_totals
+- created_by FK → PlatformUser (AUTH_USER_MODEL)
+- Package exports: ['Order']
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 57: Model structure | 5      | 5      |
+| Task 58: Order number    | 3      | 3      |
+| Task 59: Customer FK     | 3      | 3      |
+| Task 60: Status field    | 4      | 4      |
+| Task 61: Order date      | 2      | 2      |
+| Task 62: Total fields    | 4      | 4      |
+| Properties & extras      | 6      | 6      |
+| **Total**                | **27** | **27** |
+
+### Files Created/Modified in Group-E Document 01
+
+- backend/apps/orders/constants.py — NEW: ORDER_STATUS_CHOICES, DEFAULT_ORDER_STATUS
+- backend/apps/orders/models/**init**.py — NEW: Package init exporting Order
+- backend/apps/orders/models/order.py — NEW: Order model with all fields
+- docs/VERIFICATION.md — This verification record
+
+---
+
+### Document 02 — OrderItem Model (Tasks 63–66)
+
+- **Verified**: Docker `--no-deps` model introspection
+- **Command**: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend scripts/verify_groupe_doc02.py`
+- **Result**: ALL TASKS 63–66 VERIFIED SUCCESSFULLY
+
+### Task 63: OrderItem Model Structure
+
+- Model: OrderItem (UUIDMixin + TimestampMixin)
+- App label: orders
+- DB table: orders_orderitem
+- Total fields: 11 (id, created_on, updated_on, order, product, quantity, unit_price, discount_amount, tax_amount, line_total, notes)
+- Ordering: ['created_on']
+- order FK: ForeignKey → Order (on_delete=CASCADE, related_name=items)
+
+### Task 64: Product FK
+
+- product: ForeignKey → Product (on_delete=PROTECT)
+- related_name: order_items
+- Prevents deletion of products that appear on orders
+
+### Task 65: Quantity Field
+
+- quantity: DecimalField, max_digits=12, decimal_places=3
+- default: 1
+- validators: MinValueValidator(0.001) — must be > 0
+
+### Task 66: Price Fields (LKR)
+
+- unit_price: DecimalField, max_digits=10, decimal_places=2, default=0
+- discount_amount: DecimalField, max_digits=10, decimal_places=2, default=0
+- tax_amount: DecimalField, max_digits=10, decimal_places=2, default=0
+- line_total: DecimalField, max_digits=10, decimal_places=2, default=0
+- All monetary values in LKR (₨)
+
+### Additional Checks
+
+- Index: idx_orderitem_order_product (order + product composite)
+- Method: calculate_line_total (qty × unit_price + tax - discount)
+- Property: subtotal (qty × unit_price before tax/discount)
+- Package exports: ['Order', 'OrderItem']
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 63: Model structure | 6      | 6      |
+| Task 64: Product FK      | 3      | 3      |
+| Task 65: Quantity field  | 3      | 3      |
+| Task 66: Price fields    | 4      | 4      |
+| Properties & extras      | 4      | 4      |
+| **Total**                | **20** | **20** |
+
+### Files Created/Modified in Group-E Document 02
+
+- backend/apps/orders/models/order_item.py — NEW: OrderItem model with all fields
+- backend/apps/orders/models/**init**.py — MODIFIED: Added OrderItem export
+- docs/VERIFICATION.md — This verification record
+
+---
+
+### Document 03 — Invoice & Payment Models (Tasks 67–72)
+
+- **Verified**: Docker `--no-deps` model introspection
+- **Command**: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend scripts/verify_groupe_doc03.py`
+- **Result**: ALL TASKS 67–72 VERIFIED SUCCESSFULLY
+- **App mapping**: Document says "invoices" → project uses "sales"
+
+### Task 67: Invoice Model Structure
+
+- Model: Invoice (UUIDMixin + TimestampMixin + SoftDeleteMixin)
+- App label: sales
+- DB table: sales_invoice
+- Total fields: 18 (id, created_on, updated_on, is_deleted, deleted_on, invoice_number, order, customer, status, invoice_date, due_date, subtotal, tax_amount, discount_amount, total_amount, amount_paid, notes, created_by)
+- Ordering: ['-invoice_date']
+
+### Task 68: Invoice Number
+
+- invoice_number: CharField, max_length=50, unique=True, db_index=True
+- Unique identifier within the tenant
+
+### Task 69: Invoice Order FK (Optional)
+
+- order: ForeignKey → Order (on_delete=SET_NULL)
+- null=True, blank=True (optional link)
+- related_name: invoices
+- Allows standalone invoices without orders
+
+### Task 70: Invoice Status
+
+- status: CharField, max_length=20, db_index=True
+- choices: draft, sent, partially_paid, paid, overdue, cancelled (6 statuses)
+- default: draft
+- Includes partially_paid for partial payment support
+
+### Task 71: Payment Model Structure
+
+- Model: Payment (UUIDMixin + TimestampMixin)
+- App label: sales
+- DB table: sales_payment
+- Total fields: 10 (id, created_on, updated_on, invoice, payment_method, amount, payment_date, reference_number, notes, received_by)
+- Ordering: ['-payment_date']
+- invoice FK: ForeignKey → Invoice (on_delete=CASCADE, related_name=payments)
+- Partial payment support: Multiple Payment records per Invoice ✓
+
+### Task 72: Payment Method
+
+- payment_method: CharField, max_length=20, db_index=True
+- choices: cash, card, bank_transfer, cheque, mobile (5 methods)
+- default: cash
+- All 5 required methods present ✓
+
+### Additional Checks
+
+- Invoice indexes: idx_invoice_status_date, idx_invoice_customer_status, idx_invoice_date_desc, idx_invoice_due_date
+- Payment indexes: idx_payment_invoice_method, idx_payment_date_desc
+- Invoice properties: balance_due, is_paid, is_overdue, is_cancelled
+- Invoice method: calculate_totals
+- Payment properties: is_cash, is_card
+- Invoice.customer FK → Customer (on_delete=PROTECT)
+- Package exports: ['Invoice', 'Payment']
+
+### Validation Results
+
+| Category                | Checks | Passed |
+| ----------------------- | ------ | ------ |
+| Task 67: Invoice model  | 5      | 5      |
+| Task 68: Invoice number | 3      | 3      |
+| Task 69: Order FK       | 4      | 4      |
+| Task 70: Invoice status | 4      | 4      |
+| Task 71: Payment model  | 6      | 6      |
+| Task 72: Payment method | 5      | 5      |
+| Properties & extras     | 8      | 8      |
+| **Total**               | **35** | **35** |
+
+### Files Created/Modified in Group-E Document 03
+
+- backend/apps/sales/constants.py — NEW: INVOICE_STATUS_CHOICES, PAYMENT_METHOD_CHOICES
+- backend/apps/sales/models/**init**.py — NEW: Package init exporting Invoice, Payment
+- backend/apps/sales/models/invoice.py — NEW: Invoice model with all fields
+- backend/apps/sales/models/payment.py — NEW: Payment model with all fields
+- docs/VERIFICATION.md — This verification record
+
+### Group-E Complete Summary
+
+All three documents in Group-E (Order & Invoice Models) are now complete:
+
+| Document | Tasks | Models           | App    | Fields  |
+| -------- | ----- | ---------------- | ------ | ------- |
+| Doc 01   | 57–62 | Order            | orders | 15      |
+| Doc 02   | 63–66 | OrderItem        | orders | 11      |
+| Doc 03   | 67–72 | Invoice, Payment | sales  | 18 + 10 |
+
+**App name mapping**: Document says "invoices" → project uses "sales"
+
+---
+
+## Group-F: Employee & Accounting Models
+
+### Document 01 — Employee Model (Tasks 73–77)
+
+- **Verified**: Docker `--no-deps` model introspection
+- **Command**: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend scripts/verify_groupf_doc01.py`
+- **Result**: ALL TASKS 73–77 VERIFIED SUCCESSFULLY
+- **App mapping**: Document says "employees" → project uses "hr"
+
+### Task 73: Employee Model Structure
+
+- Model: Employee (UUIDMixin + TimestampMixin + SoftDeleteMixin)
+- App label: hr
+- DB table: hr_employee
+- Total fields: 20 (id, created_on, updated_on, is_deleted, deleted_on, user, employee_number, first_name, last_name, role, email, phone, mobile, date_of_birth, hire_date, termination_date, department, position, status, notes)
+- Ordering: ['last_name', 'first_name']
+
+### Task 74: User FK
+
+- user: OneToOneField → PlatformUser (on_delete=SET_NULL)
+- null=True, blank=True
+- related_name: employee_profile
+- Links employee to tenant user account
+
+### Task 75: Role Field
+
+- role: CharField, max_length=20, db_index=True
+- choices: admin, manager, cashier, warehouse, accountant (5 roles)
+- default: cashier
+- Maps to permission levels for access control
+
+### Task 76: Contact Fields
+
+- email: EmailField, max_length=254
+- phone: CharField, max_length=20 (format: +94 XX XXX XXXX)
+- mobile: CharField, max_length=20 (format: +94 XX XXX XXXX)
+
+### Task 77: Status Field
+
+- status: CharField, max_length=20, db_index=True
+- choices: active, inactive, suspended (3 statuses)
+- default: active
+- Affects system access
+
+### Additional Checks
+
+- employee_number: unique=True, db_index=True
+- Indexes: idx_employee_role_status, idx_employee_name, idx_employee_status
+- Properties: full_name, is_active, is_suspended, is_terminated
+- Package exports: ['Employee']
+
+### Validation Results
+
+| Category                 | Checks | Passed |
+| ------------------------ | ------ | ------ |
+| Task 73: Model structure | 5      | 5      |
+| Task 74: User FK         | 3      | 3      |
+| Task 75: Role field      | 5      | 5      |
+| Task 76: Contact fields  | 3      | 3      |
+| Task 77: Status field    | 4      | 4      |
+| Properties & extras      | 5      | 5      |
+| **Total**                | **25** | **25** |
+
+### Files Created/Modified in Group-F Document 01
+
+- backend/apps/hr/constants.py — NEW: EMPLOYEE_ROLE_CHOICES, EMPLOYEE_STATUS_CHOICES
+- backend/apps/hr/models/**init**.py — NEW: Package init exporting Employee
+- backend/apps/hr/models/employee.py — NEW: Employee model with all fields
+- docs/VERIFICATION.md — This verification record
+
+---
+
+### Document 02 — Accounting Models (Tasks 78–82)
+
+- **Verified**: Docker `--no-deps` model introspection
+- **Command**: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend scripts/verify_groupf_doc02.py`
+- **Result**: ALL TASKS 78–82 VERIFIED SUCCESSFULLY
+
+### Task 78: Account Model Structure
+
+- Model: Account (UUIDMixin + TimestampMixin)
+- App label: accounting
+- DB table: accounting_account
+- Total fields: 10 (id, created_on, updated_on, code, name, account_type, parent, description, is_active, is_system)
+- Ordering: ['code']
+- Self-referential parent FK for sub-account hierarchy
+
+### Task 79: Account Code
+
+- code: CharField, max_length=20, unique=True, db_index=True
+- Standard chart of accounts numbering (e.g. 1000, 2100)
+
+### Task 80: Account Type
+
+- account_type: CharField, max_length=20, db_index=True
+- choices: asset, liability, equity, revenue, expense (5 types)
+- Determines reporting position and normal balance
+
+### Task 81: JournalEntry Model Structure
+
+- Model: JournalEntry (UUIDMixin + TimestampMixin)
+- App label: accounting
+- DB table: accounting_journalentry
+- Total fields: 11 (id, created_on, updated_on, reference_number, account, entry_date, debit, credit, description, status, created_by)
+- Ordering: ['-entry_date', 'reference_number']
+- account FK: ForeignKey → Account (on_delete=PROTECT, related_name=journal_entries)
+- Double-entry rule: debits must equal credits per reference_number
+
+### Task 82: Debit/Credit Fields (LKR)
+
+- debit: DecimalField, max_digits=10, decimal_places=2, default=0
+- credit: DecimalField, max_digits=10, decimal_places=2, default=0
+- All monetary values in LKR (₨)
+- MinValueValidator(0) on both fields
+
+### Additional Checks
+
+- Account indexes: idx_account_type_active, idx_account_code
+- JournalEntry indexes: idx_journal_ref_date, idx_journal_account_date, idx_journal_date_desc
+- Account properties: is_debit_normal, is_credit_normal
+- JournalEntry properties: is_debit, is_credit, is_posted, net_amount
+- Package exports: ['Account', 'JournalEntry']
+
+### Validation Results
+
+| Category                    | Checks | Passed |
+| --------------------------- | ------ | ------ |
+| Task 78: Account model      | 4      | 4      |
+| Task 79: Account code       | 3      | 3      |
+| Task 80: Account type       | 5      | 5      |
+| Task 81: JournalEntry model | 5      | 5      |
+| Task 82: Debit/credit       | 3      | 3      |
+| Properties & extras         | 8      | 8      |
+| **Total**                   | **28** | **28** |
+
+### Files Created/Modified in Group-F Document 02
+
+- backend/apps/accounting/constants.py — NEW: ACCOUNT_TYPE_CHOICES, ENTRY_STATUS_CHOICES
+- backend/apps/accounting/models/**init**.py — NEW: Package init exporting Account, JournalEntry
+- backend/apps/accounting/models/account.py — NEW: Account model with all fields
+- backend/apps/accounting/models/journal.py — NEW: JournalEntry model with all fields
+- docs/VERIFICATION.md — This verification record
+
+---
+
+### Document 03 — Audit Log (Tasks 83–84)
+
+- **Verified**: Docker `--no-deps` model introspection
+- **Command**: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend scripts/verify_groupf_doc03.py`
+- **Result**: ALL TASKS 83–84 VERIFIED SUCCESSFULLY
+
+### Task 83: TenantAuditLog Model Structure
+
+- Model: TenantAuditLog (UUIDMixin only — no TimestampMixin, uses own timestamp field)
+- App label: accounting
+- DB table: accounting_tenantauditlog
+- Total fields: 9 (id, action, actor, actor_name, timestamp, model_name, object_id, details, ip_address)
+- Ordering: ['-timestamp']
+
+### Task 84: Audit Log Fields
+
+- action: CharField, max_length=200, db_index=True — short description of action
+- actor: ForeignKey → PlatformUser (on_delete=SET_NULL, null=True, blank=True)
+- actor_name: CharField, max_length=200 — cached display name for when user is deleted
+- timestamp: DateTimeField, default=timezone.now, db_index=True
+- model_name: CharField, max_length=100, db_index=True — affected entity type
+- object_id: CharField, max_length=100 — affected entity ID
+- details: JSONField, default=dict — additional context (IP, old/new values, etc.)
+- ip_address: GenericIPAddressField, null=True — request IP address
+
+### Additional Checks
+
+- Indexes: idx_audit_timestamp_desc, idx_audit_action_time, idx_audit_actor_time, idx_audit_model_object
+- Properties: has_actor, target
+- Package exports: ['Account', 'JournalEntry', 'TenantAuditLog']
+
+### Validation Results
+
+| Category                  | Checks | Passed |
+| ------------------------- | ------ | ------ |
+| Task 83: Model structure  | 4      | 4      |
+| Task 84: Audit log fields | 8      | 8      |
+| Properties & extras       | 4      | 4      |
+| **Total**                 | **16** | **16** |
+
+### Files Created/Modified in Group-F Document 03
+
+- backend/apps/accounting/models/audit.py — NEW: TenantAuditLog model with all fields
+- backend/apps/accounting/models/**init**.py — MODIFIED: Added TenantAuditLog export
+- docs/VERIFICATION.md — This verification record
+
+### Group-F Complete Summary
+
+All three documents in Group-F (Employee & Accounting Models) are now complete:
+
+| Document | Tasks | Models                | App        | Fields  |
+| -------- | ----- | --------------------- | ---------- | ------- |
+| Doc 01   | 73–77 | Employee              | hr         | 20      |
+| Doc 02   | 78–82 | Account, JournalEntry | accounting | 10 + 11 |
+| Doc 03   | 83–84 | TenantAuditLog        | accounting | 9       |
+
+## **App name mapping**: Document says "employees" → project uses "hr"
+
+## SubPhase-05: Group-G Document 01 — Signals, Managers & ERD (Tasks 85-88)
+
+Date: 2026-02-21
+Status: PASSED
+Tests: 4/4
+
+### Summary
+
+Verified TENANT_APPS registration (13 apps), enhanced core signals with 3 auto-creation handlers (TenantSettings, Stock-per-product, Stock-per-location), confirmed model managers with full QuerySet helpers, and created tenant-schema ERD documentation.
+
+### Task 85: Verify TENANT_APPS List
+
+- TENANT_APPS defined in config/settings/database.py
+- 13 apps total: 2 Django framework + 11 LankaCommerce business modules
+- All expected apps confirmed present:
+  - django.contrib.contenttypes, django.contrib.auth
+  - apps.products, apps.inventory, apps.vendors
+  - apps.sales, apps.customers, apps.orders
+  - apps.hr, apps.accounting, apps.reports
+  - apps.webstore, apps.integrations
+
+### Task 86: Model Signals
+
+- File: backend/apps/core/signals.py (enhanced)
+- Signal 1: auto_create_tenant_settings — post_save on Tenant (created=True) → TenantSettings.objects.get_or_create
+- Signal 2: auto_create_stock_for_product — post_save on Product (created=True) → Stock entry at every StockLocation (qty=0)
+- Signal 3: auto_create_stock_for_location — post_save on StockLocation (created=True) → Stock entry for every Product (qty=0)
+- All signals wrapped in try/except ImportError for safe startup
+- Connected via CoreConfig.ready() → connect_signals()
+- 8 post_save receivers registered at runtime
+
+### Task 87: Model Managers
+
+- File: backend/apps/core/managers.py (already complete, verified)
+- ActiveQuerySet: .active(), .inactive() — for models with StatusMixin
+- SoftDeleteQuerySet: .alive(), .dead() — for models with SoftDeleteMixin
+- AliveQuerySet: .active(), .inactive(), .alive(), .dead(), .active_alive() — for both mixins
+- ActiveManager: default queryset filters is_active=True
+- SoftDeleteManager: default queryset filters is_deleted=False
+- AliveManager: default queryset filters is_active=True AND is_deleted=False
+- All 6 classes imported and verified
+
+### Task 88: Document Model Relationships
+
+- File: docs/architecture/tenant-schema-erd.md — NEW
+- Documents 17 tenant-schema models across 8 apps
+- Covers all entity relationships: FKs, on_delete behaviours, UniqueConstraints
+- Documents signal-driven auto-creation table (3 triggers)
+- Lists all manager helpers and their QuerySet methods
+- Confirms TENANT_APPS registration table
+- No fenced code blocks (per document instructions)
+
+### Validation Results
+
+| Category             | Checks | Passed |
+| -------------------- | ------ | ------ |
+| Task 85: TENANT_APPS | 13     | 13     |
+| Task 86: Signals     | 4      | 4      |
+| Task 87: Managers    | 6      | 6      |
+| Task 88: ERD doc     | 1      | 1      |
+| **Total**            | **24** | **24** |
+
+### Files Created/Modified in Group-G Document 01
+
+- backend/apps/core/signals.py — MODIFIED: Added auto_create_stock_for_product + auto_create_stock_for_location signals
+- docs/architecture/tenant-schema-erd.md — NEW: Full tenant schema ERD and relationship documentation
+- docs/VERIFICATION.md — This verification record
