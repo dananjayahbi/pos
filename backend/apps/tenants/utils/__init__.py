@@ -98,7 +98,7 @@ Exports:
         - get_test_results_documentation()      — test results docs (Task 77)
         - get_initial_commit_config()           — initial commit config (Task 78)
 
-    From provisioning_utils (provisioning flow helpers - SubPhase-09 Tasks 01-69):
+    From provisioning_utils (provisioning flow helpers - SubPhase-09 Tasks 01-88):
         - get_provisioning_service_config()      — provisioning service (Task 01)
         - get_provisioning_interface_config()    — provisioning interface (Task 02)
         - get_provision_method_config()          — provision method (Task 03)
@@ -168,6 +168,25 @@ Exports:
         - get_quick_start_guide_config()               — quick start guide (Task 67)
         - get_admin_notification_config()              — admin notification (Task 68)
         - get_slack_discord_webhook_config()           — Slack/Discord webhook (Task 69)
+        - get_email_delivery_tracking_config()          — email delivery tracking (Task 70)
+        - get_email_failure_handling_config()           — email failure handling (Task 71)
+        - get_notification_documentation_config()      — notification documentation (Task 72)
+        - get_provisioning_status_model_config()        — provisioning status model (Task 73)
+        - get_provisioning_status_fields_config()       — provisioning status fields (Task 74)
+        - get_provisioning_error_tracking_config()      — provisioning error tracking (Task 75)
+        - get_provisioning_timestamps_config()          — provisioning timestamps (Task 76)
+        - get_status_update_method_config()             — status update method (Task 77)
+        - get_provisioning_api_config()                 — provisioning API (Task 78)
+        - get_trigger_endpoint_config()                  — trigger endpoint (Task 79)
+        - get_status_endpoint_config()                   — status endpoint (Task 80)
+        - get_cancel_endpoint_config()                   — cancel endpoint (Task 81)
+        - get_websocket_updates_config()                 — WebSocket updates (Task 82)
+        - get_admin_dashboard_view_config()              — admin dashboard view (Task 83)
+        - get_metrics_collection_config()                — metrics collection (Task 84)
+        - get_provisioning_tests_config()                — provisioning tests (Task 85)
+        - get_full_provisioning_flow_test_config()       — full provisioning flow test (Task 86)
+        - get_provisioning_initial_commit_config()       — provisioning initial commit (Task 87)
+        - get_final_documentation_config()               — final documentation (Task 88)
 
     From migration_utils (migration strategy helpers - SubPhase-08 Tasks 01-84):
         - get_migration_review_config()          — migration review config (Task 01)
@@ -310,6 +329,7 @@ from apps.tenants.utils.middleware_utils import (
     is_tenant_resolved,
 )
 from apps.tenants.utils.provisioning_utils import (
+    get_admin_dashboard_view_config,
     get_admin_notification_config,
     get_admin_role_assignment_config,
     get_admin_user_service_config,
@@ -335,24 +355,38 @@ from apps.tenants.utils.provisioning_utils import (
     get_domain_service_config,
     get_domain_setup_documentation_config,
     get_email_confirmation_config,
+    get_email_delivery_tracking_config,
+    get_cancel_endpoint_config,
+    get_email_failure_handling_config,
+    get_final_documentation_config,
     get_first_admin_user_config,
+    get_full_provisioning_flow_test_config,
     get_industry_templates_config,
     get_invoice_number_sequence_config,
     get_login_credentials_config,
     get_mark_domain_primary_config,
+    get_metrics_collection_config,
     get_migration_failure_handling_config,
+    get_notification_documentation_config,
     get_order_number_sequence_config,
     get_primary_domain_creation_config,
     get_provision_method_config,
+    get_provisioning_api_config,
     get_provisioning_celery_task_config,
     get_provisioning_error_config,
+    get_provisioning_error_tracking_config,
     get_provisioning_events_config,
+    get_provisioning_initial_commit_config,
     get_provisioning_interface_config,
     get_provisioning_logging_config,
     get_provisioning_result_config,
     get_provisioning_service_config,
     get_provisioning_service_documentation,
+    get_provisioning_status_fields_config,
+    get_provisioning_status_model_config,
     get_provisioning_steps_config,
+    get_provisioning_tests_config,
+    get_provisioning_timestamps_config,
     get_quick_start_guide_config,
     get_reserved_subdomains_config,
     get_restaurant_template_config,
@@ -371,13 +405,17 @@ from apps.tenants.utils.provisioning_utils import (
     get_seeding_interface_config,
     get_send_welcome_email_config,
     get_slack_discord_webhook_config,
+    get_status_endpoint_config,
+    get_status_update_method_config,
     get_subdomain_generation_config,
     get_subdomain_validation_config,
     get_task_retry_config,
     get_transaction_handling_config,
+    get_trigger_endpoint_config,
     get_verification_token_config,
     get_verify_migrations_config,
     get_verify_seeding_complete_config,
+    get_websocket_updates_config,
     get_welcome_email_template_config,
 )
 from apps.tenants.utils.router_utils import (
@@ -459,7 +497,6 @@ from apps.tenants.utils.tenant_context import (
     set_current_tenant,
     tenant_context,
 )
-
 __all__ = [
     # Request-level helpers
     "get_tenant_from_request",
@@ -554,7 +591,7 @@ __all__ = [
     "get_performance_test_config",
     "get_test_results_documentation",
     "get_initial_commit_config",
-    # Provisioning utilities (SubPhase-09 Tasks 01-69)
+    # Provisioning utilities (SubPhase-09 Tasks 01-88)
     "get_provisioning_service_config",
     "get_provisioning_interface_config",
     "get_provision_method_config",
@@ -624,6 +661,25 @@ __all__ = [
     "get_quick_start_guide_config",
     "get_admin_notification_config",
     "get_slack_discord_webhook_config",
+    "get_email_delivery_tracking_config",
+    "get_email_failure_handling_config",
+    "get_notification_documentation_config",
+    "get_provisioning_status_model_config",
+    "get_provisioning_status_fields_config",
+    "get_provisioning_error_tracking_config",
+    "get_provisioning_timestamps_config",
+    "get_status_update_method_config",
+    "get_provisioning_api_config",
+    "get_trigger_endpoint_config",
+    "get_status_endpoint_config",
+    "get_cancel_endpoint_config",
+    "get_websocket_updates_config",
+    "get_admin_dashboard_view_config",
+    "get_metrics_collection_config",
+    "get_provisioning_tests_config",
+    "get_full_provisioning_flow_test_config",
+    "get_provisioning_initial_commit_config",
+    "get_final_documentation_config",
     # Migration utilities (SubPhase-08 Tasks 01-84)
     "get_migration_review_config",
     "get_migration_commands_documentation",

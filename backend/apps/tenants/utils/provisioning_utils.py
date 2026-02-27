@@ -1,7 +1,7 @@
 """
 Provisioning utilities for LankaCommerce Cloud multi-tenancy.
 
-SubPhase-09, Group-A Tasks 01-14, Group-B Tasks 15-28, Group-C Tasks 29-44, Group-D Tasks 45-58, Group-E Tasks 59-69.
+SubPhase-09, Group-A Tasks 01-14, Group-B Tasks 15-28, Group-C Tasks 29-44, Group-D Tasks 45-58, Group-E Tasks 59-72, Group-F Tasks 73-88.
 
 Provides tenant provisioning flow helpers used by the provisioning
 service and documentation for multi-tenant provisioning operations.
@@ -76,6 +76,25 @@ Functions:
     get_quick_start_guide_config()           -- Quick start guide (Task 67).
     get_admin_notification_config()          -- Admin notification (Task 68).
     get_slack_discord_webhook_config()       -- Slack/Discord webhook (Task 69).
+    get_email_delivery_tracking_config()     -- Email delivery tracking (Task 70).
+    get_email_failure_handling_config()      -- Email failure handling (Task 71).
+    get_notification_documentation_config()  -- Notification documentation (Task 72).
+    get_provisioning_status_model_config()   -- Provisioning status model (Task 73).
+    get_provisioning_status_fields_config()  -- Provisioning status fields (Task 74).
+    get_provisioning_error_tracking_config() -- Provisioning error tracking (Task 75).
+    get_provisioning_timestamps_config()     -- Provisioning timestamps (Task 76).
+    get_status_update_method_config()        -- Status update method (Task 77).
+    get_provisioning_api_config()            -- Provisioning API (Task 78).
+    get_trigger_endpoint_config()             -- Trigger endpoint (Task 79).
+    get_status_endpoint_config()              -- Status endpoint (Task 80).
+    get_cancel_endpoint_config()              -- Cancel endpoint (Task 81).
+    get_websocket_updates_config()            -- WebSocket updates (Task 82).
+    get_admin_dashboard_view_config()         -- Admin dashboard view (Task 83).
+    get_metrics_collection_config()           -- Metrics collection (Task 84).
+    get_provisioning_tests_config()              -- Provisioning tests (Task 85).
+    get_full_provisioning_flow_test_config()      -- Full provisioning flow test (Task 86).
+    get_provisioning_initial_commit_config()      -- Provisioning initial commit (Task 87).
+    get_final_documentation_config()              -- Final documentation (Task 88).
 
 See also:
     - apps.tenants.utils.__init__  -- public re-exports
@@ -3789,5 +3808,955 @@ def get_slack_discord_webhook_config() -> dict:
         "Slack/Discord webhook config: webhook_platforms=%d, payload_fields=%d",
         len(config["webhook_platforms"]),
         len(config["payload_fields"]),
+    )
+    return config
+
+
+def get_email_delivery_tracking_config() -> dict:
+    """Return email delivery tracking configuration.
+
+    Documents the tracking of welcome email delivery status
+    including sent, delivered, bounced, and failed states.
+    Covers storage locations for delivery records and
+    monitoring actions for delivery health.
+
+    SubPhase-09, Group-E, Task 70.
+
+    Returns:
+        dict: Configuration with *email_delivery_tracking_documented* flag,
+              *tracking_states* list, *storage_locations* list,
+              and *monitoring_actions* list.
+    """
+    config: dict = {
+        "email_delivery_tracking_documented": True,
+        "tracking_states": [
+            "Queued state when email is submitted to mail provider",
+            "Sent state after mail provider accepts the message",
+            "Delivered state confirmed by recipient mail server",
+            "Bounced state when recipient address is invalid",
+            "Failed state on permanent delivery error",
+            "Deferred state for temporary delivery issues",
+            "Opened state tracked via pixel or webhook callback",
+        ],
+        "storage_locations": [
+            "EmailDeliveryLog model in tenant schema",
+            "Centralized delivery audit table in public schema",
+            "Redis cache for real-time delivery status lookups",
+            "Celery result backend for async task outcomes",
+            "Structured JSON log file for external analysis",
+            "Webhook callback table for provider notifications",
+        ],
+        "monitoring_actions": [
+            "Dashboard widget showing delivery success rate",
+            "Alert on delivery failure rate exceeding threshold",
+            "Daily digest report of email delivery statistics",
+            "Per-tenant delivery metrics aggregation",
+            "Bounce rate monitoring with automatic suppression",
+            "Delivery latency percentile tracking",
+        ],
+    }
+    logger.debug(
+        "Email delivery tracking config: tracking_states=%d, storage_locations=%d",
+        len(config["tracking_states"]),
+        len(config["storage_locations"]),
+    )
+    return config
+
+
+def get_email_failure_handling_config() -> dict:
+    """Return email failure handling configuration.
+
+    Documents retry strategies for failed welcome emails,
+    escalation workflows when retries are exhausted, and
+    admin alert channels for failure notification.
+
+    SubPhase-09, Group-E, Task 71.
+
+    Returns:
+        dict: Configuration with *email_failure_handling_documented* flag,
+              *retry_strategies* list, *escalation_steps* list,
+              and *admin_alert_channels* list.
+    """
+    config: dict = {
+        "email_failure_handling_documented": True,
+        "retry_strategies": [
+            "Retry failed email up to 3 times with exponential backoff",
+            "Initial retry delay of 60 seconds after first failure",
+            "Switch to fallback SMTP provider on repeated failure",
+            "Queue retry jobs via Celery with visibility timeout",
+            "Skip retry on hard bounce or invalid address error",
+            "Log each retry attempt with attempt number and error",
+            "Final retry uses plain-text fallback template",
+        ],
+        "escalation_steps": [
+            "Mark tenant provisioning as partially complete",
+            "Create internal support ticket for manual follow-up",
+            "Notify operations team via escalation channel",
+            "Record failure reason in provisioning audit log",
+            "Offer manual resend option in admin dashboard",
+            "Schedule automatic resend attempt after 24 hours",
+        ],
+        "admin_alert_channels": [
+            "Email alert to system administrator mailbox",
+            "Slack notification to ops-alerts channel",
+            "PagerDuty incident for critical failure volume",
+            "Admin dashboard banner showing pending failures",
+            "SMS alert for high-priority tenant onboarding",
+            "Webhook POST to external monitoring endpoint",
+        ],
+    }
+    logger.debug(
+        "Email failure handling config: retry_strategies=%d, escalation_steps=%d",
+        len(config["retry_strategies"]),
+        len(config["escalation_steps"]),
+    )
+    return config
+
+
+def get_notification_documentation_config() -> dict:
+    """Return notification documentation configuration.
+
+    Documents the complete notification process including
+    email and webhook steps, common failure scenarios,
+    and troubleshooting guidance for operators.
+
+    SubPhase-09, Group-E, Task 72.
+
+    Returns:
+        dict: Configuration with *notification_documentation_completed* flag,
+              *notification_steps* list, *troubleshooting_guides* list,
+              and *reference_links* list.
+    """
+    config: dict = {
+        "notification_documentation_completed": True,
+        "notification_steps": [
+            "Generate secure credentials for new admin user",
+            "Render welcome email from tenant-specific template",
+            "Send welcome email via configured SMTP provider",
+            "Track delivery status through provider webhooks",
+            "Fire Slack and Discord webhook notifications",
+            "Send admin notification to internal operations",
+            "Record all notification outcomes in audit log",
+        ],
+        "troubleshooting_guides": [
+            "SMTP connection refused -- verify provider credentials",
+            "Email bounced -- check recipient address validity",
+            "Webhook timeout -- confirm endpoint URL is reachable",
+            "Template rendering error -- validate template variables",
+            "Rate limit exceeded -- reduce send frequency or upgrade",
+            "Missing tenant context -- ensure schema is activated",
+        ],
+        "reference_links": [
+            "Provisioning flow overview in tenant-provisioning.md",
+            "Email provider setup guide in ENV_VARIABLES.md",
+            "Webhook configuration in integrations documentation",
+            "Celery task retry policy in celery.py settings",
+            "Monitoring dashboard setup in monitoring docs",
+            "Escalation runbook in operations playbook",
+        ],
+    }
+    logger.debug(
+        "Notification documentation config: notification_steps=%d, troubleshooting_guides=%d",
+        len(config["notification_steps"]),
+        len(config["troubleshooting_guides"]),
+    )
+    return config
+
+
+def get_provisioning_status_model_config() -> dict:
+    """Return provisioning status model configuration.
+
+    Defines the model for tracking tenant provisioning status
+    including schema placement in the public schema, core model
+    fields, and expected model behaviors.
+
+    SubPhase-09, Group-F, Task 73.
+
+    Returns:
+        dict: Configuration with *status_model_documented* flag,
+              *model_fields* list, *schema_considerations* list,
+              and *model_behaviors* list.
+    """
+    config: dict = {
+        "status_model_documented": True,
+        "model_fields": [
+            "tenant foreign key linking to Tenant model",
+            "current_step tracking active provisioning step",
+            "progress_percent integer from 0 to 100",
+            "status choice field with pending/running/completed/failed",
+            "error_message optional text for failure details",
+            "created_by foreign key to initiating user",
+            "metadata JSON field for extra provisioning context",
+        ],
+        "schema_considerations": [
+            "Model resides in public schema for cross-tenant visibility",
+            "Foreign key to Tenant uses public schema reference",
+            "Indexes on tenant and status for fast lookups",
+            "Unique constraint on tenant prevents duplicate records",
+            "Soft delete support via is_active boolean field",
+            "Audit mixin provides created_at and updated_at fields",
+        ],
+        "model_behaviors": [
+            "String representation shows tenant name and status",
+            "Default ordering by created_at descending",
+            "Manager method for active provisioning records",
+            "Property to check if provisioning is in progress",
+            "Property to calculate elapsed duration",
+            "Verbose name set to Provisioning Status",
+        ],
+    }
+    logger.debug(
+        "Provisioning status model config: model_fields=%d, schema_considerations=%d",
+        len(config["model_fields"]),
+        len(config["schema_considerations"]),
+    )
+    return config
+
+
+def get_provisioning_status_fields_config() -> dict:
+    """Return provisioning status fields configuration.
+
+    Documents the status fields added to the provisioning model
+    including current step tracking, progress percentage,
+    and allowed enumeration values for each field.
+
+    SubPhase-09, Group-F, Task 74.
+
+    Returns:
+        dict: Configuration with *status_fields_documented* flag,
+              *status_fields* list, *allowed_values* list,
+              and *field_constraints* list.
+    """
+    config: dict = {
+        "status_fields_documented": True,
+        "status_fields": [
+            "current_step CharField with max_length 100",
+            "progress_percent PositiveSmallIntegerField default 0",
+            "status CharField with choices from StatusChoices",
+            "is_completed BooleanField default False",
+            "is_failed BooleanField default False",
+            "step_order PositiveIntegerField for step sequencing",
+            "step_message TextField for human-readable progress",
+        ],
+        "allowed_values": [
+            "status: pending -- waiting to start provisioning",
+            "status: running -- provisioning is in progress",
+            "status: completed -- provisioning finished successfully",
+            "status: failed -- provisioning encountered an error",
+            "status: cancelled -- provisioning was manually cancelled",
+            "status: retrying -- provisioning is being retried",
+        ],
+        "field_constraints": [
+            "progress_percent must be between 0 and 100 inclusive",
+            "current_step must match a valid provisioning step name",
+            "status transitions follow defined state machine rules",
+            "is_completed and is_failed are mutually exclusive",
+            "step_order must be unique within a provisioning run",
+            "step_message is optional but recommended for logging",
+        ],
+    }
+    logger.debug(
+        "Provisioning status fields config: status_fields=%d, allowed_values=%d",
+        len(config["status_fields"]),
+        len(config["allowed_values"]),
+    )
+    return config
+
+
+def get_provisioning_error_tracking_config() -> dict:
+    """Return provisioning error tracking configuration.
+
+    Documents the error tracking fields for capturing failure
+    information during provisioning including error messages,
+    failed step identification, and API response visibility.
+
+    SubPhase-09, Group-F, Task 75.
+
+    Returns:
+        dict: Configuration with *error_tracking_documented* flag,
+              *error_fields* list, *visibility_rules* list,
+              and *error_categories* list.
+    """
+    config: dict = {
+        "error_tracking_documented": True,
+        "error_fields": [
+            "error_message TextField capturing the failure description",
+            "error_step CharField identifying which step failed",
+            "error_code CharField for machine-readable error identifier",
+            "error_traceback TextField storing Python traceback",
+            "error_timestamp DateTimeField when error occurred",
+            "error_retry_count PositiveIntegerField tracking attempts",
+            "error_resolved BooleanField indicating manual resolution",
+        ],
+        "visibility_rules": [
+            "error_message is exposed in API status responses",
+            "error_traceback is hidden from non-staff API consumers",
+            "error_code is always included for client-side handling",
+            "error_step is visible to tenant admin users",
+            "error_retry_count is visible in admin dashboard",
+            "error_resolved flag is editable by staff only",
+        ],
+        "error_categories": [
+            "schema_creation -- failures during PostgreSQL schema setup",
+            "migration_run -- failures during tenant migrations",
+            "data_seeding -- failures during default data creation",
+            "domain_setup -- failures during domain configuration",
+            "user_creation -- failures during admin user setup",
+            "notification -- failures during email or webhook delivery",
+        ],
+    }
+    logger.debug(
+        "Provisioning error tracking config: error_fields=%d, visibility_rules=%d",
+        len(config["error_fields"]),
+        len(config["visibility_rules"]),
+    )
+    return config
+
+
+def get_provisioning_timestamps_config() -> dict:
+    """Return provisioning timestamps configuration.
+
+    Documents the timestamp fields for tracking the provisioning
+    lifecycle including start time, completion time, and last
+    update time used for duration calculations.
+
+    SubPhase-09, Group-F, Task 76.
+
+    Returns:
+        dict: Configuration with *timestamps_documented* flag,
+              *timestamp_fields* list, *duration_calculations* list,
+              and *usage_patterns* list.
+    """
+    config: dict = {
+        "timestamps_documented": True,
+        "timestamp_fields": [
+            "started_at DateTimeField set when provisioning begins",
+            "completed_at DateTimeField set when provisioning finishes",
+            "updated_at DateTimeField auto-updated on each save",
+            "failed_at DateTimeField set when a failure occurs",
+            "cancelled_at DateTimeField set on manual cancellation",
+            "last_step_at DateTimeField set on each step transition",
+            "estimated_completion DateTimeField for progress estimation",
+        ],
+        "duration_calculations": [
+            "total_duration = completed_at minus started_at",
+            "current_elapsed = now minus started_at if still running",
+            "step_duration = last_step_at minus previous step timestamp",
+            "average_step_time = total_duration divided by step count",
+            "estimated_remaining = average_step_time times remaining steps",
+            "idle_time = updated_at minus last_step_at if no progress",
+        ],
+        "usage_patterns": [
+            "Display elapsed time on provisioning status dashboard",
+            "Calculate average provisioning duration for capacity planning",
+            "Detect stalled provisioning via idle time thresholds",
+            "Generate SLA compliance reports from duration metrics",
+            "Alert operators when provisioning exceeds time budget",
+            "Log step durations for performance optimization",
+        ],
+    }
+    logger.debug(
+        "Provisioning timestamps config: timestamp_fields=%d, duration_calculations=%d",
+        len(config["timestamp_fields"]),
+        len(config["duration_calculations"]),
+    )
+    return config
+
+
+def get_status_update_method_config() -> dict:
+    """Return status update method configuration.
+
+    Documents the method for updating provisioning status
+    including step and progress updates, concurrency-safe
+    operations, and transaction handling rules.
+
+    SubPhase-09, Group-F, Task 77.
+
+    Returns:
+        dict: Configuration with *status_update_method_documented* flag,
+              *update_operations* list, *concurrency_rules* list,
+              and *validation_steps* list.
+    """
+    config: dict = {
+        "status_update_method_documented": True,
+        "update_operations": [
+            "Set current_step to the new provisioning step name",
+            "Update progress_percent based on step completion ratio",
+            "Transition status field following state machine rules",
+            "Update last_step_at timestamp to current time",
+            "Recalculate estimated_completion from average pace",
+            "Persist step_message with human-readable description",
+            "Fire provisioning_step_changed signal for listeners",
+        ],
+        "concurrency_rules": [
+            "Use select_for_update to lock row during status change",
+            "Wrap updates in atomic transaction block",
+            "Check current status before applying transition",
+            "Reject stale updates using optimistic version field",
+            "Log concurrent update conflicts with warning level",
+            "Retry failed updates up to three times with backoff",
+        ],
+        "validation_steps": [
+            "Verify step name exists in provisioning steps enum",
+            "Ensure progress_percent does not decrease",
+            "Confirm status transition is allowed by state machine",
+            "Validate step_order is sequential and non-duplicate",
+            "Check that provisioning record is not already terminal",
+            "Sanitize step_message to prevent injection attacks",
+        ],
+    }
+    logger.debug(
+        "Status update method config: update_operations=%d, concurrency_rules=%d",
+        len(config["update_operations"]),
+        len(config["concurrency_rules"]),
+    )
+    return config
+
+
+def get_provisioning_api_config() -> dict:
+    """Return provisioning API configuration.
+
+    Documents the provisioning API layer including endpoints
+    for triggering, checking status, and cancelling provisioning
+    with tenant admin access control requirements.
+
+    SubPhase-09, Group-F, Task 78.
+
+    Returns:
+        dict: Configuration with *provisioning_api_documented* flag,
+              *api_endpoints* list, *access_controls* list,
+              and *response_formats* list.
+    """
+    config: dict = {
+        "provisioning_api_documented": True,
+        "api_endpoints": [
+            "POST /api/tenants/provision/ -- trigger new provisioning",
+            "GET /api/tenants/provision/status/ -- check current status",
+            "POST /api/tenants/provision/cancel/ -- cancel active run",
+            "GET /api/tenants/provision/history/ -- list past runs",
+            "GET /api/tenants/provision/steps/ -- list provisioning steps",
+            "POST /api/tenants/provision/retry/ -- retry failed run",
+            "GET /api/tenants/provision/health/ -- API health check",
+        ],
+        "access_controls": [
+            "Require authenticated user with tenant admin role",
+            "Validate tenant ownership before allowing operations",
+            "Rate limit provisioning triggers to one per minute",
+            "Log all API access attempts for audit trail",
+            "Deny access from suspended or inactive tenants",
+            "Require CSRF token for state-changing endpoints",
+        ],
+        "response_formats": [
+            "JSON envelope with status, data, and message fields",
+            "Include provisioning_id for tracking in all responses",
+            "Return progress_percent and current_step in status",
+            "Provide error details with error_code and error_message",
+            "Include hypermedia links for next available actions",
+            "Return pagination metadata for history list endpoint",
+        ],
+    }
+    logger.debug(
+        "Provisioning API config: api_endpoints=%d, access_controls=%d",
+        len(config["api_endpoints"]),
+        len(config["access_controls"]),
+    )
+    return config
+
+
+def get_trigger_endpoint_config() -> dict:
+    """Return trigger endpoint configuration.
+
+    Documents the provisioning trigger endpoint including request
+    parameters, authentication requirements, and response field
+    definitions for initiating new tenant provisioning runs.
+
+    SubPhase-09, Group-F, Task 79.
+
+    Returns:
+        dict: Configuration with *trigger_endpoint_documented* flag,
+              *request_parameters* list, *authentication_rules* list,
+              and *response_fields* list.
+    """
+    config: dict = {
+        "trigger_endpoint_documented": True,
+        "request_parameters": [
+            "tenant_name -- required string for new tenant display name",
+            "plan_id -- required UUID referencing the subscription plan",
+            "admin_email -- required email for the first admin user",
+            "subdomain -- optional custom subdomain override",
+            "industry_template -- optional template key for seed data",
+            "locale -- optional locale code defaulting to en-us",
+            "idempotency_key -- optional UUID to prevent duplicate runs",
+        ],
+        "authentication_rules": [
+            "Require valid JWT bearer token in Authorization header",
+            "Token must include tenant-admin or super-admin scope",
+            "Reject expired or revoked tokens with 401 response",
+            "Validate CSRF token on browser-originated requests",
+            "Rate limit to one provisioning trigger per minute per user",
+            "Log authentication failures to the audit trail",
+        ],
+        "response_fields": [
+            "provisioning_id -- UUID for tracking the provisioning run",
+            "status -- initial status value set to pending",
+            "created_at -- ISO-8601 timestamp of request acceptance",
+            "estimated_duration -- estimated seconds to completion",
+            "status_url -- hypermedia link to poll for progress",
+            "cancel_url -- hypermedia link to cancel the run",
+        ],
+    }
+    logger.debug(
+        "Trigger endpoint config: request_parameters=%d, authentication_rules=%d",
+        len(config["request_parameters"]),
+        len(config["authentication_rules"]),
+    )
+    return config
+
+
+def get_status_endpoint_config() -> dict:
+    """Return status endpoint configuration.
+
+    Documents the provisioning status endpoint including response
+    fields for current step and progress, query parameters for
+    filtering, and error response structures.
+
+    SubPhase-09, Group-F, Task 80.
+
+    Returns:
+        dict: Configuration with *status_endpoint_documented* flag,
+              *response_fields* list, *query_parameters* list,
+              and *error_responses* list.
+    """
+    config: dict = {
+        "status_endpoint_documented": True,
+        "response_fields": [
+            "provisioning_id -- UUID of the provisioning run",
+            "current_step -- name of the active provisioning step",
+            "progress_percent -- integer 0-100 completion percentage",
+            "started_at -- ISO-8601 timestamp when run began",
+            "updated_at -- ISO-8601 timestamp of last status change",
+            "error_details -- object with code and message if failed",
+            "steps_completed -- list of finished step names",
+        ],
+        "query_parameters": [
+            "provisioning_id -- required UUID to identify the run",
+            "include_steps -- boolean to include step details",
+            "include_errors -- boolean to include error history",
+            "include_timing -- boolean to include duration stats",
+            "format -- response format json or yaml default json",
+            "verbose -- boolean to include debug-level detail",
+        ],
+        "error_responses": [
+            "404 Not Found when provisioning_id does not exist",
+            "401 Unauthorized when token is missing or invalid",
+            "403 Forbidden when user lacks tenant admin scope",
+            "429 Too Many Requests when rate limit is exceeded",
+            "500 Internal Server Error for unexpected failures",
+            "503 Service Unavailable when provisioning is paused",
+        ],
+    }
+    logger.debug(
+        "Status endpoint config: response_fields=%d, query_parameters=%d",
+        len(config["response_fields"]),
+        len(config["query_parameters"]),
+    )
+    return config
+
+
+def get_cancel_endpoint_config() -> dict:
+    """Return cancel endpoint configuration.
+
+    Documents the provisioning cancel endpoint including conditions
+    under which cancellation is allowed, status transitions during
+    cancellation, and safety checks to prevent data corruption.
+
+    SubPhase-09, Group-F, Task 81.
+
+    Returns:
+        dict: Configuration with *cancel_endpoint_documented* flag,
+              *cancel_conditions* list, *status_transitions* list,
+              and *safety_checks* list.
+    """
+    config: dict = {
+        "cancel_endpoint_documented": True,
+        "cancel_conditions": [
+            "Allow cancel only when status is pending or in_progress",
+            "Reject cancel when status is completed or rolled_back",
+            "Reject cancel during schema migration step",
+            "Require cancel_reason field in request body",
+            "Allow forced cancel with force=true for super-admin",
+            "Block cancel if rollback is already in progress",
+        ],
+        "status_transitions": [
+            "pending -> cancelled when run has not yet started",
+            "in_progress -> cancelling when cancel is accepted",
+            "cancelling -> cancelled after cleanup completes",
+            "cancelling -> cancel_failed if cleanup errors occur",
+            "cancelled -> archived after retention period expires",
+            "cancel_failed -> cancelled after manual intervention",
+        ],
+        "safety_checks": [
+            "Verify no active database transactions before cancel",
+            "Ensure schema rollback is safe at the current step",
+            "Check that no other cancel request is in flight",
+            "Validate that tenant data is in a consistent state",
+            "Confirm DNS records can be safely removed if created",
+            "Log all cancel operations for post-mortem analysis",
+        ],
+    }
+    logger.debug(
+        "Cancel endpoint config: cancel_conditions=%d, status_transitions=%d",
+        len(config["cancel_conditions"]),
+        len(config["status_transitions"]),
+    )
+    return config
+
+
+def get_websocket_updates_config() -> dict:
+    """Return WebSocket updates configuration.
+
+    Documents real-time provisioning updates via WebSocket including
+    event types broadcast during provisioning, subscription rules
+    for access control, and message format specifications.
+
+    SubPhase-09, Group-F, Task 82.
+
+    Returns:
+        dict: Configuration with *websocket_updates_documented* flag,
+              *event_types* list, *subscription_rules* list,
+              and *message_formats* list.
+    """
+    config: dict = {
+        "websocket_updates_documented": True,
+        "event_types": [
+            "provisioning.started -- emitted when run begins",
+            "provisioning.step_changed -- emitted on step transition",
+            "provisioning.progress -- emitted on progress update",
+            "provisioning.error -- emitted when a step fails",
+            "provisioning.completed -- emitted on successful finish",
+            "provisioning.cancelled -- emitted when run is cancelled",
+            "provisioning.rollback -- emitted when rollback starts",
+        ],
+        "subscription_rules": [
+            "Authenticate WebSocket connection with JWT token",
+            "Restrict subscriptions to tenant admin users only",
+            "Allow super-admin to subscribe to any tenant channel",
+            "Disconnect clients with expired tokens automatically",
+            "Rate limit subscription attempts to five per minute",
+            "Broadcast only to connections in the matching tenant",
+        ],
+        "message_formats": [
+            "JSON envelope with event, data, and timestamp fields",
+            "Include provisioning_id in every message payload",
+            "Include current_step and progress_percent in updates",
+            "Include error_code and error_message in error events",
+            "Include sequence_number for client-side ordering",
+            "Include is_final flag to signal end of event stream",
+        ],
+    }
+    logger.debug(
+        "WebSocket updates config: event_types=%d, subscription_rules=%d",
+        len(config["event_types"]),
+        len(config["subscription_rules"]),
+    )
+    return config
+
+
+def get_admin_dashboard_view_config() -> dict:
+    """Return admin dashboard view configuration.
+
+    Documents the admin dashboard view for provisioning status
+    including dashboard panels for progress and error display,
+    access control rules, and field definitions for the UI.
+
+    SubPhase-09, Group-F, Task 83.
+
+    Returns:
+        dict: Configuration with *admin_dashboard_documented* flag,
+              *dashboard_panels* list, *access_controls* list,
+              and *display_fields* list.
+    """
+    config: dict = {
+        "admin_dashboard_documented": True,
+        "dashboard_panels": [
+            "Active provisioning runs with real-time progress bars",
+            "Recent completions with duration and step summary",
+            "Failed runs with error details and retry buttons",
+            "Cancelled runs with reason and cancellation time",
+            "Queue depth showing pending provisioning requests",
+            "System health indicators for dependent services",
+            "Historical trends chart for provisioning throughput",
+        ],
+        "access_controls": [
+            "Restrict dashboard access to admin users only",
+            "Require active session with valid CSRF token",
+            "Filter visible runs to the admin own tenant scope",
+            "Allow super-admin to view all tenant provisioning",
+            "Log all dashboard access for security audit trail",
+            "Disable sensitive fields for read-only admin roles",
+        ],
+        "display_fields": [
+            "Tenant name and subdomain for run identification",
+            "Current step name with estimated time remaining",
+            "Progress percentage with animated progress bar",
+            "Start time and elapsed duration in human format",
+            "Error count and last error message if applicable",
+            "Action buttons for cancel, retry, and view details",
+        ],
+    }
+    logger.debug(
+        "Admin dashboard view config: dashboard_panels=%d, access_controls=%d",
+        len(config["dashboard_panels"]),
+        len(config["access_controls"]),
+    )
+    return config
+
+
+def get_metrics_collection_config() -> dict:
+    """Return metrics collection configuration.
+
+    Documents provisioning metrics collection including metric
+    types for tracking start, completion, failures, and duration,
+    export formats for Prometheus integration, and collection intervals.
+
+    SubPhase-09, Group-F, Task 84.
+
+    Returns:
+        dict: Configuration with *metrics_collection_documented* flag,
+              *metric_types* list, *export_formats* list,
+              and *collection_intervals* list.
+    """
+    config: dict = {
+        "metrics_collection_documented": True,
+        "metric_types": [
+            "provisioning_started_total -- counter of started runs",
+            "provisioning_completed_total -- counter of successful runs",
+            "provisioning_failed_total -- counter of failed runs",
+            "provisioning_cancelled_total -- counter of cancelled runs",
+            "provisioning_duration_seconds -- histogram of durations",
+            "provisioning_step_duration_seconds -- histogram per step",
+            "provisioning_active_runs -- gauge of in-progress runs",
+        ],
+        "export_formats": [
+            "Prometheus exposition format on /metrics endpoint",
+            "JSON summary endpoint for internal dashboards",
+            "StatsD UDP packets for legacy monitoring systems",
+            "OpenTelemetry OTLP export for distributed tracing",
+            "CSV export for periodic reporting and analysis",
+            "Grafana-compatible annotations for event overlay",
+        ],
+        "collection_intervals": [
+            "Real-time counters updated on every state change",
+            "Histogram buckets flushed every fifteen seconds",
+            "Gauge values refreshed every ten seconds",
+            "Summary percentiles calculated over five minutes",
+            "Daily aggregation job for long-term trend storage",
+            "Weekly rollup for capacity planning dashboards",
+        ],
+    }
+    logger.debug(
+        "Metrics collection config: metric_types=%d, export_formats=%d",
+        len(config["metric_types"]),
+        len(config["export_formats"]),
+    )
+    return config
+
+
+def get_provisioning_tests_config() -> dict:
+    """Return provisioning tests configuration.
+
+    Documents test coverage and test data for provisioning status
+    and API including test coverage areas, test data fixtures,
+    and assertion patterns for comprehensive validation.
+
+    SubPhase-09, Group-F, Task 85.
+
+    Returns:
+        dict: Configuration with *provisioning_tests_documented* flag,
+              *test_coverage_areas* list, *test_data_fixtures* list,
+              and *test_assertions* list.
+    """
+    config: dict = {
+        "provisioning_tests_documented": True,
+        "test_coverage_areas": [
+            "Model tests for ProvisioningStatus creation and fields",
+            "API endpoint tests for trigger, status, and cancel views",
+            "Status update tests verifying state machine transitions",
+            "Error handling tests for invalid inputs and edge cases",
+            "Permission tests for admin-only provisioning actions",
+            "Serializer tests for request and response validation",
+            "Integration tests for end-to-end provisioning flow",
+        ],
+        "test_data_fixtures": [
+            "Tenant fixture with active subscription and valid plan",
+            "User fixture with admin role and email confirmation",
+            "Domain fixture with verified subdomain and SSL cert",
+            "Schema fixture with migrations applied and seed data",
+            "Settings fixture with default configuration values",
+            "Plan fixture with resource limits and feature flags",
+        ],
+        "test_assertions": [
+            "assertEqual for status field exact value matching",
+            "assertTrue for boolean flag verification checks",
+            "assertIsInstance for response type validation",
+            "assertIn for required key presence in results",
+            "assertRaises for expected exception scenarios",
+            "assertGreaterEqual for minimum list length checks",
+        ],
+    }
+    logger.debug(
+        "Provisioning tests config: test_coverage_areas=%d, test_data_fixtures=%d",
+        len(config["test_coverage_areas"]),
+        len(config["test_data_fixtures"]),
+    )
+    return config
+
+
+def get_full_provisioning_flow_test_config() -> dict:
+    """Return full provisioning flow test configuration.
+
+    Documents full provisioning flow end-to-end validation with
+    acceptance criteria including flow steps, success criteria,
+    and failure test scenarios for complete coverage.
+
+    SubPhase-09, Group-F, Task 86.
+
+    Returns:
+        dict: Configuration with *flow_test_documented* flag,
+              *flow_steps* list, *acceptance_criteria* list,
+              and *failure_scenarios* list.
+    """
+    config: dict = {
+        "flow_test_documented": True,
+        "flow_steps": [
+            "Trigger provisioning via API with valid tenant payload",
+            "Verify schema creation with correct naming convention",
+            "Confirm migrations applied to the new tenant schema",
+            "Validate seed data populated for categories and roles",
+            "Check domain assignment and subdomain DNS resolution",
+            "Verify admin user created with correct role and email",
+            "Confirm final status updated to provisioning_complete",
+        ],
+        "acceptance_criteria": [
+            "Provisioning completes within sixty seconds end-to-end",
+            "All database tables created with correct schema prefix",
+            "Seed data matches expected counts for each model type",
+            "Welcome email delivered to the tenant admin address",
+            "WebSocket notification sent for each status transition",
+            "Final status response returns HTTP 200 with success flag",
+        ],
+        "failure_scenarios": [
+            "Schema creation timeout triggers automatic rollback",
+            "Duplicate tenant name returns conflict error response",
+            "Invalid plan reference returns validation error message",
+            "Migration failure rolls back schema and notifies admin",
+            "Network interruption during seeding retries gracefully",
+            "Concurrent provisioning requests handled with locking",
+        ],
+    }
+    logger.debug(
+        "Full provisioning flow test config: flow_steps=%d, acceptance_criteria=%d",
+        len(config["flow_steps"]),
+        len(config["acceptance_criteria"]),
+    )
+    return config
+
+
+def get_provisioning_initial_commit_config() -> dict:
+    """Return provisioning initial commit configuration.
+
+    Documents initial commit scope and commit message for the
+    provisioning flow including commit scope items, message
+    format parts, and included file types.
+
+    SubPhase-09, Group-F, Task 87.
+
+    Returns:
+        dict: Configuration with *initial_commit_documented* flag,
+              *commit_scope* list, *commit_message_parts* list,
+              and *included_files* list.
+    """
+    config: dict = {
+        "initial_commit_documented": True,
+        "commit_scope": [
+            "Provisioning service models and status tracking fields",
+            "Schema creation utilities and migration runner helpers",
+            "Data seeding service with default categories and roles",
+            "Domain setup service with subdomain and DNS utilities",
+            "Admin user creation with password generation and email",
+            "REST API endpoints for trigger, status, and cancel",
+            "Celery task definitions with retry and error handling",
+        ],
+        "commit_message_parts": [
+            "feat(tenants): add tenant provisioning flow infrastructure",
+            "Include ProvisioningStatus model with step tracking",
+            "Add schema creation, migration, and seeding services",
+            "Implement domain setup and admin user provisioning",
+            "Create REST API endpoints and WebSocket notifications",
+            "Add comprehensive test suite for all provisioning steps",
+        ],
+        "included_files": [
+            "apps/tenants/models/provisioning.py -- status model",
+            "apps/tenants/services/provisioning.py -- service layer",
+            "apps/tenants/api/provisioning.py -- API endpoints",
+            "apps/tenants/tasks/provisioning.py -- Celery tasks",
+            "apps/tenants/utils/provisioning_utils.py -- utilities",
+            "tests/tenants/test_provisioning.py -- test suite",
+        ],
+    }
+    logger.debug(
+        "Provisioning initial commit config: commit_scope=%d, commit_message_parts=%d",
+        len(config["commit_scope"]),
+        len(config["commit_message_parts"]),
+    )
+    return config
+
+
+def get_final_documentation_config() -> dict:
+    """Return final documentation configuration.
+
+    Completes final documentation with artifacts summary and
+    troubleshooting including documented artifacts, troubleshooting
+    entries, and quick reference links for the provisioning flow.
+
+    SubPhase-09, Group-F, Task 88.
+
+    Returns:
+        dict: Configuration with *final_documentation_complete* flag,
+              *documented_artifacts* list, *troubleshooting_entries* list,
+              and *quick_references* list.
+    """
+    config: dict = {
+        "final_documentation_complete": True,
+        "documented_artifacts": [
+            "REST API endpoints for provisioning trigger and status",
+            "ProvisioningStatus model with field-level documentation",
+            "Service layer methods for schema and domain creation",
+            "Celery task configuration with retry and timeout policy",
+            "WebSocket event types and subscription protocol details",
+            "Admin dashboard panels and access control requirements",
+            "Metrics collection endpoints and export format options",
+        ],
+        "troubleshooting_entries": [
+            "Schema creation fails -- check PostgreSQL permissions",
+            "Migration timeout -- increase PROVISIONING_TIMEOUT setting",
+            "Seed data missing -- verify fixture files exist on disk",
+            "Domain not resolving -- confirm DNS propagation complete",
+            "Email not sent -- check SMTP credentials and queue status",
+            "WebSocket disconnect -- verify Redis channel layer config",
+        ],
+        "quick_references": [
+            "API reference at docs/api/provisioning-endpoints.md",
+            "Model reference at docs/database/tenant-provisioning.md",
+            "Service guide at docs/backend/provisioning-service.md",
+            "Deployment guide at docs/guides/provisioning-deploy.md",
+            "Troubleshooting at docs/guides/provisioning-debug.md",
+            "Architecture overview at docs/architecture/provisioning.md",
+        ],
+    }
+    logger.debug(
+        "Final documentation config: documented_artifacts=%d, troubleshooting_entries=%d",
+        len(config["documented_artifacts"]),
+        len(config["troubleshooting_entries"]),
     )
     return config

@@ -1,6 +1,6 @@
 """Tests for tenant provisioning utilities (SubPhase-09).
 
-Covers Group-A (Tasks 01-14), Group-B (Tasks 15-28), Group-C (Tasks 29-44), Group-D (Tasks 45-58), Group-E (Tasks 59-69).
+Covers Group-A (Tasks 01-14), Group-B (Tasks 15-28), Group-C (Tasks 29-44), Group-D (Tasks 45-58), Group-E (Tasks 59-72), Group-F (Tasks 73-88).
 """
 
 import pytest
@@ -3312,3 +3312,916 @@ class TestGetSlackDiscordWebhookConfig:
         """get_slack_discord_webhook_config should reference Task 69."""
         from apps.tenants.utils.provisioning_utils import get_slack_discord_webhook_config
         assert "Task 69" in get_slack_discord_webhook_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-E: User & Notification – Tasks 70-72 (Track, Failure & Docs)
+# ---------------------------------------------------------------------------
+
+
+class TestGetEmailDeliveryTrackingConfig:
+    """Tests for get_email_delivery_tracking_config (Task 70)."""
+
+    def test_returns_dict(self):
+        """get_email_delivery_tracking_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_email_delivery_tracking_config
+        result = get_email_delivery_tracking_config()
+        assert isinstance(result, dict)
+
+    def test_email_delivery_tracking_documented_flag(self):
+        """Result must contain email_delivery_tracking_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_email_delivery_tracking_config
+        result = get_email_delivery_tracking_config()
+        assert result["email_delivery_tracking_documented"] is True
+
+    def test_tracking_states_list(self):
+        """tracking_states must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_email_delivery_tracking_config
+        result = get_email_delivery_tracking_config()
+        assert isinstance(result["tracking_states"], list)
+        assert len(result["tracking_states"]) >= 6
+
+    def test_storage_locations_list(self):
+        """storage_locations must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_email_delivery_tracking_config
+        result = get_email_delivery_tracking_config()
+        assert isinstance(result["storage_locations"], list)
+        assert len(result["storage_locations"]) >= 6
+
+    def test_monitoring_actions_list(self):
+        """monitoring_actions must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_email_delivery_tracking_config
+        result = get_email_delivery_tracking_config()
+        assert isinstance(result["monitoring_actions"], list)
+        assert len(result["monitoring_actions"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_email_delivery_tracking_config should be importable from utils."""
+        from apps.tenants.utils import get_email_delivery_tracking_config
+        assert callable(get_email_delivery_tracking_config)
+
+    def test_docstring_ref(self):
+        """get_email_delivery_tracking_config should reference Task 70."""
+        from apps.tenants.utils.provisioning_utils import get_email_delivery_tracking_config
+        assert "Task 70" in get_email_delivery_tracking_config.__doc__
+
+
+class TestGetEmailFailureHandlingConfig:
+    """Tests for get_email_failure_handling_config (Task 71)."""
+
+    def test_returns_dict(self):
+        """get_email_failure_handling_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_email_failure_handling_config
+        result = get_email_failure_handling_config()
+        assert isinstance(result, dict)
+
+    def test_email_failure_handling_documented_flag(self):
+        """Result must contain email_failure_handling_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_email_failure_handling_config
+        result = get_email_failure_handling_config()
+        assert result["email_failure_handling_documented"] is True
+
+    def test_retry_strategies_list(self):
+        """retry_strategies must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_email_failure_handling_config
+        result = get_email_failure_handling_config()
+        assert isinstance(result["retry_strategies"], list)
+        assert len(result["retry_strategies"]) >= 6
+
+    def test_escalation_steps_list(self):
+        """escalation_steps must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_email_failure_handling_config
+        result = get_email_failure_handling_config()
+        assert isinstance(result["escalation_steps"], list)
+        assert len(result["escalation_steps"]) >= 6
+
+    def test_admin_alert_channels_list(self):
+        """admin_alert_channels must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_email_failure_handling_config
+        result = get_email_failure_handling_config()
+        assert isinstance(result["admin_alert_channels"], list)
+        assert len(result["admin_alert_channels"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_email_failure_handling_config should be importable from utils."""
+        from apps.tenants.utils import get_email_failure_handling_config
+        assert callable(get_email_failure_handling_config)
+
+    def test_docstring_ref(self):
+        """get_email_failure_handling_config should reference Task 71."""
+        from apps.tenants.utils.provisioning_utils import get_email_failure_handling_config
+        assert "Task 71" in get_email_failure_handling_config.__doc__
+
+
+class TestGetNotificationDocumentationConfig:
+    """Tests for get_notification_documentation_config (Task 72)."""
+
+    def test_returns_dict(self):
+        """get_notification_documentation_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_notification_documentation_config
+        result = get_notification_documentation_config()
+        assert isinstance(result, dict)
+
+    def test_notification_documentation_completed_flag(self):
+        """Result must contain notification_documentation_completed=True."""
+        from apps.tenants.utils.provisioning_utils import get_notification_documentation_config
+        result = get_notification_documentation_config()
+        assert result["notification_documentation_completed"] is True
+
+    def test_notification_steps_list(self):
+        """notification_steps must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_notification_documentation_config
+        result = get_notification_documentation_config()
+        assert isinstance(result["notification_steps"], list)
+        assert len(result["notification_steps"]) >= 6
+
+    def test_troubleshooting_guides_list(self):
+        """troubleshooting_guides must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_notification_documentation_config
+        result = get_notification_documentation_config()
+        assert isinstance(result["troubleshooting_guides"], list)
+        assert len(result["troubleshooting_guides"]) >= 6
+
+    def test_reference_links_list(self):
+        """reference_links must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_notification_documentation_config
+        result = get_notification_documentation_config()
+        assert isinstance(result["reference_links"], list)
+        assert len(result["reference_links"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_notification_documentation_config should be importable from utils."""
+        from apps.tenants.utils import get_notification_documentation_config
+        assert callable(get_notification_documentation_config)
+
+    def test_docstring_ref(self):
+        """get_notification_documentation_config should reference Task 72."""
+        from apps.tenants.utils.provisioning_utils import get_notification_documentation_config
+        assert "Task 72" in get_notification_documentation_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-F: Status Tracking & API – Tasks 73-78 (Model & API)
+# ---------------------------------------------------------------------------
+
+
+class TestGetProvisioningStatusModelConfig:
+    """Tests for get_provisioning_status_model_config (Task 73)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_status_model_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_model_config
+        result = get_provisioning_status_model_config()
+        assert isinstance(result, dict)
+
+    def test_status_model_documented_flag(self):
+        """Result must contain status_model_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_model_config
+        result = get_provisioning_status_model_config()
+        assert result["status_model_documented"] is True
+
+    def test_model_fields_list(self):
+        """model_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_model_config
+        result = get_provisioning_status_model_config()
+        assert isinstance(result["model_fields"], list)
+        assert len(result["model_fields"]) >= 6
+
+    def test_schema_considerations_list(self):
+        """schema_considerations must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_model_config
+        result = get_provisioning_status_model_config()
+        assert isinstance(result["schema_considerations"], list)
+        assert len(result["schema_considerations"]) >= 6
+
+    def test_model_behaviors_list(self):
+        """model_behaviors must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_model_config
+        result = get_provisioning_status_model_config()
+        assert isinstance(result["model_behaviors"], list)
+        assert len(result["model_behaviors"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_status_model_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_status_model_config
+        assert callable(get_provisioning_status_model_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_status_model_config should reference Task 73."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_model_config
+        assert "Task 73" in get_provisioning_status_model_config.__doc__
+
+
+class TestGetProvisioningStatusFieldsConfig:
+    """Tests for get_provisioning_status_fields_config (Task 74)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_status_fields_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_fields_config
+        result = get_provisioning_status_fields_config()
+        assert isinstance(result, dict)
+
+    def test_status_fields_documented_flag(self):
+        """Result must contain status_fields_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_fields_config
+        result = get_provisioning_status_fields_config()
+        assert result["status_fields_documented"] is True
+
+    def test_status_fields_list(self):
+        """status_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_fields_config
+        result = get_provisioning_status_fields_config()
+        assert isinstance(result["status_fields"], list)
+        assert len(result["status_fields"]) >= 6
+
+    def test_allowed_values_list(self):
+        """allowed_values must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_fields_config
+        result = get_provisioning_status_fields_config()
+        assert isinstance(result["allowed_values"], list)
+        assert len(result["allowed_values"]) >= 6
+
+    def test_field_constraints_list(self):
+        """field_constraints must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_fields_config
+        result = get_provisioning_status_fields_config()
+        assert isinstance(result["field_constraints"], list)
+        assert len(result["field_constraints"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_status_fields_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_status_fields_config
+        assert callable(get_provisioning_status_fields_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_status_fields_config should reference Task 74."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_status_fields_config
+        assert "Task 74" in get_provisioning_status_fields_config.__doc__
+
+
+class TestGetProvisioningErrorTrackingConfig:
+    """Tests for get_provisioning_error_tracking_config (Task 75)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_error_tracking_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_error_tracking_config
+        result = get_provisioning_error_tracking_config()
+        assert isinstance(result, dict)
+
+    def test_error_tracking_documented_flag(self):
+        """Result must contain error_tracking_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_error_tracking_config
+        result = get_provisioning_error_tracking_config()
+        assert result["error_tracking_documented"] is True
+
+    def test_error_fields_list(self):
+        """error_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_error_tracking_config
+        result = get_provisioning_error_tracking_config()
+        assert isinstance(result["error_fields"], list)
+        assert len(result["error_fields"]) >= 6
+
+    def test_visibility_rules_list(self):
+        """visibility_rules must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_error_tracking_config
+        result = get_provisioning_error_tracking_config()
+        assert isinstance(result["visibility_rules"], list)
+        assert len(result["visibility_rules"]) >= 6
+
+    def test_error_categories_list(self):
+        """error_categories must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_error_tracking_config
+        result = get_provisioning_error_tracking_config()
+        assert isinstance(result["error_categories"], list)
+        assert len(result["error_categories"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_error_tracking_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_error_tracking_config
+        assert callable(get_provisioning_error_tracking_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_error_tracking_config should reference Task 75."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_error_tracking_config
+        assert "Task 75" in get_provisioning_error_tracking_config.__doc__
+
+
+class TestGetProvisioningTimestampsConfig:
+    """Tests for get_provisioning_timestamps_config (Task 76)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_timestamps_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_timestamps_config
+        result = get_provisioning_timestamps_config()
+        assert isinstance(result, dict)
+
+    def test_timestamps_documented_flag(self):
+        """Result must contain timestamps_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_timestamps_config
+        result = get_provisioning_timestamps_config()
+        assert result["timestamps_documented"] is True
+
+    def test_timestamp_fields_list(self):
+        """timestamp_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_timestamps_config
+        result = get_provisioning_timestamps_config()
+        assert isinstance(result["timestamp_fields"], list)
+        assert len(result["timestamp_fields"]) >= 6
+
+    def test_duration_calculations_list(self):
+        """duration_calculations must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_timestamps_config
+        result = get_provisioning_timestamps_config()
+        assert isinstance(result["duration_calculations"], list)
+        assert len(result["duration_calculations"]) >= 6
+
+    def test_usage_patterns_list(self):
+        """usage_patterns must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_timestamps_config
+        result = get_provisioning_timestamps_config()
+        assert isinstance(result["usage_patterns"], list)
+        assert len(result["usage_patterns"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_timestamps_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_timestamps_config
+        assert callable(get_provisioning_timestamps_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_timestamps_config should reference Task 76."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_timestamps_config
+        assert "Task 76" in get_provisioning_timestamps_config.__doc__
+
+
+class TestGetStatusUpdateMethodConfig:
+    """Tests for get_status_update_method_config (Task 77)."""
+
+    def test_returns_dict(self):
+        """get_status_update_method_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_status_update_method_config
+        result = get_status_update_method_config()
+        assert isinstance(result, dict)
+
+    def test_status_update_method_documented_flag(self):
+        """Result must contain status_update_method_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_status_update_method_config
+        result = get_status_update_method_config()
+        assert result["status_update_method_documented"] is True
+
+    def test_update_operations_list(self):
+        """update_operations must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_status_update_method_config
+        result = get_status_update_method_config()
+        assert isinstance(result["update_operations"], list)
+        assert len(result["update_operations"]) >= 6
+
+    def test_concurrency_rules_list(self):
+        """concurrency_rules must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_status_update_method_config
+        result = get_status_update_method_config()
+        assert isinstance(result["concurrency_rules"], list)
+        assert len(result["concurrency_rules"]) >= 6
+
+    def test_validation_steps_list(self):
+        """validation_steps must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_status_update_method_config
+        result = get_status_update_method_config()
+        assert isinstance(result["validation_steps"], list)
+        assert len(result["validation_steps"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_status_update_method_config should be importable from utils."""
+        from apps.tenants.utils import get_status_update_method_config
+        assert callable(get_status_update_method_config)
+
+    def test_docstring_ref(self):
+        """get_status_update_method_config should reference Task 77."""
+        from apps.tenants.utils.provisioning_utils import get_status_update_method_config
+        assert "Task 77" in get_status_update_method_config.__doc__
+
+
+class TestGetProvisioningApiConfig:
+    """Tests for get_provisioning_api_config (Task 78)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_api_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_api_config
+        result = get_provisioning_api_config()
+        assert isinstance(result, dict)
+
+    def test_provisioning_api_documented_flag(self):
+        """Result must contain provisioning_api_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_api_config
+        result = get_provisioning_api_config()
+        assert result["provisioning_api_documented"] is True
+
+    def test_api_endpoints_list(self):
+        """api_endpoints must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_api_config
+        result = get_provisioning_api_config()
+        assert isinstance(result["api_endpoints"], list)
+        assert len(result["api_endpoints"]) >= 6
+
+    def test_access_controls_list(self):
+        """access_controls must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_api_config
+        result = get_provisioning_api_config()
+        assert isinstance(result["access_controls"], list)
+        assert len(result["access_controls"]) >= 6
+
+    def test_response_formats_list(self):
+        """response_formats must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_api_config
+        result = get_provisioning_api_config()
+        assert isinstance(result["response_formats"], list)
+        assert len(result["response_formats"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_api_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_api_config
+        assert callable(get_provisioning_api_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_api_config should reference Task 78."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_api_config
+        assert "Task 78" in get_provisioning_api_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-F: Status Tracking & API – Tasks 79-84 (Endpoints, Dashboard & Metrics)
+# ---------------------------------------------------------------------------
+
+
+class TestGetTriggerEndpointConfig:
+    """Tests for get_trigger_endpoint_config (Task 79)."""
+
+    def test_returns_dict(self):
+        """get_trigger_endpoint_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_trigger_endpoint_config
+        result = get_trigger_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_trigger_endpoint_documented_flag(self):
+        """Result must contain trigger_endpoint_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_trigger_endpoint_config
+        result = get_trigger_endpoint_config()
+        assert result["trigger_endpoint_documented"] is True
+
+    def test_request_parameters_list(self):
+        """request_parameters must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_trigger_endpoint_config
+        result = get_trigger_endpoint_config()
+        assert isinstance(result["request_parameters"], list)
+        assert len(result["request_parameters"]) >= 6
+
+    def test_authentication_rules_list(self):
+        """authentication_rules must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_trigger_endpoint_config
+        result = get_trigger_endpoint_config()
+        assert isinstance(result["authentication_rules"], list)
+        assert len(result["authentication_rules"]) >= 6
+
+    def test_response_fields_list(self):
+        """response_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_trigger_endpoint_config
+        result = get_trigger_endpoint_config()
+        assert isinstance(result["response_fields"], list)
+        assert len(result["response_fields"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_trigger_endpoint_config should be importable from utils."""
+        from apps.tenants.utils import get_trigger_endpoint_config
+        assert callable(get_trigger_endpoint_config)
+
+    def test_docstring_ref(self):
+        """get_trigger_endpoint_config should reference Task 79."""
+        from apps.tenants.utils.provisioning_utils import get_trigger_endpoint_config
+        assert "Task 79" in get_trigger_endpoint_config.__doc__
+
+
+class TestGetStatusEndpointConfig:
+    """Tests for get_status_endpoint_config (Task 80)."""
+
+    def test_returns_dict(self):
+        """get_status_endpoint_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_status_endpoint_config
+        result = get_status_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_status_endpoint_documented_flag(self):
+        """Result must contain status_endpoint_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_status_endpoint_config
+        result = get_status_endpoint_config()
+        assert result["status_endpoint_documented"] is True
+
+    def test_response_fields_list(self):
+        """response_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_status_endpoint_config
+        result = get_status_endpoint_config()
+        assert isinstance(result["response_fields"], list)
+        assert len(result["response_fields"]) >= 6
+
+    def test_query_parameters_list(self):
+        """query_parameters must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_status_endpoint_config
+        result = get_status_endpoint_config()
+        assert isinstance(result["query_parameters"], list)
+        assert len(result["query_parameters"]) >= 6
+
+    def test_error_responses_list(self):
+        """error_responses must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_status_endpoint_config
+        result = get_status_endpoint_config()
+        assert isinstance(result["error_responses"], list)
+        assert len(result["error_responses"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_status_endpoint_config should be importable from utils."""
+        from apps.tenants.utils import get_status_endpoint_config
+        assert callable(get_status_endpoint_config)
+
+    def test_docstring_ref(self):
+        """get_status_endpoint_config should reference Task 80."""
+        from apps.tenants.utils.provisioning_utils import get_status_endpoint_config
+        assert "Task 80" in get_status_endpoint_config.__doc__
+
+
+class TestGetCancelEndpointConfig:
+    """Tests for get_cancel_endpoint_config (Task 81)."""
+
+    def test_returns_dict(self):
+        """get_cancel_endpoint_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_cancel_endpoint_config
+        result = get_cancel_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_cancel_endpoint_documented_flag(self):
+        """Result must contain cancel_endpoint_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_cancel_endpoint_config
+        result = get_cancel_endpoint_config()
+        assert result["cancel_endpoint_documented"] is True
+
+    def test_cancel_conditions_list(self):
+        """cancel_conditions must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_cancel_endpoint_config
+        result = get_cancel_endpoint_config()
+        assert isinstance(result["cancel_conditions"], list)
+        assert len(result["cancel_conditions"]) >= 6
+
+    def test_status_transitions_list(self):
+        """status_transitions must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_cancel_endpoint_config
+        result = get_cancel_endpoint_config()
+        assert isinstance(result["status_transitions"], list)
+        assert len(result["status_transitions"]) >= 6
+
+    def test_safety_checks_list(self):
+        """safety_checks must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_cancel_endpoint_config
+        result = get_cancel_endpoint_config()
+        assert isinstance(result["safety_checks"], list)
+        assert len(result["safety_checks"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_cancel_endpoint_config should be importable from utils."""
+        from apps.tenants.utils import get_cancel_endpoint_config
+        assert callable(get_cancel_endpoint_config)
+
+    def test_docstring_ref(self):
+        """get_cancel_endpoint_config should reference Task 81."""
+        from apps.tenants.utils.provisioning_utils import get_cancel_endpoint_config
+        assert "Task 81" in get_cancel_endpoint_config.__doc__
+
+
+class TestGetWebsocketUpdatesConfig:
+    """Tests for get_websocket_updates_config (Task 82)."""
+
+    def test_returns_dict(self):
+        """get_websocket_updates_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_websocket_updates_config
+        result = get_websocket_updates_config()
+        assert isinstance(result, dict)
+
+    def test_websocket_updates_documented_flag(self):
+        """Result must contain websocket_updates_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_websocket_updates_config
+        result = get_websocket_updates_config()
+        assert result["websocket_updates_documented"] is True
+
+    def test_event_types_list(self):
+        """event_types must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_websocket_updates_config
+        result = get_websocket_updates_config()
+        assert isinstance(result["event_types"], list)
+        assert len(result["event_types"]) >= 6
+
+    def test_subscription_rules_list(self):
+        """subscription_rules must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_websocket_updates_config
+        result = get_websocket_updates_config()
+        assert isinstance(result["subscription_rules"], list)
+        assert len(result["subscription_rules"]) >= 6
+
+    def test_message_formats_list(self):
+        """message_formats must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_websocket_updates_config
+        result = get_websocket_updates_config()
+        assert isinstance(result["message_formats"], list)
+        assert len(result["message_formats"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_websocket_updates_config should be importable from utils."""
+        from apps.tenants.utils import get_websocket_updates_config
+        assert callable(get_websocket_updates_config)
+
+    def test_docstring_ref(self):
+        """get_websocket_updates_config should reference Task 82."""
+        from apps.tenants.utils.provisioning_utils import get_websocket_updates_config
+        assert "Task 82" in get_websocket_updates_config.__doc__
+
+
+class TestGetAdminDashboardViewConfig:
+    """Tests for get_admin_dashboard_view_config (Task 83)."""
+
+    def test_returns_dict(self):
+        """get_admin_dashboard_view_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_admin_dashboard_view_config
+        result = get_admin_dashboard_view_config()
+        assert isinstance(result, dict)
+
+    def test_admin_dashboard_documented_flag(self):
+        """Result must contain admin_dashboard_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_admin_dashboard_view_config
+        result = get_admin_dashboard_view_config()
+        assert result["admin_dashboard_documented"] is True
+
+    def test_dashboard_panels_list(self):
+        """dashboard_panels must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_admin_dashboard_view_config
+        result = get_admin_dashboard_view_config()
+        assert isinstance(result["dashboard_panels"], list)
+        assert len(result["dashboard_panels"]) >= 6
+
+    def test_access_controls_list(self):
+        """access_controls must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_admin_dashboard_view_config
+        result = get_admin_dashboard_view_config()
+        assert isinstance(result["access_controls"], list)
+        assert len(result["access_controls"]) >= 6
+
+    def test_display_fields_list(self):
+        """display_fields must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_admin_dashboard_view_config
+        result = get_admin_dashboard_view_config()
+        assert isinstance(result["display_fields"], list)
+        assert len(result["display_fields"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_admin_dashboard_view_config should be importable from utils."""
+        from apps.tenants.utils import get_admin_dashboard_view_config
+        assert callable(get_admin_dashboard_view_config)
+
+    def test_docstring_ref(self):
+        """get_admin_dashboard_view_config should reference Task 83."""
+        from apps.tenants.utils.provisioning_utils import get_admin_dashboard_view_config
+        assert "Task 83" in get_admin_dashboard_view_config.__doc__
+
+
+class TestGetMetricsCollectionConfig:
+    """Tests for get_metrics_collection_config (Task 84)."""
+
+    def test_returns_dict(self):
+        """get_metrics_collection_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_metrics_collection_config
+        result = get_metrics_collection_config()
+        assert isinstance(result, dict)
+
+    def test_metrics_collection_documented_flag(self):
+        """Result must contain metrics_collection_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_metrics_collection_config
+        result = get_metrics_collection_config()
+        assert result["metrics_collection_documented"] is True
+
+    def test_metric_types_list(self):
+        """metric_types must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_metrics_collection_config
+        result = get_metrics_collection_config()
+        assert isinstance(result["metric_types"], list)
+        assert len(result["metric_types"]) >= 6
+
+    def test_export_formats_list(self):
+        """export_formats must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_metrics_collection_config
+        result = get_metrics_collection_config()
+        assert isinstance(result["export_formats"], list)
+        assert len(result["export_formats"]) >= 6
+
+    def test_collection_intervals_list(self):
+        """collection_intervals must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_metrics_collection_config
+        result = get_metrics_collection_config()
+        assert isinstance(result["collection_intervals"], list)
+        assert len(result["collection_intervals"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_metrics_collection_config should be importable from utils."""
+        from apps.tenants.utils import get_metrics_collection_config
+        assert callable(get_metrics_collection_config)
+
+    def test_docstring_ref(self):
+        """get_metrics_collection_config should reference Task 84."""
+        from apps.tenants.utils.provisioning_utils import get_metrics_collection_config
+        assert "Task 84" in get_metrics_collection_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-F: Status Tracking & API – Tasks 85-88 (Tests, Commit & Final)
+# ---------------------------------------------------------------------------
+
+
+class TestGetProvisioningTestsConfig:
+    """Tests for get_provisioning_tests_config (Task 85)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_tests_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_tests_config
+        result = get_provisioning_tests_config()
+        assert isinstance(result, dict)
+
+    def test_provisioning_tests_documented_flag(self):
+        """Result must contain provisioning_tests_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_tests_config
+        result = get_provisioning_tests_config()
+        assert result["provisioning_tests_documented"] is True
+
+    def test_test_coverage_areas_list(self):
+        """test_coverage_areas must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_tests_config
+        result = get_provisioning_tests_config()
+        assert isinstance(result["test_coverage_areas"], list)
+        assert len(result["test_coverage_areas"]) >= 6
+
+    def test_test_data_fixtures_list(self):
+        """test_data_fixtures must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_tests_config
+        result = get_provisioning_tests_config()
+        assert isinstance(result["test_data_fixtures"], list)
+        assert len(result["test_data_fixtures"]) >= 6
+
+    def test_test_assertions_list(self):
+        """test_assertions must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_tests_config
+        result = get_provisioning_tests_config()
+        assert isinstance(result["test_assertions"], list)
+        assert len(result["test_assertions"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_tests_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_tests_config
+        assert callable(get_provisioning_tests_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_tests_config should reference Task 85."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_tests_config
+        assert "Task 85" in get_provisioning_tests_config.__doc__
+
+
+class TestGetFullProvisioningFlowTestConfig:
+    """Tests for get_full_provisioning_flow_test_config (Task 86)."""
+
+    def test_returns_dict(self):
+        """get_full_provisioning_flow_test_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_full_provisioning_flow_test_config
+        result = get_full_provisioning_flow_test_config()
+        assert isinstance(result, dict)
+
+    def test_flow_test_documented_flag(self):
+        """Result must contain flow_test_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_full_provisioning_flow_test_config
+        result = get_full_provisioning_flow_test_config()
+        assert result["flow_test_documented"] is True
+
+    def test_flow_steps_list(self):
+        """flow_steps must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_full_provisioning_flow_test_config
+        result = get_full_provisioning_flow_test_config()
+        assert isinstance(result["flow_steps"], list)
+        assert len(result["flow_steps"]) >= 6
+
+    def test_acceptance_criteria_list(self):
+        """acceptance_criteria must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_full_provisioning_flow_test_config
+        result = get_full_provisioning_flow_test_config()
+        assert isinstance(result["acceptance_criteria"], list)
+        assert len(result["acceptance_criteria"]) >= 6
+
+    def test_failure_scenarios_list(self):
+        """failure_scenarios must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_full_provisioning_flow_test_config
+        result = get_full_provisioning_flow_test_config()
+        assert isinstance(result["failure_scenarios"], list)
+        assert len(result["failure_scenarios"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_full_provisioning_flow_test_config should be importable from utils."""
+        from apps.tenants.utils import get_full_provisioning_flow_test_config
+        assert callable(get_full_provisioning_flow_test_config)
+
+    def test_docstring_ref(self):
+        """get_full_provisioning_flow_test_config should reference Task 86."""
+        from apps.tenants.utils.provisioning_utils import get_full_provisioning_flow_test_config
+        assert "Task 86" in get_full_provisioning_flow_test_config.__doc__
+
+
+class TestGetProvisioningInitialCommitConfig:
+    """Tests for get_provisioning_initial_commit_config (Task 87)."""
+
+    def test_returns_dict(self):
+        """get_provisioning_initial_commit_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_initial_commit_config
+        result = get_provisioning_initial_commit_config()
+        assert isinstance(result, dict)
+
+    def test_initial_commit_documented_flag(self):
+        """Result must contain initial_commit_documented=True."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_initial_commit_config
+        result = get_provisioning_initial_commit_config()
+        assert result["initial_commit_documented"] is True
+
+    def test_commit_scope_list(self):
+        """commit_scope must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_initial_commit_config
+        result = get_provisioning_initial_commit_config()
+        assert isinstance(result["commit_scope"], list)
+        assert len(result["commit_scope"]) >= 6
+
+    def test_commit_message_parts_list(self):
+        """commit_message_parts must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_initial_commit_config
+        result = get_provisioning_initial_commit_config()
+        assert isinstance(result["commit_message_parts"], list)
+        assert len(result["commit_message_parts"]) >= 6
+
+    def test_included_files_list(self):
+        """included_files must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_initial_commit_config
+        result = get_provisioning_initial_commit_config()
+        assert isinstance(result["included_files"], list)
+        assert len(result["included_files"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_provisioning_initial_commit_config should be importable from utils."""
+        from apps.tenants.utils import get_provisioning_initial_commit_config
+        assert callable(get_provisioning_initial_commit_config)
+
+    def test_docstring_ref(self):
+        """get_provisioning_initial_commit_config should reference Task 87."""
+        from apps.tenants.utils.provisioning_utils import get_provisioning_initial_commit_config
+        assert "Task 87" in get_provisioning_initial_commit_config.__doc__
+
+
+class TestGetFinalDocumentationConfig:
+    """Tests for get_final_documentation_config (Task 88)."""
+
+    def test_returns_dict(self):
+        """get_final_documentation_config should return a dict."""
+        from apps.tenants.utils.provisioning_utils import get_final_documentation_config
+        result = get_final_documentation_config()
+        assert isinstance(result, dict)
+
+    def test_final_documentation_complete_flag(self):
+        """Result must contain final_documentation_complete=True."""
+        from apps.tenants.utils.provisioning_utils import get_final_documentation_config
+        result = get_final_documentation_config()
+        assert result["final_documentation_complete"] is True
+
+    def test_documented_artifacts_list(self):
+        """documented_artifacts must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_final_documentation_config
+        result = get_final_documentation_config()
+        assert isinstance(result["documented_artifacts"], list)
+        assert len(result["documented_artifacts"]) >= 6
+
+    def test_troubleshooting_entries_list(self):
+        """troubleshooting_entries must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_final_documentation_config
+        result = get_final_documentation_config()
+        assert isinstance(result["troubleshooting_entries"], list)
+        assert len(result["troubleshooting_entries"]) >= 6
+
+    def test_quick_references_list(self):
+        """quick_references must be a list with >= 6 items."""
+        from apps.tenants.utils.provisioning_utils import get_final_documentation_config
+        result = get_final_documentation_config()
+        assert isinstance(result["quick_references"], list)
+        assert len(result["quick_references"]) >= 6
+
+    def test_importable_from_package(self):
+        """get_final_documentation_config should be importable from utils."""
+        from apps.tenants.utils import get_final_documentation_config
+        assert callable(get_final_documentation_config)
+
+    def test_docstring_ref(self):
+        """get_final_documentation_config should reference Task 88."""
+        from apps.tenants.utils.provisioning_utils import get_final_documentation_config
+        assert "Task 88" in get_final_documentation_config.__doc__
