@@ -1,157 +1,176 @@
-# Session Handover Document
+# SESSION HANDOVER DOCUMENT
 
-## Date: 2025-07-22
+> **Created:** 2025-01-20
+> **Purpose:** Context for continuing SubPhase-08 (Migration Strategy) in a new session.
 
-## Project Context
+---
 
-LankaCommerce Cloud Multi-Tenant SaaS ERP — Phase 02: Database Architecture & Multi-Tenancy, SubPhase-04: Tenant Model & Domain Model.
+## Project Overview
 
-## Tech Stack
+- **Project:** LankaCommerce Cloud (LCC) - Multi-tenant SaaS ERP
+- **Stack:** Django 5.2.11 + django-tenants 3.10.0 + PostgreSQL 15.16 + Python 3.12
+- **Workspace:** `E:\work_git_repos\pos`
 
-- Django 5.2.11, django-tenants 3.10.0, PostgreSQL 15.16, Python 3.12
-- AUTH_USER_MODEL = "platform.PlatformUser"
-- TENANT_MODEL = "tenants.Tenant", TENANT_DOMAIN_MODEL = "tenants.Domain"
-- Currency: LKR (₨), PRICE_MAX_DIGITS=10, PRICE_DECIMAL_PLACES=2
-- Tenant model uses Django default AutoField PK (NOT UUID)
-- Tenants app uses flat models.py (NOT models/ package)
+---
 
-## Critical Environment Info
+## Current Phase Progress
 
-- PgBouncer UNAVAILABLE (port 6432 conflict)
-- ALL DB commands must use: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend ...`
-- For manage.py: `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 --entrypoint python backend manage.py <cmd>`
-- Validation scripts: create at `backend/scripts/<name>.py`, run via Docker `python -c "import os; os.chdir('/app'); exec(open('scripts/<name>.py').read())"`, delete after
-- Docs files on host filesystem only (not Docker-mounted)
-- flow.py path: `python E:\My_GitHub_Repos\flow\flow.py`
+### SubPhase-07: Database Router Setup — FULLY COMPLETE ✅
 
-## Database State
+- Tasks 01-78: ALL COMPLETE
+- Files: `router_utils.py` (72 functions, ~4216 lines), `routers.py` (~950 lines), `test_routers.py` (78 test classes, ~4700 lines)
+- All files FROZEN — no further changes needed
 
-- 3 tenants: public (ID=1, schema=public), test-isolation (ID=2), cmd-test (ID=3)
-- Each has 1 primary domain (3 total domains)
-- TenantSettings record exists for cmd-test tenant (created by Group-D signal)
-- SHARED_APPS includes apps.tenants, apps.platform, apps.core, apps.users
-- Use migrate_schemas --shared for public schema migrations
+### SubPhase-08: Migration Strategy — IN PROGRESS
 
-## Current Progress — SubPhase-04 Complete Summary
+| Group                              | Tasks       | Status         | Verification     |
+| ---------------------------------- | ----------- | -------------- | ---------------- |
+| Group-A (Migration Foundation)     | Tasks 01-14 | ✅ COMPLETE    | 80+104+88 PASSED |
+| Group-B (Public Schema Migrations) | Tasks 15-28 | ✅ COMPLETE    | 88+67+40 PASSED  |
+| Group-C (Tenant Schema Migrations) | Tasks 29-44 | ✅ COMPLETE    | 57+71+51 PASSED  |
+| Group-D (Zero-Downtime Approach)   | Tasks 45-50 | ✅ COMPLETE    | 70/70 PASSED     |
+| Group-D (continued)                | Tasks 51-55 | ✅ COMPLETE    | 66/66 PASSED     |
+| Group-D (continued)                | Tasks 56-58 | ✅ COMPLETE    | 41/41 PASSED     |
+| Group-E (Rollback Strategy)        | Tasks 59-64 | ✅ COMPLETE    | 74/74 PASSED     |
+| Group-E (Testing & Rollback)       | Tasks 61-?? | ⏳ NOT STARTED |                  |
 
-### All Groups A-F Status
+---
 
-| Group                           | Documents   | Tasks       | Status                      |
-| ------------------------------- | ----------- | ----------- | --------------------------- |
-| Group-A: Tenant Core Fields     | 3 docs      | Tasks 01-16 | COMPLETE                    |
-| Group-B: Tenant Extended Fields | 3 docs      | Tasks 17-30 | COMPLETE                    |
-| Group-C: Domain Model           | 3 docs      | Tasks 31-46 | COMPLETE                    |
-| Group-D: Tenant Settings        | 2 docs      | Tasks 47-58 | COMPLETE                    |
-| Group-E: Tenant Subscription    | 2 docs      | Tasks 59-72 | COMPLETE                    |
-| Group-F: Admin & Management     | 2 of 3 docs | Tasks 73-83 | COMPLETE (Doc 03 REMAINING) |
+## Files Modified in SubPhase-08
 
-### Validation Results Summary
+### 1. `backend/apps/tenants/utils/migration_utils.py`
 
-| Document                     | Tests   |
-| ---------------------------- | ------- |
-| Group-A Doc 01 (Tasks 01-06) | 23/23   |
-| Group-A Doc 02 (Tasks 07-12) | 19/19   |
-| Group-A Doc 03 (Tasks 13-16) | 26/26   |
-| Group-B Doc 01 (Tasks 17-21) | 47/47   |
-| Group-B Doc 02 (Tasks 22-26) | 50/50   |
-| Group-B Doc 03 (Tasks 27-30) | 49/49   |
-| Group-C Doc 01 (Tasks 31-36) | 32/32   |
-| Group-C Doc 02 (Tasks 37-42) | 57/57   |
-| Group-C Doc 03 (Tasks 43-46) | 55/55   |
-| Group-D Doc 01 (Tasks 47-52) | 54/54   |
-| Group-D Doc 02 (Tasks 53-58) | 48/48   |
-| Group-E Doc 01 (Tasks 59-65) | 79/79   |
-| Group-E Doc 02 (Tasks 66-72) | 77/77   |
-| Group-F Doc 01 (Tasks 73-79) | 122/122 |
-| Group-F Doc 02 (Tasks 80-83) | 74/74   |
+- **Purpose:** Migration strategy helper functions
+- **Current State:** 64 functions, ~3700+ lines
+- **Module docstring says:** "SubPhase-08, Group-A Tasks 01-14, Group-B Tasks 15-28, Group-C Tasks 29-44, Group-D Tasks 45-58, Group-E Tasks 59-64."
+- **Functions by group:**
+  - Tasks 01-05: get_migration_review_config, get_migration_commands_documentation, get_migration_directory_config, get_migration_settings_config, get_shared_apps_migration_config
+  - Tasks 06-10: get_tenant_apps_migration_config, get_migration_helper_module_config, get_migration_naming_convention, get_migration_template_config, get_migration_dependencies_config
+  - Tasks 11-14: get_migration_check_script_config, get_makefile_migration_config, get_ci_migration_checks_config, get_migration_flow_documentation
+  - Tasks 15-20: get_public_migration_command_config, get_public_schema_apps_config, get_initial_public_migration_config, get_public_tables_verification, get_public_migration_script_config, get_tenant_table_updates_config
+  - Tasks 21-25: get_domain_table_updates_config, get_plan_table_updates_config, get_data_migration_template_config, get_seed_initial_data_config, get_public_tenant_creation_config
+  - Tasks 26-28: get_public_migration_verification_config, get_migration_backup_config, get_public_migration_documentation_config
+  - Tasks 29-34: get_tenant_migration_command_config, get_tenant_schema_apps_config, get_single_tenant_migration_config, get_batch_tenant_migration_config, get_parallel_migration_config, get_concurrency_limit_config
+  - Tasks 35-40: get_migration_ordering_config, get_progress_tracking_config, get_migration_log_table_config, get_failed_migration_handling_config, get_retry_failed_migrations_config, get_skip_problematic_tenants_config
+  - Tasks 41-44: get_tenant_data_migration_config, get_large_tenant_handling_config, get_tenant_migration_verification_config, get_tenant_migration_documentation_config
+  - Tasks 45-50: get_zero_downtime_rules_config, get_additive_migrations_policy_config, get_nullable_new_columns_config, get_default_values_required_config, get_no_column_renames_config, get_phased_column_removal_config
+  - Tasks 51-55: get_migration_linter_config, get_pg_zero_downtime_config, get_index_creation_config, get_constraint_addition_config, get_migration_dry_run_config
+  - Tasks 56-58: get_off_peak_migration_schedule_config, get_migration_monitoring_config, get_zero_downtime_documentation_config
+  - Tasks 59-64: get_rollback_strategy_config, get_rollback_command_config, get_forward_backward_ops_config, get_rollback_test_config, get_single_tenant_rollback_config, get_all_tenants_rollback_config
 
-## What Remains — Group-F Doc 03 (Tasks 84-88)
+### 2. `backend/apps/tenants/utils/__init__.py`
 
-The FINAL document in SubPhase-04:
+- **Purpose:** Re-exports all tenant utilities
+- **Current State:** 64 migration_utils imports + 72 router_utils imports + others
+- **Docstring says:** "SubPhase-08 Tasks 01-64"
+- \***\*all** comment says:\*\* "# Migration utilities (SubPhase-08 Tasks 01-64)"
 
-File: `Document-Series\Phase-02_Database-Architecture-MultiTenancy\SubPhase-04_Tenant-Model-Domain-Model\Group-F_Admin-Management\03_Tasks-84-88_Migrations-Commit.md`
+### 3. `backend/tests/tenants/test_migrations.py`
 
-Tasks:
+- **Purpose:** Tests for migration strategy utilities
+- **Current State:** 64 test classes, ~3700+ lines
+- **Docstring says:** "SubPhase-08, Group-A (Tasks 01-14), Group-B (Tasks 15-28), Group-C (Tasks 29-44), Group-D (Tasks 45-58), Group-E (Tasks 59-64)."
+- **Pattern:** Each class has 5-8 test methods (returns_dict, flag checks, list sizes, structure checks, importable_from_package, docstring_ref)
 
-- Task 84: Create Migrations (already done — 10 migrations exist)
-- Task 85: Review Migration SQL
-- Task 86: Run Shared Migrations (already done — all applied)
-- Task 87: Create Test Tenants (3 already exist)
-- Task 88: Create Initial Commit
+### 4. `docs/database/migration-strategy.md`
 
-NOTE: Most of these tasks may already be satisfied since migrations 0001-0010 all exist and are applied, and test tenants already exist. The document likely needs review of SQL, verification of existing state, and a git commit.
+- **Purpose:** Migration strategy documentation
+- **Current State:** ~400+ lines
+- **Header:** "SubPhase-08, Group-A (Tasks 01-14), Group-B (Tasks 15-28), Group-C (Tasks 29-44), Group-D (Tasks 45-58), Group-E (Tasks 59-64)"
+- **Sections:** Overview, Review/Commands/Settings (01-05), Helpers/Naming/Template (06-10), Check/Makefile/CI/Docs (11-14), Command/Apps/Initial (15-20), Models/Data/Seed (21-25), Verify/Backup/Docs (26-28), Commands/Parallel (29-34), Progress/Errors/Retry (35-40), Data/Large/Verify/Docs (41-44), Rules/Columns (45-50), Linter/Indexes/DryRun (51-55), Schedule/Monitor/Docs (56-58), Strategy/Commands (59-64), Related Documentation
 
-## Files Modified in SubPhase-04 (not yet committed)
+### 5. `docs/VERIFICATION.md`
 
-### backend/apps/tenants/models.py (1,372 lines)
+- **Purpose:** Verification log for all tasks
+- **Current State:** ~9070+ lines
+- **Latest entry:** SubPhase-08 Tasks 59-64: 74/74 ALL PASSED
 
-- Tenant model: 28 fields (name, slug, schema_name, business_type, industry, business_registration_number, contact_name, contact_email, contact_phone, address_line_1, address_line_2, city, district, province, postal_code, logo, primary_color, secondary_color, language, timezone, paid_until, on_trial, status, onboarding_step, onboarding_completed, schema_version, settings, created_on, updated_on)
-- Domain model: 11 fields (domain, tenant, is_primary from DomainMixin + domain_type, is_verified, verified_at, ssl_status, ssl_expires_at, metadata, created_on, updated_on)
-- TenantSettings model: 12 fields (tenant OneToOne related_name="tenant_settings", theme_color, invoice_prefix, order_prefix, tax_rate, invoice_footer, receipt_footer, notification_settings, feature_settings, integration_settings, created_on, updated_on)
-- TenantSubscription model: 13 fields (tenant FK related_name="subscriptions", plan FK to platform.SubscriptionPlan related_name="tenant_subscriptions", status, billing_cycle, started_at, expires_at, trial_ends_at, next_billing_date, amount, payment_method, is_auto_renew, created_on, updated_on)
-- Module constants: TENANT*STATUS*_, BUSINESS*TYPE_CHOICES, INDUSTRY_CHOICES, PROVINCE_CHOICES, LANGUAGE_CHOICES, TIMEZONE_CHOICES, SUBSCRIPTION_STATUS*_, BILLING*CYCLE*\*
-- Validators: slug_validator, brn_validator, phone_validator, postal_code_validator, hex_color_validator
-- Functions: tenant_logo_upload_path, default_notification_settings, default_feature_settings, default_integration_settings
+---
 
-### backend/apps/tenants/managers.py (526 lines)
+## Implementation Pattern
 
-- TenantQuerySet: 12 methods (active, suspended, archived, not_archived, on_trial, not_on_trial, paid, expired, onboarded, needs_onboarding, business, public_only)
-- TenantManager: wraps TenantQuerySet, 12 shortcuts
-- DomainQuerySet: 12 methods (platform, custom, verified, unverified, needs_verification, ssl_active, ssl_expiring_soon, ssl_expired, ssl_pending, active_domains, primary, for_tenant)
-- DomainManager: wraps DomainQuerySet, 12 shortcuts
-- SubscriptionQuerySet: 15 methods (active, trial, active_or_trial, expired, cancelled, suspended, monthly, annual, auto_renew, no_auto_renew, expiring_soon, trial_ending_soon, billing_due, for_tenant, current_for_tenant)
-- SubscriptionManager: wraps SubscriptionQuerySet, 15 shortcuts
+Each task group follows this exact workflow:
 
-### backend/apps/tenants/admin.py (585 lines)
+1. **Read the document** (use subagent) from `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-08_Migration-Strategy/Group-X_Name/NN_Tasks-XX-YY_Title.md`
+2. **Update migration_utils.py:** Update module docstring + append new functions after the last function
+3. **Update **init**.py:** Update docstring + add imports (alphabetically sorted) + add **all** entries
+4. **Update test_migrations.py:** Update docstring + append test classes after the last class
+5. **Update migration-strategy.md:** Update header + add new section before "## Related Documentation"
+6. **Create verification script** in `backend/scripts/verify_tasks_XX_YY.py`
+7. **Run in Docker:** `docker compose run --rm --no-deps -e DB_HOST=db -e DB_PORT=5432 -v "${PWD}/docs:/docs" --entrypoint python backend scripts/verify_tasks_XX_YY.py`
+8. **Delete verification script** after all pass
+9. **Update VERIFICATION.md** with results
+10. **Run flow.py** for user review: `python E:\My_GitHub_Repos\flow\flow.py`
 
-- TenantAdmin: 8 list_display, 6 list_filter, 6 search_fields, 3 readonly_fields, 12 fieldsets, 3 inlines, 3 actions
-- DomainAdmin: 6 list_display, 4 list_filter, 3 search_fields, 4 readonly_fields, 5 fieldsets, 1 action
-- TenantSubscriptionAdmin: 9 list_display, 3 list_filter, 3 search_fields, 2 readonly_fields, 4 fieldsets
-- DomainInline (TabularInline): 8 fields, 3 readonly
-- TenantSettingsInline (StackedInline): 11 fields, 2 readonly, max_num=1, can_delete=False
-- TenantSubscriptionInline (TabularInline): 11 fields, 1 readonly
-- Actions: verify_domains, suspend_tenants, activate_tenants, export_tenants_csv
+### Function Pattern
 
-### backend/apps/tenants/signals.py (53 lines, NEW)
+Each function:
 
-- create_tenant_settings: post_save receiver on Tenant, auto-creates TenantSettings on first save
+- Returns a `dict` with a documented flag (`True`), lists of steps/notes, and optional config dicts
+- Has a full docstring with Returns section and Reference line (e.g., "SubPhase-08, Group-D, Task 50")
+- Ends with `logger.debug(...)` and `return result`
 
-### backend/apps/tenants/apps.py (24 lines)
+### Test Pattern
 
-- TenantsConfig with ready() method importing signals
+Each test class:
 
-### Migrations (10 total, all applied)
+- Has 5-8 methods: test*returns_dict, test*[flag]_flag, test_[list]_list (with length checks), test_[dict]\_dict (with key checks), test_importable_from_package, test_docstring_ref
+- Uses local imports from `apps.tenants.utils.migration_utils` and `apps.tenants.utils`
 
-- 0001_initial.py — Original Tenant/Domain
-- 0002_add_onboarding_schema_metadata.py — onboarding_step, onboarding_completed, schema_version, 2 indexes
-- 0003_add_business_info_contact.py — business_type, industry, BRN, contact fields
-- 0004_add_address_fields.py — address fields + altered contact_phone
-- 0005_add_branding_locale.py — logo, primary_color, secondary_color, language, timezone
-- 0006_add_domain_type_ssl_meta.py — domain_type, verification, SSL, metadata, timestamps, 2 indexes
-- 0007_add_tenant_settings.py — TenantSettings model creation
-- 0008_add_settings_text_json.py — footer text fields + 3 JSON settings fields
-- 0009_add_tenant_subscription.py — TenantSubscription model creation
-- 0010_add_billing_fields.py — trial_ends_at, next_billing_date, amount, payment_method, is_auto_renew
+---
 
-### docs/VERIFICATION.md (~6000+ lines)
+## Next Steps
 
-- Contains all verification records from SubPhase-03 through SubPhase-04 Group-F Doc 02
+### Immediate Next: Group-E Tasks 65-70
 
-## Git Status
+- **Document:** `Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-08_Migration-Strategy/Group-E_Rollback-Strategy/02_Tasks-65-70_Backup-Restore-Runbook.md`
+- **Group:** E - Rollback Strategy (Document 02 of 02)
 
-- SubPhase-03: FULLY COMMITTED (commit 0742eba)
-- SubPhase-04 Groups A-F (Docs 01-02): ALL COMPLETE, NOT YET COMMITTED
-- A commit should happen after Group-F Doc 03 (Task 88)
+### After That: Remaining groups
 
-## Key Gotchas for Next Session
+- Check `00_GROUP_OVERVIEW.md` files in SubPhase-08 for remaining groups
 
-1. Field name is `business_registration_number` (NOT `brn`) — the property `has_brn` exists but the field is the full name
-2. Field names are `address_line_1` and `address_line_2` (with underscores before the number)
-3. TenantSettings.tenant has related_name="tenant_settings" (NOT "settings") because Tenant model has a `settings` JSONField
-4. SubscriptionPlan is at `platform.SubscriptionPlan` with UUID primary key
-5. Phone validator pattern: `^(\+94|0)[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{4}$`
-6. Postal code validator: `^\d{5}$`
-7. SAVEPOINT commands don't work in Docker without explicit transaction blocks — use pg_indexes check instead
-8. `timezone.timedelta` doesn't exist — use `from datetime import timedelta`
-9. Always delete validation scripts after running them
-10. No fenced code blocks in documentation files
+---
+
+## Important Rules
+
+1. **DO NOT use backticks** in `replace_string_in_file` oldString/newString
+2. **Docker docs volume:** Must mount with `-v "${PWD}/docs:/docs"` for doc verification
+3. **Scripts need:** `sys.path.insert(0, "/app")` and `DJANGO_SETTINGS_MODULE=config.settings.local`
+4. **flow.py path:** `python E:\My_GitHub_Repos\flow\flow.py` (PowerShell on Windows)
+5. **SubPhase-07 files are FROZEN** — do not modify router_utils.py, routers.py, or test_routers.py
+6. **Use subagents** to read documents and check file state to manage context window
+7. **Alphabetical imports** in **init**.py
+8. **Sequential **all\*\*\*\* entries (in task order, not alphabetical)
+9. **Module docstring format:** Accumulates groups (e.g., "Group-A Tasks 01-14, Group-B Tasks 15-28, ...")
+
+---
+
+## Document-Series Structure
+
+```
+Document-Series/Phase-02_Database-Architecture-MultiTenancy/SubPhase-08_Migration-Strategy/
+├── Group-A_Migration-Foundation/
+│   ├── 00_GROUP_OVERVIEW.md
+│   ├── 01_Tasks-01-05_Review-Commands-Settings.md ✅
+│   ├── 02_Tasks-06-10_Helpers-Naming-Template.md ✅
+│   └── 03_Tasks-11-14_Check-Makefile-CI-Docs.md ✅
+├── Group-B_Public-Schema-Migrations/
+│   ├── 00_GROUP_OVERVIEW.md
+│   ├── 01_Tasks-15-20_Command-Apps-Initial.md ✅
+│   ├── 02_Tasks-21-25_Models-Data-Seed.md ✅
+│   └── 03_Tasks-26-28_Verify-Backup-Docs.md ✅
+├── Group-C_Tenant-Schema-Migrations/
+│   ├── 00_GROUP_OVERVIEW.md
+│   ├── 01_Tasks-29-34_Commands-Parallel.md ✅
+│   ├── 02_Tasks-35-40_Progress-Errors-Retry.md ✅
+│   └── 03_Tasks-41-44_Data-Large-Verify-Docs.md ✅
+├── Group-D_Zero-Downtime-Approach/
+│   ├── 00_GROUP_OVERVIEW.md
+│   ├── 01_Tasks-45-50_Rules-Columns.md ✅
+│   ├── 02_Tasks-51-55_Linter-Indexes-DryRun.md ✅
+│   └── 03_Tasks-56-58_Schedule-Monitor-Docs.md ✅
+├── Group-E_Testing-Rollback/ (if exists)
+│   └── ...
+└── ...
+```

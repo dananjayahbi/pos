@@ -43,16 +43,24 @@ TENANT_DOMAIN_MODEL = "tenants.Domain"
 # ════════════════════════════════════════════════════════════════════════
 # Routers are evaluated in order. The first non-None return value wins.
 #
-# 1. TenantRouter: Prevents cross-schema foreign key relations between
-#    shared-only and tenant-only apps. Implements allow_relation only.
-#    See apps/tenants/routers.py for implementation details.
+# LCCDatabaseRouter (SubPhase-07, Task 04-05):
+#   Custom router extending django-tenants' TenantSyncRouter.
+#   Inherits allow_migrate (migration routing to correct schema) and
+#   adds allow_relation (cross-schema relation prevention).
 #
-# 2. TenantSyncRouter: Routes migrations to the correct schema.
-#    Shared apps migrate to public, tenant apps migrate to each tenant
-#    schema. Implements allow_migrate only.
+# django_tenants.routers.TenantSyncRouter:
+#   Required by django-tenants AppConfig.ready() validation.
+#   django-tenants performs a string-based check to ensure this router
+#   is present in DATABASE_ROUTERS. LCCDatabaseRouter extends it, so
+#   the actual routing logic is handled by our custom class first.
+#   TenantSyncRouter is listed second as a framework requirement.
+#
+# Legacy reference (pre-SubPhase-07):
+#   1. TenantRouter (allow_relation only)
+#   2. TenantSyncRouter (allow_migrate only)
 
 DATABASE_ROUTERS = [
-    "apps.tenants.routers.TenantRouter",
+    "apps.tenants.routers.LCCDatabaseRouter",
     "django_tenants.routers.TenantSyncRouter",
 ]
 

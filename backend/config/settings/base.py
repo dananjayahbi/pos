@@ -111,9 +111,16 @@ LOCAL_APPS: list[str] = [
 # Order is critical — security first, then session, auth, etc.
 
 MIDDLEWARE = [
+    # ── Task 08-09 (SubPhase-06): Tenant middleware — MUST be first ──
+    # Resolves the active tenant from the request hostname, activates the
+    # tenant's PostgreSQL schema, and injects request.tenant /
+    # request.schema_name before any other middleware runs.
+    # Must precede SecurityMiddleware so all downstream code runs inside
+    # the correct schema context.
+    "apps.tenants.middleware.LCCTenantMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    # "django_tenants.middleware.main.TenantMainMiddleware",   # Phase 2
+    # "django_tenants.middleware.main.TenantMainMiddleware",   # replaced above
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -432,3 +439,115 @@ SECURE_HSTS_PRELOAD = False
 # ════════════════════════════════════════════════════════════════════════
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ════════════════════════════════════════════════════════════════════════
+# TENANT SUBDOMAIN CONFIGURATION  (SubPhase-06 Group-B Task 16)
+# ════════════════════════════════════════════════════════════════════════
+# Controls how LCCTenantMiddleware resolves tenant subdomains from the
+# incoming request's Host header.
+#
+# TENANT_BASE_DOMAIN: The root domain shared by all tenants.
+#   Production example: "lcc.example.com"
+#   → acme.lcc.example.com  resolves to tenant "acme"
+#   Development default: "localhost"
+#   → acme.localhost resolves to tenant "acme"
+#
+# Override in local.py, staging.py, or production.py as needed.
+# Also configurable via the TENANT_BASE_DOMAIN environment variable.
+
+TENANT_BASE_DOMAIN: str = env("TENANT_BASE_DOMAIN", default="localhost")
+
+# Subdomains reserved for platform/infrastructure use.
+# Requests with these subdomains are never resolved to a tenant.
+TENANT_RESERVED_SUBDOMAINS: list[str] = [
+    "www",
+    "api",
+    "admin",
+    "app",
+    "static",
+    "media",
+    "mail",
+    "smtp",
+    "cdn",
+    "docs",
+    "help",
+    "support",
+    "status",
+]
+
+# Task 21: Development domains that bypass strict subdomain matching.
+# Requests from these hosts use .localhost subdomain parsing rules.
+# Port numbers are always stripped before matching (Task 22).
+TENANT_DEV_DOMAINS: list[str] = [
+    "localhost",
+    "127.0.0.1",
+]
+
+# Task 24: Cache time-to-live for subdomain → Tenant lookups (in seconds).
+# 300 = 5 minutes. Increase in production to reduce DB round-trips.
+# Task 25: Cache is invalidated immediately on Domain post_save/post_delete.
+TENANT_DOMAIN_CACHE_TTL: int = 300
+
+# ---------------------------------------------------------------------------
+# Header-Based Tenant Resolution (Group-D, Tasks 43-48)
+# ---------------------------------------------------------------------------
+# Used by HeaderResolver for API-only traffic where the client
+# explicitly identifies the tenant via an HTTP header.
+#
+# TENANT_HEADER_NAME: Primary header carrying the tenant ID (UUID/PK).
+#   Clients send: X-Tenant-ID: <tenant-pk-or-uuid>
+#
+# TENANT_SLUG_HEADER: Alternative header carrying the tenant slug.
+#   Clients send: X-Tenant-Slug: <schema-name>
+#   Used as a fallback when TENANT_HEADER_NAME is not present.
+#
+# TENANT_HEADER_PATHS: URL path prefixes where header resolution is active.
+#   Only requests whose path starts with one of these prefixes will
+#   have their tenant resolved via header. All other paths fall through
+#   to subdomain or custom domain resolution.
+#
+# Security: Headers alone are NOT authentication. They only select the
+# target tenant schema. API authentication (JWT, API key, etc.) must
+# still be enforced by the DRF permission/authentication classes.
+
+TENANT_HEADER_NAME: str = env("TENANT_HEADER_NAME", default="X-Tenant-ID")
+
+TENANT_SLUG_HEADER: str = env("TENANT_SLUG_HEADER", default="X-Tenant-Slug")
+
+TENANT_HEADER_PATHS: list[str] = [
+    "/api/",
+    "/mobile/",
+    "/webhook/",
+]
+
+# ---------------------------------------------------------------------------
+# Error Handling & Fallback (Group-E, Tasks 55-61)
+# ---------------------------------------------------------------------------
+# PUBLIC_SCHEMA_PATHS: URL path prefixes that always use the public schema.
+# These paths bypass tenant resolution entirely, allowing access to
+# shared endpoints regardless of the tenant context. Use cases:
+# - Authentication (login, token refresh) before tenant is known.
+# - Tenant registration (new tenant sign-up flow).
+# - Subscription plan listing (public pricing page).
+# - Health checks (infrastructure monitoring).
+# - Prometheus metrics (observability).
+#
+# Security: Keep this list minimal. Every public path is accessible
+# without tenant context, which means no tenant-level access control.
+
+PUBLIC_SCHEMA_PATHS: list[str] = [
+    "/api/v1/auth/",
+    "/api/v1/register/",
+    "/api/v1/plans/",
+    "/health/",
+    "/metrics/",
+]
+
+# Template paths for tenant error pages (overridable per environment).
+TENANT_404_TEMPLATE: str = "tenants/404_tenant_not_found.html"
+TENANT_SUSPENDED_TEMPLATE: str = "tenants/suspended.html"
+TENANT_EXPIRED_TEMPLATE: str = "tenants/expired.html"
+
+# Grace period (in days) for expired subscriptions (Task 63).
+# After expiration, tenants have this many days before full revocation.
+TENANT_GRACE_PERIOD_DAYS: int = 7

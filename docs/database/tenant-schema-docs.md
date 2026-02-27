@@ -26,60 +26,60 @@ migrations are applied to the new schema. The resulting tables are:
 
 ### products app
 
-| Table | Description |
-|---|---|
-| products_category | Product category tree (self-referential parent FK) |
-| products_product | Core product catalog — SKU, pricing, tax, status |
-| products_productimage | Product photo attachments (is_primary flag) |
-| products_productvariant | Product variants — size, colour, attributes |
+| Table                   | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| products_category       | Product category tree (self-referential parent FK) |
+| products_product        | Core product catalog — SKU, pricing, tax, status   |
+| products_productimage   | Product photo attachments (is_primary flag)        |
+| products_productvariant | Product variants — size, colour, attributes        |
 
 ### inventory app
 
-| Table | Description |
-|---|---|
+| Table                   | Description                                          |
+| ----------------------- | ---------------------------------------------------- |
 | inventory_stocklocation | Warehouses, stores, transit areas, virtual locations |
-| inventory_stock | Quantity on hand per product per location |
-| inventory_stockmovement | Audit trail for every stock quantity change |
+| inventory_stock         | Quantity on hand per product per location            |
+| inventory_stockmovement | Audit trail for every stock quantity change          |
 
 ### vendors app
 
-| Table | Description |
-|---|---|
+| Table            | Description                 |
+| ---------------- | --------------------------- |
 | vendors_supplier | Supplier and vendor records |
 
 ### customers app
 
-| Table | Description |
-|---|---|
+| Table              | Description                                              |
+| ------------------ | -------------------------------------------------------- |
 | customers_customer | Customer CRM records with billing and shipping addresses |
 
 ### orders app
 
-| Table | Description |
-|---|---|
-| orders_order | Customer purchase order headers |
-| orders_orderitem | Line items within each order |
+| Table            | Description                     |
+| ---------------- | ------------------------------- |
+| orders_order     | Customer purchase order headers |
+| orders_orderitem | Line items within each order    |
 
 ### sales app
 
-| Table | Description |
-|---|---|
-| sales_invoice | Invoices issued to customers |
+| Table         | Description                        |
+| ------------- | ---------------------------------- |
+| sales_invoice | Invoices issued to customers       |
 | sales_payment | Payments received against invoices |
 
 ### hr app
 
-| Table | Description |
-|---|---|
+| Table       | Description                                   |
+| ----------- | --------------------------------------------- |
 | hr_employee | Staff members linked to PlatformUser accounts |
 
 ### accounting app
 
-| Table | Description |
-|---|---|
-| accounting_account | Chart of accounts entries |
-| accounting_journalentry | Double-entry accounting transactions |
-| accounting_tenantauditlog | Tenant-level action audit trail |
+| Table                     | Description                          |
+| ------------------------- | ------------------------------------ |
+| accounting_account        | Chart of accounts entries            |
+| accounting_journalentry   | Double-entry accounting transactions |
+| accounting_tenantauditlog | Tenant-level action audit trail      |
 
 ---
 
@@ -100,15 +100,15 @@ Every model uses a UUID v4 primary key (from UUIDMixin). Key indexes include:
 
 All 8 initial migrations are applied and verified:
 
-| Migration | App | Status |
-|---|---|---|
-| products 0001_initial | products | Applied |
-| inventory 0001_initial | inventory | Applied |
-| vendors 0001_initial | vendors | Applied |
-| sales 0001_initial | sales | Applied |
-| customers 0001_initial | customers | Applied |
-| orders 0001_initial | orders | Applied |
-| hr 0001_initial | hr | Applied |
+| Migration               | App        | Status  |
+| ----------------------- | ---------- | ------- |
+| products 0001_initial   | products   | Applied |
+| inventory 0001_initial  | inventory  | Applied |
+| vendors 0001_initial    | vendors    | Applied |
+| sales 0001_initial      | sales      | Applied |
+| customers 0001_initial  | customers  | Applied |
+| orders 0001_initial     | orders     | Applied |
+| hr 0001_initial         | hr         | Applied |
 | accounting 0001_initial | accounting | Applied |
 
 ---
