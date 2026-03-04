@@ -188,6 +188,94 @@ Exports:
         - get_provisioning_initial_commit_config()       — provisioning initial commit (Task 87)
         - get_final_documentation_config()               — final documentation (Task 88)
 
+    From testing_utils (testing infrastructure helpers - SubPhase-10 Tasks 01-50):
+        - get_test_module_structure_config()      — test module structure (Task 01)
+        - get_conftest_config()                  — conftest configuration (Task 02)
+        - get_test_database_config()             — test database config (Task 03)
+        - get_test_schema_management_config()    — test schema management (Task 04)
+        - get_pytest_django_config()             — pytest-django config (Task 05)
+        - get_pytest_xdist_config()              — pytest-xdist config (Task 06)
+        - get_factory_boy_config()               — factory-boy config (Task 07)
+        - get_faker_config()                     — faker config (Task 08)
+        - get_test_settings_module_config()      — test settings module (Task 09)
+        - get_test_runner_config()               — test runner config (Task 10)
+        - get_test_markers_config()              — test markers (Task 11)
+        - get_multi_tenant_marker_config()       — multi-tenant marker (Task 12)
+        - get_slow_test_marker_config()          — slow test marker (Task 13)
+        - get_test_infrastructure_documentation() — test infrastructure docs (Task 14)
+        - get_tenant_test_case_config()          — TenantTestCase class (Task 15)
+        - get_django_testcase_extension_config() — Django TestCase extension (Task 16)
+        - get_setup_method_config()              — setUp method (Task 17)
+        - get_teardown_method_config()           — tearDown method (Task 18)
+        - get_test_tenant_creation_config()      — test tenant creation (Task 19)
+        - get_tenant_context_setup_config()      — tenant context setup (Task 20)
+        - get_tenant_context_manager_config()    — tenant context manager (Task 21)
+        - get_multi_tenant_test_mixin_config()   — multi-tenant test mixin (Task 22)
+        - get_two_tenant_setup_config()          — two-tenant setup (Task 23)
+        - get_tenant_switching_helper_config()   — tenant switching helper (Task 24)
+        - get_schema_assertion_helper_config()   — schema assertion helper (Task 25)
+        - get_isolation_assertion_config()       — isolation assertion (Task 26)
+        - get_transaction_rollback_config()      — transaction rollback (Task 27)
+        - get_tenant_test_case_documentation()   — TenantTestCase docs (Task 28)
+        - get_tenant_factory_config()            — TenantFactory config (Task 29)
+        - get_domain_factory_config()            — DomainFactory config (Task 30)
+        - get_product_factory_config()           — ProductFactory config (Task 31)
+        - get_category_factory_config()          — CategoryFactory config (Task 32)
+        - get_customer_factory_config()          — CustomerFactory config (Task 33)
+        - get_order_factory_config()             — OrderFactory config (Task 34)
+        - get_user_factory_config()              — UserFactory config (Task 35)
+        - get_tenant_fixtures_config()           — Tenant fixtures config (Task 36)
+        - get_sample_data_fixtures_config()      — Sample data fixtures config (Task 37)
+        - get_minimal_fixture_config()           — Minimal fixture config (Task 38)
+        - get_full_fixture_config()              — Full fixture config (Task 39)
+        - get_load_fixture_helper_config()       — Load fixture helper config (Task 40)
+        - get_random_data_generator_config()     — Random data generator config (Task 41)
+        - get_bulk_data_generator_config()       — Bulk data generator config (Task 42)
+        - get_factory_isolation_verification_config() — Factory isolation verification (Task 43)
+        - get_fixtures_documentation_config()    — Fixtures documentation config (Task 44)
+        - get_isolation_test_module_config()      — Isolation test module config (Task 45)
+        - get_schema_exists_test_config()         — Schema exists test config (Task 46)
+        - get_tables_in_schema_test_config()      — Tables in schema test config (Task 47)
+        - get_data_placement_test_config()        — Data placement test config (Task 48)
+        - get_query_schema_context_test_config()  — Query schema context test config (Task 49)
+        - get_multi_tenant_separation_test_config() — Multi-tenant separation test config (Task 50)
+        - get_same_id_different_tenants_test_config() — Same ID different tenants test config (Task 51)
+        - get_tenant_a_cannot_see_b_test_config() — Tenant A cannot see B test config (Task 52)
+        - get_tenant_b_cannot_see_a_test_config() — Tenant B cannot see A test config (Task 53)
+        - get_public_schema_shared_test_config() — Public schema shared test config (Task 54)
+        - get_tenant_to_public_access_test_config() — Tenant to public access test config (Task 55)
+        - get_public_cannot_access_tenant_test_config() — Public cannot access tenant test config (Task 56)
+        - get_isolation_suite_execution_config() — Isolation suite execution config (Task 57)
+        - get_isolation_tests_documentation_config() — Isolation tests documentation config (Task 58)
+        - get_leak_test_module_config() — Leak test module config (Task 59)
+        - get_direct_query_leak_test_config() — Direct query leak test config (Task 60)
+        - get_orm_query_leak_test_config() — ORM query leak test config (Task 61)
+        - get_aggregate_query_leak_test_config() — Aggregate query leak test config (Task 62)
+        - get_join_query_leak_test_config() — Join query leak test config (Task 63)
+        - get_subquery_leak_test_config() — Subquery leak test config (Task 64)
+        - get_api_response_leak_test_config() — API response leak test config (Task 65)
+        - get_admin_leak_test_config() — Admin leak test config (Task 66)
+        - get_file_storage_leak_test_config() — File storage leak test config (Task 67)
+        - get_cache_leak_test_config() — Cache leak test config (Task 68)
+        - get_session_leak_test_config() — Session leak test config (Task 69)
+        - get_logging_leak_test_config() — Logging leak test config (Task 70)
+        - get_leak_suite_execution_config() — Leak suite execution config (Task 71)
+        - get_leak_prevention_documentation_config() — Leak prevention documentation config (Task 72)
+        - get_performance_test_module_config() — Performance test module config (Task 73)
+        - get_query_performance_test_config() — Query performance test config (Task 74)
+        - get_tenant_switching_speed_test_config() — Tenant switching speed test config (Task 75)
+        - get_schema_creation_time_test_config() — Schema creation time test config (Task 76)
+        - get_many_tenants_scale_test_config() — Many tenants scale test config (Task 77)
+        - get_concurrent_tenant_access_test_config() — Concurrent tenant access test config (Task 78)
+        - get_performance_baselines_config() — Performance baselines config (Task 79)
+        - get_ci_test_configuration_config() — CI test configuration config (Task 80)
+        - get_ci_test_job_config() — CI test job config (Task 81)
+        - get_test_coverage_config() — Test coverage config (Task 82)
+        - get_coverage_threshold_config() — Coverage threshold config (Task 83)
+        - get_test_report_config() — Test report config (Task 84)
+        - get_initial_commit_config() — Initial commit config (Task 85)
+        - get_final_phase_documentation_config() — Final phase documentation config (Task 86)
+
     From migration_utils (migration strategy helpers - SubPhase-08 Tasks 01-84):
         - get_migration_review_config()          — migration review config (Task 01)
         - get_migration_commands_documentation() — migration commands docs (Task 02)
@@ -492,6 +580,94 @@ from apps.tenants.utils.router_utils import (
     validate_router_order,
     validate_schema_exists,
 )
+from apps.tenants.utils.testing_utils import (
+    get_admin_leak_test_config,
+    get_aggregate_query_leak_test_config,
+    get_api_response_leak_test_config,
+    get_bulk_data_generator_config,
+    get_cache_leak_test_config,
+    get_ci_test_configuration_config,
+    get_ci_test_job_config,
+    get_category_factory_config,
+    get_concurrent_tenant_access_test_config,
+    get_conftest_config,
+    get_customer_factory_config,
+    get_coverage_threshold_config,
+    get_data_placement_test_config,
+    get_direct_query_leak_test_config,
+    get_django_testcase_extension_config,
+    get_domain_factory_config,
+    get_factory_boy_config,
+    get_factory_isolation_verification_config,
+    get_faker_config,
+    get_file_storage_leak_test_config,
+    get_final_phase_documentation_config,
+    get_fixtures_documentation_config,
+    get_full_fixture_config,
+    get_initial_commit_config,
+    get_isolation_assertion_config,
+    get_isolation_suite_execution_config,
+    get_isolation_test_module_config,
+    get_isolation_tests_documentation_config,
+    get_join_query_leak_test_config,
+    get_leak_prevention_documentation_config,
+    get_leak_suite_execution_config,
+    get_leak_test_module_config,
+    get_logging_leak_test_config,
+    get_many_tenants_scale_test_config,
+    get_load_fixture_helper_config,
+    get_minimal_fixture_config,
+    get_multi_tenant_marker_config,
+    get_multi_tenant_separation_test_config,
+    get_multi_tenant_test_mixin_config,
+    get_order_factory_config,
+    get_orm_query_leak_test_config,
+    get_performance_baselines_config,
+    get_performance_test_module_config,
+    get_product_factory_config,
+    get_public_cannot_access_tenant_test_config,
+    get_public_schema_shared_test_config,
+    get_pytest_django_config,
+    get_pytest_xdist_config,
+    get_query_schema_context_test_config,
+    get_query_performance_test_config,
+    get_random_data_generator_config,
+    get_same_id_different_tenants_test_config,
+    get_sample_data_fixtures_config,
+    get_schema_assertion_helper_config,
+    get_schema_exists_test_config,
+    get_schema_creation_time_test_config,
+    get_session_leak_test_config,
+    get_setup_method_config,
+    get_slow_test_marker_config,
+    get_subquery_leak_test_config,
+    get_tables_in_schema_test_config,
+    get_teardown_method_config,
+    get_tenant_a_cannot_see_b_test_config,
+    get_tenant_b_cannot_see_a_test_config,
+    get_tenant_context_manager_config,
+    get_tenant_context_setup_config,
+    get_tenant_to_public_access_test_config,
+    get_tenant_factory_config,
+    get_tenant_fixtures_config,
+    get_tenant_switching_helper_config,
+    get_tenant_test_case_config,
+    get_tenant_test_case_documentation,
+    get_tenant_switching_speed_test_config,
+    get_test_coverage_config,
+    get_test_database_config,
+    get_test_infrastructure_documentation,
+    get_test_markers_config,
+    get_test_module_structure_config,
+    get_test_report_config,
+    get_test_runner_config,
+    get_test_schema_management_config,
+    get_test_settings_module_config,
+    get_test_tenant_creation_config,
+    get_transaction_rollback_config,
+    get_two_tenant_setup_config,
+    get_user_factory_config,
+)
 from apps.tenants.utils.tenant_context import (
     get_current_tenant,
     set_current_tenant,
@@ -765,4 +941,106 @@ __all__ = [
     "get_migration_best_practices_config",
     "get_migration_initial_commit_config",
     "get_final_verification_config",
+    # Testing utilities (SubPhase-10 Tasks 01-14)
+    "get_test_module_structure_config",
+    "get_conftest_config",
+    "get_test_database_config",
+    "get_test_schema_management_config",
+    "get_pytest_django_config",
+    "get_pytest_xdist_config",
+    "get_factory_boy_config",
+    "get_faker_config",
+    "get_test_settings_module_config",
+    "get_test_runner_config",
+    "get_test_markers_config",
+    "get_multi_tenant_marker_config",
+    "get_slow_test_marker_config",
+    "get_test_infrastructure_documentation",
+    # Testing utilities (SubPhase-10 Tasks 15-20, Group-B Base Class)
+    "get_tenant_test_case_config",
+    "get_django_testcase_extension_config",
+    "get_setup_method_config",
+    "get_teardown_method_config",
+    "get_test_tenant_creation_config",
+    "get_tenant_context_setup_config",
+    # Testing utilities (SubPhase-10 Tasks 21-25, Group-B Mixin & Helpers)
+    "get_tenant_context_manager_config",
+    "get_multi_tenant_test_mixin_config",
+    "get_two_tenant_setup_config",
+    "get_tenant_switching_helper_config",
+    "get_schema_assertion_helper_config",
+    # Testing utilities (SubPhase-10 Tasks 26-28, Group-B Isolation & Docs)
+    "get_isolation_assertion_config",
+    "get_transaction_rollback_config",
+    "get_tenant_test_case_documentation",
+    # Testing utilities (SubPhase-10 Tasks 29-34, Group-C Model Factories)
+    "get_tenant_factory_config",
+    "get_domain_factory_config",
+    "get_product_factory_config",
+    "get_category_factory_config",
+    "get_customer_factory_config",
+    "get_order_factory_config",
+    # Testing utilities (SubPhase-10 Tasks 35-40, Group-C User & Fixtures)
+    "get_user_factory_config",
+    "get_tenant_fixtures_config",
+    "get_sample_data_fixtures_config",
+    "get_minimal_fixture_config",
+    "get_full_fixture_config",
+    "get_load_fixture_helper_config",
+    # Testing utilities (SubPhase-10 Tasks 41-44, Group-C Generators & Docs)
+    "get_random_data_generator_config",
+    "get_bulk_data_generator_config",
+    "get_factory_isolation_verification_config",
+    "get_fixtures_documentation_config",
+    # Testing utilities (SubPhase-10 Tasks 45-50, Group-D Schema Separation)
+    "get_isolation_test_module_config",
+    "get_schema_exists_test_config",
+    "get_tables_in_schema_test_config",
+    "get_data_placement_test_config",
+    "get_query_schema_context_test_config",
+    "get_multi_tenant_separation_test_config",
+    # Testing utilities (SubPhase-10 Tasks 51-56, Group-D Cross-Tenant & Public)
+    "get_same_id_different_tenants_test_config",
+    "get_tenant_a_cannot_see_b_test_config",
+    "get_tenant_b_cannot_see_a_test_config",
+    "get_public_schema_shared_test_config",
+    "get_tenant_to_public_access_test_config",
+    "get_public_cannot_access_tenant_test_config",
+    # Testing utilities (SubPhase-10 Tasks 57-58, Group-D Suite & Docs)
+    "get_isolation_suite_execution_config",
+    "get_isolation_tests_documentation_config",
+    # Testing utilities (SubPhase-10 Tasks 59-64, Group-E Query Leaks)
+    "get_leak_test_module_config",
+    "get_direct_query_leak_test_config",
+    "get_orm_query_leak_test_config",
+    "get_aggregate_query_leak_test_config",
+    "get_join_query_leak_test_config",
+    "get_subquery_leak_test_config",
+    # Testing utilities (SubPhase-10 Tasks 65-70, Group-E Channel Leaks)
+    "get_api_response_leak_test_config",
+    "get_admin_leak_test_config",
+    "get_file_storage_leak_test_config",
+    "get_cache_leak_test_config",
+    "get_session_leak_test_config",
+    "get_logging_leak_test_config",
+    # Testing utilities (SubPhase-10 Tasks 71-72, Group-E Suite & Docs)
+    "get_leak_suite_execution_config",
+    "get_leak_prevention_documentation_config",
+    # Testing utilities (SubPhase-10 Tasks 73-78, Group-F Performance Tests)
+    "get_performance_test_module_config",
+    "get_query_performance_test_config",
+    "get_tenant_switching_speed_test_config",
+    "get_schema_creation_time_test_config",
+    "get_many_tenants_scale_test_config",
+    "get_concurrent_tenant_access_test_config",
+    # Testing utilities (SubPhase-10 Tasks 79-84, Group-F CI & Coverage)
+    "get_performance_baselines_config",
+    "get_ci_test_configuration_config",
+    "get_ci_test_job_config",
+    "get_test_coverage_config",
+    "get_coverage_threshold_config",
+    "get_test_report_config",
+    # Testing utilities (SubPhase-10 Tasks 85-86, Group-F Commit & Final)
+    "get_initial_commit_config",
+    "get_final_phase_documentation_config",
 ]
