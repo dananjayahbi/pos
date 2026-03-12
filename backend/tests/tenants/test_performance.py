@@ -18,7 +18,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 
 
 # ---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ class TestSubdomainResolverPerformance:
     target when the cache is populated (hot path).
     """
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_subdomain_cache_hit_under_5ms(self, mock_cache):
         """Subdomain cache hit resolves in under 5ms average."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -73,7 +73,7 @@ class TestSubdomainResolverPerformance:
             f"(target: <{PERFORMANCE_TARGET_MS}ms)"
         )
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_subdomain_cache_miss_sentinel_under_5ms(self, mock_cache):
         """Subdomain cache miss sentinel resolves in under 5ms."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -110,7 +110,7 @@ class TestCustomDomainResolverPerformance:
     5ms target when the cache is populated.
     """
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_custom_domain_cache_hit_under_5ms(self, mock_cache):
         """Custom domain cache hit resolves in under 5ms average."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -126,6 +126,7 @@ class TestCustomDomainResolverPerformance:
 
         assert elapsed_ms < PERFORMANCE_TARGET_MS
 
+    @override_settings(ALLOWED_HOSTS=["*"])
     def test_platform_domain_skip_under_5ms(self):
         """Platform domain skip completes in under 5ms."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver

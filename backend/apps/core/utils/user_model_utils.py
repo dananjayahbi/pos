@@ -1,7 +1,7 @@
 """
 User model utilities for LankaCommerce Cloud core infrastructure.
 
-SubPhase-04, Group-A Tasks 01-16 and Group-B Tasks 17-32 and Group-C Tasks 33-48 and Group-D Tasks 49-64.
+SubPhase-04, Group-A Tasks 01-16 and Group-B Tasks 17-32 and Group-C Tasks 33-48 and Group-D Tasks 49-64 and Group-E Tasks 65-80 and Group-F Tasks 81-96.
 
 Provides user model configuration helpers used by the
 core application for documenting Django custom User model setup.
@@ -71,6 +71,38 @@ Functions:
     get_login_endpoint_config()            -- Login endpoint config (Task 62).
     get_logout_endpoint_config()           -- Logout endpoint config (Task 63).
     get_me_endpoint_config()               -- Me endpoint config (Task 64).
+    get_password_reset_token_model_config() -- PasswordResetToken model config (Task 65).
+    get_user_foreign_key_config()          -- User ForeignKey config (Task 66).
+    get_token_field_config()               -- Token field config (Task 67).
+    get_expires_at_field_config()          -- expires_at field config (Task 68).
+    get_is_used_field_config()             -- is_used field config (Task 69).
+    get_token_generation_utility_config()  -- Token generation utility config (Task 70).
+    get_password_reset_request_serializer_config() -- PasswordResetRequestSerializer config (Task 71).
+    get_password_reset_confirm_serializer_config() -- PasswordResetConfirmSerializer config (Task 72).
+    get_password_reset_request_view_config() -- PasswordResetRequestView config (Task 73).
+    get_password_reset_confirm_view_config() -- PasswordResetConfirmView config (Task 74).
+    get_email_service_config()             -- Email service config (Task 75).
+    get_reset_email_template_config()      -- Reset email template config (Task 76).
+    get_password_reset_endpoint_config()   -- Password reset endpoint config (Task 77).
+    get_password_reset_confirm_endpoint_config() -- Password reset confirm endpoint config (Task 78).
+    get_token_expiration_check_config()    -- Token expiration check config (Task 79).
+    get_password_reset_documentation_config() -- Password reset documentation config (Task 80).
+    get_email_verification_token_model_config() -- EmailVerificationToken model config (Task 81).
+    get_verification_fields_config()       -- Verification fields config (Task 82).
+    get_verification_email_service_config() -- VerificationEmailService config (Task 83).
+    get_verification_email_template_config() -- Verification email template config (Task 84).
+    get_email_verification_view_config()   -- EmailVerificationView config (Task 85).
+    get_resend_verification_view_config()  -- ResendVerificationView config (Task 86).
+    get_verify_email_endpoint_config()     -- verify-email endpoint config (Task 87).
+    get_resend_verification_endpoint_config() -- resend-verification endpoint config (Task 88).
+    get_user_admin_class_config()          -- User admin class config (Task 89).
+    get_user_admin_registration_config()   -- User admin registration config (Task 90).
+    get_user_model_tests_config()          -- User model tests config (Task 91).
+    get_auth_endpoint_tests_config()       -- Auth endpoint tests config (Task 92).
+    get_jwt_token_tests_config()           -- JWT token tests config (Task 93).
+    get_password_reset_tests_config()      -- Password reset tests config (Task 94).
+    get_run_all_migrations_config()        -- Run all migrations config (Task 95).
+    get_authentication_documentation_config() -- Authentication documentation config (Task 96).
 
 See also:
     - apps.core.utils.__init__  -- public re-exports
@@ -2675,5 +2707,1285 @@ def get_me_endpoint_config() -> dict:
         "me endpoint config: endpoint_details=%d, route_details=%d",
         len(config["endpoint_details"]),
         len(config["route_details"]),
+    )
+    return config
+
+
+def get_password_reset_token_model_config() -> dict:
+    """Return PasswordResetToken model configuration for password reset flow.
+
+    SubPhase-04, Group-E, Task 65.
+    """
+    config: dict = {
+        "configured": True,
+        "model_details": [
+            "model PasswordResetToken stores one-time-use tokens for password resets",
+            "model is defined in the users app models.py alongside the User model",
+            "model inherits from TimeStampedModel for created_at and updated_at tracking",
+            "model uses a UUID primary key for globally unique record identification",
+            "model is registered in Django admin for operational visibility and management",
+            "model has a __str__ method returning a truncated token for safe display",
+        ],
+        "purpose_details": [
+            "purpose is to enable secure self-service password reset for users",
+            "purpose supports the forgot-password flow in the authentication system",
+            "purpose decouples token storage from the User model for clean separation",
+            "purpose allows multiple pending tokens per user for retry scenarios",
+            "purpose enforces token expiration to limit the window of vulnerability",
+            "purpose provides an auditable record of password reset requests",
+        ],
+        "structure_details": [
+            "structure includes a ForeignKey to User for ownership association",
+            "structure includes a unique token field for secure reset link lookups",
+            "structure includes an expires_at DateTimeField for time-based validity",
+            "structure includes an is_used BooleanField to prevent token reuse",
+            "structure defines Meta ordering by created_at descending for recency",
+            "structure indexes the token field for fast lookup during reset validation",
+        ],
+    }
+    logger.debug(
+        "password reset token model config: model_details=%d, purpose_details=%d",
+        len(config["model_details"]),
+        len(config["purpose_details"]),
+    )
+    return config
+
+
+def get_user_foreign_key_config() -> dict:
+    """Return User ForeignKey relationship configuration for PasswordResetToken.
+
+    SubPhase-04, Group-E, Task 66.
+    """
+    config: dict = {
+        "configured": True,
+        "relationship_details": [
+            "relationship links PasswordResetToken to the User model via ForeignKey",
+            "relationship uses settings.AUTH_USER_MODEL for swappable user reference",
+            "relationship is defined on the PasswordResetToken model as the user field",
+            "relationship enables reverse access from User via related_name attribute",
+            "relationship is required so every token must be associated with a user",
+            "relationship supports Django admin inline display for user token history",
+        ],
+        "cardinality_details": [
+            "cardinality is many-to-one allowing multiple tokens per user account",
+            "cardinality means each token belongs to exactly one user instance",
+            "cardinality supports concurrent reset requests without conflict",
+            "cardinality allows querying all tokens for a given user efficiently",
+            "cardinality is enforced at the database level via a foreign key constraint",
+            "cardinality is reflected in the Django ORM via reverse manager access",
+        ],
+        "constraint_details": [
+            "constraint uses on_delete=CASCADE to remove tokens when user is deleted",
+            "constraint ensures referential integrity between token and user records",
+            "constraint prevents orphaned tokens from remaining after user deletion",
+            "constraint is enforced at the database level for data consistency",
+            "constraint related_name is 'password_reset_tokens' for reverse lookups",
+            "constraint db_index is True by default on ForeignKey for query performance",
+        ],
+    }
+    logger.debug(
+        "user foreign key config: relationship_details=%d, cardinality_details=%d",
+        len(config["relationship_details"]),
+        len(config["cardinality_details"]),
+    )
+    return config
+
+
+def get_token_field_config() -> dict:
+    """Return token field configuration for password reset lookups.
+
+    SubPhase-04, Group-E, Task 67.
+    """
+    config: dict = {
+        "configured": True,
+        "field_details": [
+            "field is a CharField with max_length=255 for storing the reset token",
+            "field has unique=True constraint to prevent duplicate token values",
+            "field is not editable by users and is set programmatically on creation",
+            "field stores a URL-safe base64-encoded random string for reset links",
+            "field is the primary lookup field when validating a password reset request",
+            "field value is generated using secrets.token_urlsafe for cryptographic safety",
+        ],
+        "security_details": [
+            "security relies on cryptographically secure random token generation",
+            "security uses sufficient token length to resist brute-force attacks",
+            "security ensures tokens are single-use via the is_used flag on the model",
+            "security tokens are time-limited by the expires_at timestamp field",
+            "security avoids exposing token values in logs or admin list displays",
+            "security follows OWASP guidelines for password reset token handling",
+        ],
+        "indexing_details": [
+            "indexing is automatic due to the unique=True constraint on the field",
+            "indexing enables O(1) lookup speed when resolving reset links by token",
+            "indexing supports high-throughput password reset flows under load",
+            "indexing is maintained by the database backend transparently",
+            "indexing ensures the token validation query uses an index scan",
+            "indexing is compatible with PostgreSQL and SQLite database backends",
+        ],
+    }
+    logger.debug(
+        "token field config: field_details=%d, security_details=%d",
+        len(config["field_details"]),
+        len(config["security_details"]),
+    )
+    return config
+
+
+def get_expires_at_field_config() -> dict:
+    """Return expires_at field configuration for token expiration policy.
+
+    SubPhase-04, Group-E, Task 68.
+    """
+    config: dict = {
+        "configured": True,
+        "field_details": [
+            "field is a DateTimeField storing the token expiration timestamp",
+            "field is set automatically at token creation time using timezone.now",
+            "field value defaults to 24 hours after token creation for standard policy",
+            "field is compared against current time to determine token validity",
+            "field is stored in UTC to avoid timezone-related expiration errors",
+            "field is not editable by end users and is managed internally",
+        ],
+        "policy_details": [
+            "policy sets a 24-hour default expiration window for password reset tokens",
+            "policy duration is configurable via Django settings for flexibility",
+            "policy ensures expired tokens cannot be used to reset a password",
+            "policy follows security best practices for time-limited credentials",
+            "policy balances user convenience with security risk mitigation",
+            "policy is enforced at the application layer during token validation",
+        ],
+        "validation_details": [
+            "validation checks expires_at against timezone.now() before accepting token",
+            "validation rejects tokens where expires_at is in the past as expired",
+            "validation is performed in the password reset confirmation view or service",
+            "validation returns a clear error message when a token has expired",
+            "validation is combined with is_used check for comprehensive token verification",
+            "validation prevents replay attacks using previously valid but expired tokens",
+        ],
+    }
+    logger.debug(
+        "expires_at field config: field_details=%d, policy_details=%d",
+        len(config["field_details"]),
+        len(config["policy_details"]),
+    )
+    return config
+
+
+def get_is_used_field_config() -> dict:
+    """Return is_used field configuration for token consumption tracking.
+
+    SubPhase-04, Group-E, Task 69.
+    """
+    config: dict = {
+        "configured": True,
+        "field_details": [
+            "field is a BooleanField with default=False indicating unused state",
+            "field is set to True when the token is successfully consumed for reset",
+            "field prevents a token from being used more than once for security",
+            "field is stored as a boolean column in the database for efficient filtering",
+            "field is updated atomically during the password reset transaction",
+            "field name follows Django convention for boolean flag fields",
+        ],
+        "behavior_details": [
+            "behavior flips is_used from False to True upon successful password reset",
+            "behavior is irreversible once set to prevent token reactivation",
+            "behavior is checked before expiration to short-circuit invalid attempts",
+            "behavior ensures idempotency if the reset endpoint is called multiple times",
+            "behavior triggers within the same database transaction as password update",
+            "behavior is logged for audit trail purposes in the security log",
+        ],
+        "tracking_details": [
+            "tracking records which tokens have been consumed for audit purposes",
+            "tracking allows administrators to review reset activity per user",
+            "tracking supports analytics on password reset completion rates",
+            "tracking enables detection of suspicious reset token usage patterns",
+            "tracking is queryable via Django ORM filters for reporting",
+            "tracking preserves token records rather than deleting for history retention",
+        ],
+    }
+    logger.debug(
+        "is_used field config: field_details=%d, behavior_details=%d",
+        len(config["field_details"]),
+        len(config["behavior_details"]),
+    )
+    return config
+
+
+def get_token_generation_utility_config() -> dict:
+    """Return token generation utility configuration for secure reset tokens.
+
+    SubPhase-04, Group-E, Task 70.
+    """
+    config: dict = {
+        "configured": True,
+        "utility_details": [
+            "utility function generates a secure random token for password reset links",
+            "utility is defined as a standalone helper for reuse across the application",
+            "utility returns a URL-safe string suitable for embedding in reset URLs",
+            "utility accepts an optional length parameter with a sensible default value",
+            "utility is called during PasswordResetToken creation in the service layer",
+            "utility is importable from the users app utils module for access",
+        ],
+        "security_details": [
+            "security uses Python secrets module for cryptographically strong randomness",
+            "security generates tokens with at least 32 bytes of entropy by default",
+            "security output is URL-safe base64 encoded to avoid special characters",
+            "security avoids predictable patterns by relying on OS-level randomness",
+            "security is compliant with OWASP token generation recommendations",
+            "security does not log or cache generated token values for safety",
+        ],
+        "usage_details": [
+            "usage is invoked when a user requests a password reset via the API",
+            "usage produces a token that is stored in the PasswordResetToken model",
+            "usage token is included in the reset email link sent to the user",
+            "usage supports customization of token length for different security tiers",
+            "usage is tested with unit tests verifying uniqueness and format",
+            "usage is documented in the API specification for developer reference",
+        ],
+    }
+    logger.debug(
+        "token generation utility config: utility_details=%d, security_details=%d",
+        len(config["utility_details"]),
+        len(config["security_details"]),
+    )
+    return config
+
+
+def get_password_reset_request_serializer_config() -> dict:
+    """Return PasswordResetRequestSerializer configuration for password reset requests.
+
+    SubPhase-04, Group-E, Task 71.
+    """
+    config: dict = {
+        "configured": True,
+        "serializer_details": [
+            "serializer accepts an email field as the sole input for reset requests",
+            "serializer is defined in the auth serializers module alongside other auth serializers",
+            "serializer inherits from rest_framework.serializers.Serializer base class",
+            "serializer returns a success message regardless of whether the email exists",
+            "serializer is used by PasswordResetRequestView to validate incoming data",
+            "serializer is documented in the API specification for developer reference",
+        ],
+        "validation_details": [
+            "validation ensures the email field is required and non-empty",
+            "validation checks that the email conforms to a valid email format",
+            "validation normalizes the email to lowercase before processing",
+            "validation does not reveal whether the email exists in the system",
+            "validation strips leading and trailing whitespace from the email input",
+            "validation raises a DRF ValidationError for malformed email addresses",
+        ],
+        "security_details": [
+            "security prevents user enumeration by returning identical responses for all emails",
+            "security rate-limits reset requests to prevent abuse of the endpoint",
+            "security logs reset request attempts for monitoring and audit trails",
+            "security does not include sensitive data in serializer error messages",
+            "security applies throttling at the view level to limit brute-force attempts",
+            "security ensures email lookup is case-insensitive to avoid bypass issues",
+        ],
+    }
+    logger.debug(
+        "password reset request serializer config: serializer_details=%d, validation_details=%d",
+        len(config["serializer_details"]),
+        len(config["validation_details"]),
+    )
+    return config
+
+
+def get_password_reset_confirm_serializer_config() -> dict:
+    """Return PasswordResetConfirmSerializer configuration for confirming password resets.
+
+    SubPhase-04, Group-E, Task 72.
+    """
+    config: dict = {
+        "configured": True,
+        "serializer_details": [
+            "serializer accepts token, uid, and new_password fields for reset confirmation",
+            "serializer is defined in the auth serializers module for password reset flow",
+            "serializer inherits from rest_framework.serializers.Serializer base class",
+            "serializer validates the token and uid pair before allowing password change",
+            "serializer is used by PasswordResetConfirmView to process reset submissions",
+            "serializer is documented with field descriptions in the API schema",
+        ],
+        "validation_details": [
+            "validation ensures the new_password meets configured password policy rules",
+            "validation checks that the token has not expired based on its expiry timestamp",
+            "validation verifies the token has not already been used for a prior reset",
+            "validation confirms the uid corresponds to a valid user in the database",
+            "validation runs Django password validators against the new password value",
+            "validation raises clear error messages for each type of validation failure",
+        ],
+        "field_details": [
+            "field token is a CharField that carries the secure reset token string",
+            "field uid is a CharField that identifies the target user for the reset",
+            "field new_password is a CharField with write_only set to True for security",
+            "field new_password enforces a minimum length aligned with password policy",
+            "field token is matched against the PasswordResetToken model for verification",
+            "field uid is decoded and used to retrieve the user object from the database",
+        ],
+    }
+    logger.debug(
+        "password reset confirm serializer config: serializer_details=%d, validation_details=%d",
+        len(config["serializer_details"]),
+        len(config["validation_details"]),
+    )
+    return config
+
+
+def get_password_reset_request_view_config() -> dict:
+    """Return PasswordResetRequestView configuration for initiating password resets.
+
+    SubPhase-04, Group-E, Task 73.
+    """
+    config: dict = {
+        "configured": True,
+        "view_details": [
+            "view is a DRF APIView that handles POST requests for password reset initiation",
+            "view uses AllowAny permission class so unauthenticated users can request resets",
+            "view delegates input validation to PasswordResetRequestSerializer",
+            "view invokes the email service to send the reset link upon valid requests",
+            "view is registered at the password-reset-request URL endpoint in auth URLs",
+            "view is documented in the API specification with request and response schemas",
+        ],
+        "response_details": [
+            "response returns HTTP 200 with a generic success message for all valid requests",
+            "response does not disclose whether the provided email exists in the system",
+            "response includes a JSON body with a message field confirming request receipt",
+            "response content type is application/json as per DRF default renderer",
+            "response is identical for existing and non-existing emails to prevent enumeration",
+            "response is tested with integration tests covering both success and failure cases",
+        ],
+        "flow_details": [
+            "flow begins when a user submits their email to the reset request endpoint",
+            "flow validates the email format using the PasswordResetRequestSerializer",
+            "flow looks up the user by email and creates a PasswordResetToken if found",
+            "flow generates a secure token using the token generation utility function",
+            "flow sends a reset email containing a link with the token and user identifier",
+            "flow completes by returning a success response regardless of email existence",
+        ],
+    }
+    logger.debug(
+        "password reset request view config: view_details=%d, response_details=%d",
+        len(config["view_details"]),
+        len(config["response_details"]),
+    )
+    return config
+
+
+def get_password_reset_confirm_view_config() -> dict:
+    """Return PasswordResetConfirmView configuration for completing password resets.
+
+    SubPhase-04, Group-E, Task 74.
+    """
+    config: dict = {
+        "configured": True,
+        "view_details": [
+            "view is a DRF APIView that handles POST requests for password reset confirmation",
+            "view uses AllowAny permission class so users with valid tokens can reset passwords",
+            "view delegates validation to PasswordResetConfirmSerializer for data integrity",
+            "view updates the user password and marks the token as used upon success",
+            "view is registered at the password-reset-confirm URL endpoint in auth URLs",
+            "view is documented in the API specification with request and response schemas",
+        ],
+        "token_details": [
+            "token is validated against the PasswordResetToken model for existence and ownership",
+            "token must not have been previously used as indicated by the is_used flag",
+            "token must not have exceeded its expiry time stored in the expires_at field",
+            "token is marked as used immediately after a successful password change",
+            "token validation failure returns a clear error message to the client",
+            "token is a one-time-use credential that cannot be reused for subsequent resets",
+        ],
+        "response_details": [
+            "response returns HTTP 200 with a success message when the password is changed",
+            "response returns HTTP 400 with error details for invalid or expired tokens",
+            "response includes a JSON body with a message field describing the outcome",
+            "response content type is application/json as per DRF default renderer",
+            "response is tested with integration tests covering valid and invalid token scenarios",
+            "response does not include the new password or token in the success payload",
+        ],
+    }
+    logger.debug(
+        "password reset confirm view config: view_details=%d, token_details=%d",
+        len(config["view_details"]),
+        len(config["token_details"]),
+    )
+    return config
+
+
+def get_email_service_config() -> dict:
+    """Return email service configuration for password reset email delivery.
+
+    SubPhase-04, Group-E, Task 75.
+    """
+    config: dict = {
+        "configured": True,
+        "service_details": [
+            "service is a standalone module responsible for composing and sending reset emails",
+            "service accepts a user object and a reset token to generate the email content",
+            "service constructs the reset link URL using the frontend base URL and token",
+            "service delegates actual email sending to Django send_mail or configured backend",
+            "service is importable from the users app services module for use by views",
+            "service is designed for extensibility to support other transactional email types",
+        ],
+        "configuration_details": [
+            "configuration uses Django EMAIL_BACKEND setting to determine the mail transport",
+            "configuration reads the sender address from DEFAULT_FROM_EMAIL in settings",
+            "configuration supports environment-based overrides for SMTP host and credentials",
+            "configuration allows customization of the reset link base URL via settings",
+            "configuration defaults to console email backend in development for easy testing",
+            "configuration is documented in the environment variables guide for deployment",
+        ],
+        "delivery_details": [
+            "delivery sends the email asynchronously when Celery is available for performance",
+            "delivery falls back to synchronous sending if no task queue is configured",
+            "delivery logs the email send attempt with recipient and timestamp for auditing",
+            "delivery handles SMTP errors gracefully and logs failures without crashing",
+            "delivery supports HTML and plain-text multipart emails for broad compatibility",
+            "delivery is tested with Django mail outbox in unit tests to verify content",
+        ],
+    }
+    logger.debug(
+        "email service config: service_details=%d, configuration_details=%d",
+        len(config["service_details"]),
+        len(config["configuration_details"]),
+    )
+    return config
+
+
+def get_reset_email_template_config() -> dict:
+    """Return reset email template configuration for password reset emails.
+
+    SubPhase-04, Group-E, Task 76.
+    """
+    config: dict = {
+        "configured": True,
+        "template_details": [
+            "template is a Django template file used to render the password reset email body",
+            "template is located in the templates/emails directory of the users app",
+            "template receives context variables including user name and reset link URL",
+            "template supports both HTML and plain-text versions for email client compatibility",
+            "template is rendered by the email service before sending to the recipient",
+            "template follows Django template language syntax with standard block structure",
+        ],
+        "content_details": [
+            "content includes a greeting addressing the user by their first name",
+            "content provides a clear call-to-action button or link for the password reset",
+            "content states the expiry duration of the reset link for user awareness",
+            "content advises the user to ignore the email if they did not request a reset",
+            "content includes the application name and support contact for brand consistency",
+            "content avoids including sensitive information such as the current password",
+        ],
+        "tone_details": [
+            "tone is professional and reassuring to reduce user anxiety about account security",
+            "tone uses clear and concise language to guide the user through the reset process",
+            "tone avoids technical jargon to ensure accessibility for all user skill levels",
+            "tone maintains brand voice consistency with other transactional emails",
+            "tone includes a polite closing with the team or company signature",
+            "tone is reviewed for localization readiness to support multiple languages",
+        ],
+    }
+    logger.debug(
+        "reset email template config: template_details=%d, content_details=%d",
+        len(config["template_details"]),
+        len(config["content_details"]),
+    )
+    return config
+
+
+def get_password_reset_endpoint_config() -> dict:
+    """Return password reset endpoint configuration for the password-reset/ route.
+
+    SubPhase-04, Group-E, Task 77.
+    """
+    config: dict = {
+        "configured": True,
+        "endpoint_details": [
+            "endpoint is mapped to the password-reset/ URL path under the auth namespace",
+            "endpoint accepts POST requests containing the user email address for reset",
+            "endpoint returns a success response regardless of whether the email exists",
+            "endpoint triggers an asynchronous email delivery task upon valid submission",
+            "endpoint is publicly accessible and does not require authentication headers",
+            "endpoint is rate-limited to prevent abuse and brute-force enumeration attacks",
+        ],
+        "route_details": [
+            "route is registered in the users app URL configuration module",
+            "route uses a descriptive URL name for reverse resolution in templates and code",
+            "route is included under the api/v1/auth/ prefix via the root URL configuration",
+            "route maps to the PasswordResetRequestView class-based API view",
+            "route does not include any path parameters or captured URL segments",
+            "route is documented in the OpenAPI schema with request and response examples",
+        ],
+        "request_details": [
+            "request body must include an email field validated as a proper email format",
+            "request content type is application/json as enforced by the API parser",
+            "request is validated by the PasswordResetRequestSerializer before processing",
+            "request does not require a CSRF token because it uses token-based API auth",
+            "request payload must not exceed the configured maximum request body size",
+            "request is logged with a correlation identifier for audit and debugging purposes",
+        ],
+    }
+    logger.debug(
+        "password reset endpoint config: endpoint_details=%d, route_details=%d",
+        len(config["endpoint_details"]),
+        len(config["route_details"]),
+    )
+    return config
+
+
+def get_password_reset_confirm_endpoint_config() -> dict:
+    """Return password reset confirm endpoint configuration for the password-reset/confirm/ route.
+
+    SubPhase-04, Group-E, Task 78.
+    """
+    config: dict = {
+        "configured": True,
+        "endpoint_details": [
+            "endpoint is mapped to the password-reset/confirm/ URL path under the auth namespace",
+            "endpoint accepts POST requests containing the reset token and new password",
+            "endpoint validates the token authenticity and expiration before processing",
+            "endpoint updates the user password and marks the reset token as used on success",
+            "endpoint returns an appropriate error response when the token is invalid or expired",
+            "endpoint is publicly accessible and does not require authentication headers",
+        ],
+        "route_details": [
+            "route is registered in the users app URL configuration alongside the reset request route",
+            "route uses a descriptive URL name for reverse resolution in templates and code",
+            "route is included under the api/v1/auth/ prefix via the root URL configuration",
+            "route maps to the PasswordResetConfirmView class-based API view",
+            "route does not include path parameters as the token is submitted in the request body",
+            "route is documented in the OpenAPI schema with request and response examples",
+        ],
+        "validation_details": [
+            "validation checks that the submitted token matches an existing unused reset token",
+            "validation ensures the token has not exceeded its configured expiration duration",
+            "validation requires the new password to pass all configured password validators",
+            "validation confirms the new password and confirmation password fields match exactly",
+            "validation rejects tokens that have already been used to prevent replay attacks",
+            "validation returns detailed error messages indicating the specific validation failure",
+        ],
+    }
+    logger.debug(
+        "password reset confirm endpoint config: endpoint_details=%d, route_details=%d",
+        len(config["endpoint_details"]),
+        len(config["route_details"]),
+    )
+    return config
+
+
+def get_token_expiration_check_config() -> dict:
+    """Return token expiration check configuration for password reset token validation.
+
+    SubPhase-04, Group-E, Task 79.
+    """
+    config: dict = {
+        "configured": True,
+        "validation_details": [
+            "validation compares the token creation timestamp against the current server time",
+            "validation uses the configured TOKEN_EXPIRATION_HOURS setting for the time window",
+            "validation is performed before any password update logic is executed",
+            "validation accounts for server timezone settings to ensure consistent calculations",
+            "validation treats tokens without a creation timestamp as expired by default",
+            "validation is implemented as a reusable utility method on the token model",
+        ],
+        "error_details": [
+            "error response uses HTTP 400 Bad Request status for expired token submissions",
+            "error message clearly states that the password reset token has expired",
+            "error payload includes an error code for programmatic handling by the client",
+            "error is logged at warning level with the token identifier for monitoring",
+            "error response does not reveal the exact expiration time for security reasons",
+            "error handling is consistent with other validation error responses in the API",
+        ],
+        "enforcement_details": [
+            "enforcement is applied in the PasswordResetConfirmView before password update",
+            "enforcement prevents reuse of tokens that have passed the expiration window",
+            "enforcement is tested with time-mocking utilities to verify boundary conditions",
+            "enforcement works in conjunction with the is_used flag for complete token invalidation",
+            "enforcement interval is configurable via environment variable or Django settings",
+            "enforcement is documented in the API reference with example error responses",
+        ],
+    }
+    logger.debug(
+        "token expiration check config: validation_details=%d, error_details=%d",
+        len(config["validation_details"]),
+        len(config["error_details"]),
+    )
+    return config
+
+
+def get_password_reset_documentation_config() -> dict:
+    """Return password reset documentation configuration for the full reset flow.
+
+    SubPhase-04, Group-E, Task 80.
+    """
+    config: dict = {
+        "configured": True,
+        "flow_details": [
+            "flow begins when the user submits their email to the password-reset/ endpoint",
+            "flow generates a unique token and stores it with an expiration timestamp",
+            "flow sends an email containing a link with the token to the user address",
+            "flow continues when the user submits the token and new password to confirm endpoint",
+            "flow validates the token and updates the password upon successful verification",
+            "flow concludes by marking the token as used and returning a success response",
+        ],
+        "security_details": [
+            "security ensures tokens are cryptographically random and sufficiently long",
+            "security enforces token expiration to limit the window of vulnerability",
+            "security marks tokens as used immediately to prevent replay attacks",
+            "security rate-limits the request endpoint to prevent email enumeration",
+            "security does not reveal whether an email address exists in the system",
+            "security logs all password reset attempts for audit trail and monitoring",
+        ],
+        "documentation_details": [
+            "documentation describes each step of the password reset flow with examples",
+            "documentation includes request and response schemas for both endpoints",
+            "documentation lists all possible error codes and their meanings for clients",
+            "documentation provides sequence diagrams illustrating the complete flow",
+            "documentation covers configuration options such as token lifetime settings",
+            "documentation is maintained alongside the codebase in the docs/users directory",
+        ],
+    }
+    logger.debug(
+        "password reset documentation config: flow_details=%d, security_details=%d",
+        len(config["flow_details"]),
+        len(config["security_details"]),
+    )
+    return config
+
+
+def get_email_verification_token_model_config() -> dict:
+    """Return EmailVerificationToken model configuration for email verification.
+
+    SubPhase-04, Group-F, Task 81.
+    """
+    config: dict = {
+        "configured": True,
+        "model_details": [
+            "model is named EmailVerificationToken and resides in the users app models",
+            "model stores a one-to-one mapping between a user and their verification token",
+            "model inherits from the TimeStampedModel base to track creation and update times",
+            "model uses a UUID primary key for consistent identification across services",
+            "model is registered in the Django admin for manual token inspection if needed",
+            "model is documented in the users app data model reference in the project docs",
+        ],
+        "purpose_details": [
+            "purpose is to verify that a newly registered user owns the provided email address",
+            "purpose includes preventing spam accounts by requiring email confirmation",
+            "purpose extends to enabling re-verification when a user changes their email",
+            "purpose supports security by ensuring only verified users can access protected features",
+            "purpose aligns with industry best practices for user onboarding and account security",
+            "purpose is documented in the authentication flow design document for the platform",
+        ],
+        "structure_details": [
+            "structure includes a ForeignKey to the User model with CASCADE on delete",
+            "structure contains a unique token field generated via a secure random utility",
+            "structure has an expires_at datetime field to enforce token time-to-live limits",
+            "structure includes an is_used boolean field defaulting to False for single-use enforcement",
+            "structure defines a Meta class with ordering by creation date descending",
+            "structure provides a __str__ method returning a summary of the token and user email",
+        ],
+    }
+    logger.debug(
+        "email verification token model config: model_details=%d, purpose_details=%d",
+        len(config["model_details"]),
+        len(config["purpose_details"]),
+    )
+    return config
+
+
+def get_verification_fields_config() -> dict:
+    """Return verification fields configuration for the EmailVerificationToken model.
+
+    SubPhase-04, Group-F, Task 82.
+    """
+    config: dict = {
+        "configured": True,
+        "field_details": [
+            "field user is a ForeignKey linking the token to the User who requested verification",
+            "field token is a CharField with max_length 255 storing the secure random string",
+            "field expires_at is a DateTimeField recording when the token becomes invalid",
+            "field is_used is a BooleanField tracking whether the token has already been consumed",
+            "field created_at is inherited from TimeStampedModel for automatic timestamp tracking",
+            "field updated_at is inherited from TimeStampedModel for modification tracking",
+        ],
+        "default_details": [
+            "default for is_used is False so that newly created tokens are immediately usable",
+            "default for expires_at is computed as current time plus the configured token lifetime",
+            "default for token is generated at creation time by the token generation utility",
+            "default for created_at is auto_now_add as inherited from the TimeStampedModel base",
+            "default for updated_at is auto_now as inherited from the TimeStampedModel base",
+            "default values are documented in the model field reference for developer clarity",
+        ],
+        "constraint_details": [
+            "constraint ensures the token field is unique across all rows to prevent collisions",
+            "constraint enforces that expires_at must be a future datetime at creation time",
+            "constraint validates that the associated user has not already been verified when creating",
+            "constraint applies a database index on the token field for fast lookup during verification",
+            "constraint limits one active token per user by invalidating previous tokens on creation",
+            "constraint details are captured in the model's Meta class and field validators",
+        ],
+    }
+    logger.debug(
+        "verification fields config: field_details=%d, default_details=%d",
+        len(config["field_details"]),
+        len(config["default_details"]),
+    )
+    return config
+
+
+def get_verification_email_service_config() -> dict:
+    """Return VerificationEmailService configuration for sending verification emails.
+
+    SubPhase-04, Group-F, Task 83.
+    """
+    config: dict = {
+        "configured": True,
+        "service_details": [
+            "service is implemented as a class named VerificationEmailService in the users app",
+            "service accepts a user instance and a verification token as constructor arguments",
+            "service constructs the verification URL using the frontend base URL and the token",
+            "service delegates actual email sending to Django's built-in send_mail utility",
+            "service handles exceptions during sending and logs errors for monitoring purposes",
+            "service is designed as a standalone component for easy testing and mocking",
+        ],
+        "configuration_details": [
+            "configuration reads the frontend base URL from the FRONTEND_URL Django setting",
+            "configuration reads the email sender address from the DEFAULT_FROM_EMAIL setting",
+            "configuration supports an optional subject line override via a class attribute",
+            "configuration allows toggling HTML email content via a use_html_email flag",
+            "configuration is environment-aware and uses different URLs for dev and production",
+            "configuration is documented in the environment variables reference for operators",
+        ],
+        "delivery_details": [
+            "delivery sends the verification email to the user's registered email address",
+            "delivery includes both plain-text and HTML versions for maximum client compatibility",
+            "delivery sets the email subject to a configurable verification prompt message",
+            "delivery logs the sending attempt and result at info level for audit purposes",
+            "delivery retries on transient SMTP failures up to a configurable maximum count",
+            "delivery is tested with Django's mail outbox in unit tests for reliable assertions",
+        ],
+    }
+    logger.debug(
+        "verification email service config: service_details=%d, configuration_details=%d",
+        len(config["service_details"]),
+        len(config["configuration_details"]),
+    )
+    return config
+
+
+def get_verification_email_template_config() -> dict:
+    """Return verification email template configuration for the verification message.
+
+    SubPhase-04, Group-F, Task 84.
+    """
+    config: dict = {
+        "configured": True,
+        "template_details": [
+            "template is stored in the templates/emails/verification.html file path",
+            "template extends a base email layout template for consistent branding",
+            "template receives the user's first name and the verification link as context",
+            "template includes a plain-text alternative in templates/emails/verification.txt",
+            "template uses Django template language for variable substitution and logic",
+            "template is version-controlled alongside the codebase for change tracking",
+        ],
+        "content_details": [
+            "content greets the user by first name to create a personalized experience",
+            "content includes a clear call-to-action button linking to the verification URL",
+            "content explains that the link expires after the configured token lifetime",
+            "content provides a fallback plain-text URL for email clients that block HTML",
+            "content includes the company name and support contact in the email footer",
+            "content is reviewed for accessibility and readability across email clients",
+        ],
+        "tone_details": [
+            "tone is welcoming and professional to make a positive first impression",
+            "tone avoids technical jargon so that non-technical users can understand the steps",
+            "tone uses active voice and concise sentences for clarity and quick scanning",
+            "tone matches the overall brand voice guidelines documented in the style guide",
+            "tone includes a brief thank-you message to appreciate the user's registration",
+            "tone is consistent with other transactional emails sent by the platform",
+        ],
+    }
+    logger.debug(
+        "verification email template config: template_details=%d, content_details=%d",
+        len(config["template_details"]),
+        len(config["content_details"]),
+    )
+    return config
+
+
+def get_email_verification_view_config() -> dict:
+    """Return EmailVerificationView configuration for handling verification requests.
+
+    SubPhase-04, Group-F, Task 85.
+    """
+    config: dict = {
+        "configured": True,
+        "view_details": [
+            "view is a class-based API view named EmailVerificationView in the auth views module",
+            "view accepts GET requests with the verification token as a URL path parameter",
+            "view does not require authentication since unverified users are not yet logged in",
+            "view uses AllowAny permission class to ensure public accessibility of the endpoint",
+            "view is registered in the auth URL configuration under the verify-email path",
+            "view is documented in the API reference with request and response examples",
+        ],
+        "outcome_details": [
+            "outcome on success sets the user's is_verified field to True and saves the user",
+            "outcome on success marks the verification token as used to prevent reuse",
+            "outcome on success returns HTTP 200 with a confirmation message in the response body",
+            "outcome on failure returns HTTP 400 with an error describing the invalid token",
+            "outcome on expired token returns HTTP 400 advising the user to request a new link",
+            "outcome is logged at info level for both success and failure scenarios",
+        ],
+        "validation_details": [
+            "validation checks that the token exists in the database before proceeding",
+            "validation ensures the token has not already been used for a previous verification",
+            "validation confirms the token has not expired based on the expires_at timestamp",
+            "validation verifies the associated user account is still active and not deleted",
+            "validation returns specific error codes for each failure reason for client handling",
+            "validation logic is encapsulated in a service method for reusability in other flows",
+        ],
+    }
+    logger.debug(
+        "email verification view config: view_details=%d, outcome_details=%d",
+        len(config["view_details"]),
+        len(config["outcome_details"]),
+    )
+    return config
+
+
+def get_resend_verification_view_config() -> dict:
+    """Return ResendVerificationView configuration for resending verification emails.
+
+    SubPhase-04, Group-F, Task 86.
+    """
+    config: dict = {
+        "configured": True,
+        "view_details": [
+            "view is a class-based API view named ResendVerificationView in the auth views module",
+            "view accepts POST requests with the user's email address in the request body",
+            "view uses AllowAny permission class so unauthenticated users can request resending",
+            "view is registered in the auth URL configuration under the resend-verification path",
+            "view returns a generic success message regardless of whether the email exists",
+            "view is documented in the API reference with example payloads and responses",
+        ],
+        "guardrail_details": [
+            "guardrail rate-limits resend requests to prevent abuse and email flooding",
+            "guardrail checks that the user associated with the email is not already verified",
+            "guardrail invalidates any existing unused tokens before generating a new one",
+            "guardrail enforces a cooldown period between consecutive resend requests",
+            "guardrail logs excessive resend attempts at warning level for security monitoring",
+            "guardrail details are documented in the security section of the API reference",
+        ],
+        "flow_details": [
+            "flow begins when the user submits their email to the resend-verification endpoint",
+            "flow looks up the user by email and verifies they exist and are not already verified",
+            "flow generates a new verification token and stores it with a fresh expiration time",
+            "flow calls the VerificationEmailService to send a new verification email to the user",
+            "flow returns HTTP 200 with a generic message to avoid leaking user existence info",
+            "flow is tested end-to-end with Django's test client and mail outbox assertions",
+        ],
+    }
+    logger.debug(
+        "resend verification view config: view_details=%d, guardrail_details=%d",
+        len(config["view_details"]),
+        len(config["guardrail_details"]),
+    )
+    return config
+
+
+def get_verify_email_endpoint_config() -> dict:
+    """Return verify-email endpoint configuration for the URL routing setup.
+
+    SubPhase-04, Group-F, Task 87.
+    """
+    config: dict = {
+        "configured": True,
+        "endpoint_details": [
+            "endpoint is exposed at the path auth/verify-email/<token>/ in the URL configuration",
+            "endpoint maps to the EmailVerificationView class-based view for request handling",
+            "endpoint uses a URL path converter to capture the token parameter from the URL",
+            "endpoint is named verify-email for reverse URL resolution in templates and services",
+            "endpoint is included in the auth URL namespace for consistent API organization",
+            "endpoint is listed in the OpenAPI schema generated by drf-spectacular for docs",
+        ],
+        "route_details": [
+            "route is defined in the users app auth URL configuration module",
+            "route uses Django's path() function with a string converter for the token segment",
+            "route is prefixed by the auth/ namespace when included in the project root URLs",
+            "route does not conflict with other auth endpoints due to unique path specificity",
+            "route supports trailing slash behavior as configured in the DRF settings module",
+            "route is tested with Django's resolve() utility to verify correct view mapping",
+        ],
+        "access_details": [
+            "access is open to all users including unauthenticated visitors via AllowAny",
+            "access does not require any specific role or group membership to use the endpoint",
+            "access is rate-limited at the view level to prevent brute-force token guessing",
+            "access logs each verification attempt with the client IP for security auditing",
+            "access is available in both development and production environments by default",
+            "access control details are documented in the endpoint's OpenAPI operation metadata",
+        ],
+    }
+    logger.debug(
+        "verify email endpoint config: endpoint_details=%d, route_details=%d",
+        len(config["endpoint_details"]),
+        len(config["route_details"]),
+    )
+    return config
+
+
+def get_resend_verification_endpoint_config() -> dict:
+    """Return resend-verification endpoint configuration for the URL routing setup.
+
+    SubPhase-04, Group-F, Task 88.
+    """
+    config: dict = {
+        "configured": True,
+        "endpoint_details": [
+            "endpoint is exposed at the path auth/resend-verification/ in the URL configuration",
+            "endpoint maps to the ResendVerificationView class-based view for request handling",
+            "endpoint accepts POST requests with a JSON body containing the user email address",
+            "endpoint is named resend-verification for reverse URL resolution throughout the app",
+            "endpoint is included in the auth URL namespace alongside other authentication routes",
+            "endpoint is listed in the OpenAPI schema with full request and response documentation",
+        ],
+        "route_details": [
+            "route is defined in the users app auth URL configuration module alongside verify-email",
+            "route uses Django's path() function without additional path converters for simplicity",
+            "route is prefixed by the auth/ namespace when included in the project root URL config",
+            "route does not conflict with the verify-email route due to distinct path segments",
+            "route supports trailing slash behavior consistent with other API endpoints",
+            "route is tested with Django's resolve() utility to confirm correct view resolution",
+        ],
+        "access_details": [
+            "access is open to all users via AllowAny since the requester may not be logged in",
+            "access does not require authentication tokens or session cookies to invoke",
+            "access is rate-limited more strictly than verify-email to prevent email flooding",
+            "access logs each resend request with the client IP address for abuse detection",
+            "access is available in all deployment environments including staging and production",
+            "access control is documented in the endpoint's security section of the API reference",
+        ],
+    }
+    logger.debug(
+        "resend verification endpoint config: endpoint_details=%d, route_details=%d",
+        len(config["endpoint_details"]),
+        len(config["route_details"]),
+    )
+    return config
+
+
+def get_user_admin_class_config() -> dict:
+    """Return User admin class configuration for the Django admin interface.
+
+    SubPhase-04, Group-F, Task 89.
+    """
+    config: dict = {
+        "configured": True,
+        "admin_details": [
+            "admin class is named UserAdmin and extends Django's BaseUserAdmin for customization",
+            "admin class is registered with the User model using the @admin.register decorator",
+            "admin class is defined in the users app admin.py module alongside other admin classes",
+            "admin class overrides the default UserAdmin to support email-based authentication",
+            "admin class includes custom fieldsets for organizing user fields in the edit form",
+            "admin class is documented with a docstring explaining its purpose and customizations",
+        ],
+        "display_details": [
+            "display includes list_display with email, first_name, last_name, and is_active fields",
+            "display includes list_filter with is_active, is_staff, and is_verified filter options",
+            "display includes search_fields with email, first_name, and last_name for quick lookup",
+            "display uses ordering by email to provide consistent alphabetical user listing",
+            "display includes date_hierarchy on date_joined for temporal navigation in the admin",
+            "display configuration is tested to ensure all specified fields render without errors",
+        ],
+        "organization_details": [
+            "organization groups fields into Personal Info, Permissions, and Important Dates sections",
+            "organization uses fieldsets tuple to define the layout of the user edit form",
+            "organization places email and password fields in the top unnamed fieldset section",
+            "organization includes is_active, is_staff, is_verified in the Permissions fieldset",
+            "organization shows date_joined and last_login as read-only in Important Dates",
+            "organization follows Django admin best practices for custom user model admin setup",
+        ],
+    }
+    logger.debug(
+        "user admin class config: admin_details=%d, display_details=%d",
+        len(config["admin_details"]),
+        len(config["display_details"]),
+    )
+    return config
+
+
+def get_user_admin_registration_config() -> dict:
+    """Return User admin registration configuration for admin site setup.
+
+    SubPhase-04, Group-F, Task 90.
+    """
+    config: dict = {
+        "configured": True,
+        "registration_details": [
+            "registration uses admin.site.register or @admin.register decorator to bind the model",
+            "registration connects the User model to the custom UserAdmin class for display",
+            "registration is performed in the users app admin.py module at module level",
+            "registration ensures the User model appears in the Django admin site navigation",
+            "registration overrides the default auth User admin entry with the custom configuration",
+            "registration is verified by checking admin.site._registry for the User model key",
+        ],
+        "accessibility_details": [
+            "accessibility ensures only superusers and staff users can access the admin interface",
+            "accessibility respects Django's built-in permission framework for add, change, delete",
+            "accessibility is enforced by the AdminSite login_required middleware by default",
+            "accessibility can be further restricted with custom permission classes on the admin",
+            "accessibility logs admin access attempts for security auditing and compliance",
+            "accessibility configuration is documented in the project's admin usage guide",
+        ],
+        "interface_details": [
+            "interface provides add and change forms customized for the email-based user model",
+            "interface includes inline editing for related UserProfile instances when applicable",
+            "interface supports bulk actions such as activate, deactivate, and verify selected users",
+            "interface uses Django's built-in pagination for listing large numbers of user records",
+            "interface renders responsive admin templates compatible with modern browsers",
+            "interface configuration is tested to ensure forms render and submit without errors",
+        ],
+    }
+    logger.debug(
+        "user admin registration config: registration_details=%d, accessibility_details=%d",
+        len(config["registration_details"]),
+        len(config["accessibility_details"]),
+    )
+    return config
+
+
+def get_user_model_tests_config() -> dict:
+    """Return User model tests configuration for test coverage documentation.
+
+    SubPhase-04, Group-F, Task 91.
+    """
+    config: dict = {
+        "configured": True,
+        "test_details": [
+            "test suite covers the custom User model creation with valid email and password",
+            "test suite verifies that creating a user without email raises a ValueError",
+            "test suite confirms superuser creation sets is_staff and is_superuser to True",
+            "test suite validates that email normalization lowercases the domain portion",
+            "test suite checks that the string representation returns the user's email address",
+            "test suite is organized in the tests/core/ directory following project conventions",
+        ],
+        "assertion_details": [
+            "assertion checks that newly created users have is_active set to True by default",
+            "assertion verifies that is_verified defaults to False for newly registered users",
+            "assertion confirms that the USERNAME_FIELD is set to email on the User model",
+            "assertion validates that REQUIRED_FIELDS contains first_name and last_name entries",
+            "assertion ensures the UserManager is correctly assigned as the objects manager",
+            "assertion uses pytest assertion introspection for clear failure messages",
+        ],
+        "coverage_details": [
+            "coverage targets all fields defined on the custom User model including optional ones",
+            "coverage includes both positive and negative test cases for each model method",
+            "coverage verifies signal-based profile creation on user post_save events",
+            "coverage tests manager methods create_user and create_superuser independently",
+            "coverage ensures migration files are consistent with the current model definitions",
+            "coverage reports are generated using pytest-cov and tracked in CI pipelines",
+        ],
+    }
+    logger.debug(
+        "user model tests config: test_details=%d, assertion_details=%d",
+        len(config["test_details"]),
+        len(config["assertion_details"]),
+    )
+    return config
+
+
+def get_auth_endpoint_tests_config() -> dict:
+    """Return Auth endpoint tests configuration for API test coverage documentation.
+
+    SubPhase-04, Group-F, Task 92.
+    """
+    config: dict = {
+        "configured": True,
+        "test_details": [
+            "test suite covers all authentication endpoints including register, login, and logout",
+            "test suite uses Django REST Framework's APIClient for sending HTTP requests",
+            "test suite creates test users in setUp methods to ensure isolated test state",
+            "test suite verifies correct HTTP status codes for both success and error responses",
+            "test suite validates response body structure and content for each endpoint",
+            "test suite is located in the tests/core/ directory alongside other core test modules",
+        ],
+        "expectation_details": [
+            "expectation for register endpoint is HTTP 201 with user data and token pair",
+            "expectation for login endpoint is HTTP 200 with access and refresh tokens",
+            "expectation for logout endpoint is HTTP 205 indicating token blacklisting success",
+            "expectation for me endpoint is HTTP 200 with the authenticated user's profile data",
+            "expectation for invalid credentials on login is HTTP 401 with error detail message",
+            "expectation for duplicate email on register is HTTP 400 with validation errors",
+        ],
+        "scenario_details": [
+            "scenario tests unauthenticated access to protected endpoints returns HTTP 401",
+            "scenario tests expired access tokens are rejected with HTTP 401 response",
+            "scenario tests refresh token rotation provides a new valid access token",
+            "scenario tests password reset flow from request through confirmation endpoint",
+            "scenario tests email verification flow from token generation to account activation",
+            "scenario tests rate limiting returns HTTP 429 when request threshold is exceeded",
+        ],
+    }
+    logger.debug(
+        "auth endpoint tests config: test_details=%d, expectation_details=%d",
+        len(config["test_details"]),
+        len(config["expectation_details"]),
+    )
+    return config
+
+
+def get_jwt_token_tests_config() -> dict:
+    """Return JWT token tests configuration for token generation and validation test coverage.
+
+    SubPhase-04, Group-F, Task 93.
+    """
+    config: dict = {
+        "configured": True,
+        "test_details": [
+            "test suite covers JWT access token generation for authenticated users",
+            "test suite verifies refresh token rotation produces new valid token pairs",
+            "test suite checks token expiration by comparing lifetime against settings",
+            "test suite validates custom claims including user_id, email, and tenant_id",
+            "test suite ensures blacklisted tokens are rejected on subsequent requests",
+            "test suite uses freezegun to simulate time-based token expiry scenarios",
+        ],
+        "assertion_details": [
+            "assertion checks the access token decode returns correct user_id claim value",
+            "assertion verifies the token type claim distinguishes access from refresh",
+            "assertion ensures expired tokens raise TokenError with appropriate message",
+            "assertion confirms refresh endpoint returns HTTP 200 with new token pair",
+            "assertion validates the signing algorithm matches SIMPLE_JWT configuration",
+            "assertion checks token payload contains all required custom claim fields",
+        ],
+        "coverage_details": [
+            "coverage includes positive path for each token endpoint returning valid JWT",
+            "coverage includes negative path for expired and malformed token strings",
+            "coverage tests token blacklist functionality after logout endpoint call",
+            "coverage verifies sliding token configuration when enabled in settings",
+            "coverage ensures token lifetime boundaries are respected within tolerance",
+            "coverage reports are generated via pytest-cov and tracked in CI pipelines",
+        ],
+    }
+    logger.debug(
+        "jwt token tests config: test_details=%d, assertion_details=%d",
+        len(config["test_details"]),
+        len(config["assertion_details"]),
+    )
+    return config
+
+
+def get_password_reset_tests_config() -> dict:
+    """Return password reset tests configuration for reset flow test coverage.
+
+    SubPhase-04, Group-F, Task 94.
+    """
+    config: dict = {
+        "configured": True,
+        "test_details": [
+            "test suite covers the full password reset request to confirmation flow",
+            "test suite verifies reset token generation stores hashed token in database",
+            "test suite checks reset email is sent with a valid tokenized confirmation link",
+            "test suite validates password confirmation matching on the confirm endpoint",
+            "test suite ensures expired reset tokens are rejected with appropriate error",
+            "test suite tests rate limiting on password reset request endpoint",
+        ],
+        "expectation_details": [
+            "expectation for reset request with valid email is HTTP 200 with success message",
+            "expectation for reset request with unknown email is still HTTP 200 to prevent enumeration",
+            "expectation for confirm with valid token is HTTP 200 and password is updated",
+            "expectation for confirm with expired token is HTTP 400 with expiration error",
+            "expectation for confirm with mismatched passwords is HTTP 400 validation error",
+            "expectation for confirm with already-used token is HTTP 400 with used token error",
+        ],
+        "scenario_details": [
+            "scenario tests requesting multiple resets invalidates all previous tokens",
+            "scenario tests reset token is marked as used after successful confirmation",
+            "scenario tests password complexity validation applies during reset confirmation",
+            "scenario tests user can log in with new password after successful reset",
+            "scenario tests reset flow works correctly for users with special characters in email",
+            "scenario tests concurrent reset requests are handled without race conditions",
+        ],
+    }
+    logger.debug(
+        "password reset tests config: test_details=%d, expectation_details=%d",
+        len(config["test_details"]),
+        len(config["expectation_details"]),
+    )
+    return config
+
+
+def get_run_all_migrations_config() -> dict:
+    """Return run all migrations configuration for migration execution documentation.
+
+    SubPhase-04, Group-F, Task 95.
+    """
+    config: dict = {
+        "configured": True,
+        "migration_details": [
+            "migration command runs python manage.py migrate to apply all pending migrations",
+            "migration process creates the custom User model table with email-based authentication",
+            "migration process creates the UserProfile table with one-to-one link to User",
+            "migration process creates the PasswordResetToken table for reset flow support",
+            "migration process creates the EmailVerificationToken table for email verification",
+            "migration process applies django-tenants schema migrations for multi-tenancy",
+        ],
+        "result_details": [
+            "result confirms all migration files apply without errors or conflicts",
+            "result shows each app migration listed with OK status in terminal output",
+            "result verifies zero unapplied migrations via showmigrations command check",
+            "result confirms database tables match the expected schema after full migration",
+            "result validates foreign key constraints are correctly established between tables",
+            "result ensures index creation for frequently queried fields is completed",
+        ],
+        "schema_details": [
+            "schema includes users_user table with email as unique identifier column",
+            "schema includes users_userprofile table with user_id foreign key reference",
+            "schema includes users_passwordresettoken table with expiration timestamp column",
+            "schema includes users_emailverificationtoken table with verified status column",
+            "schema includes all django-tenants required tables for tenant isolation",
+            "schema documentation is generated and stored in the docs/database/ directory",
+        ],
+    }
+    logger.debug(
+        "run all migrations config: migration_details=%d, result_details=%d",
+        len(config["migration_details"]),
+        len(config["result_details"]),
+    )
+    return config
+
+
+def get_authentication_documentation_config() -> dict:
+    """Return authentication documentation configuration for auth system documentation.
+
+    SubPhase-04, Group-F, Task 96.
+    """
+    config: dict = {
+        "configured": True,
+        "flow_details": [
+            "flow documents the complete user registration process from signup to email verification",
+            "flow documents the login process returning JWT access and refresh token pair",
+            "flow documents the token refresh mechanism for obtaining new access tokens",
+            "flow documents the logout process including refresh token blacklisting",
+            "flow documents the password reset request and confirmation two-step process",
+            "flow documents the email verification and resend verification endpoints",
+        ],
+        "endpoint_details": [
+            "endpoint POST /api/v1/auth/register/ creates a new user account with tokens",
+            "endpoint POST /api/v1/auth/login/ authenticates user and returns token pair",
+            "endpoint POST /api/v1/auth/refresh/ rotates refresh token and returns new pair",
+            "endpoint POST /api/v1/auth/logout/ blacklists refresh token to end session",
+            "endpoint GET /api/v1/auth/me/ returns the authenticated user profile data",
+            "endpoint POST /api/v1/auth/password-reset/ initiates password reset email flow",
+        ],
+        "policy_details": [
+            "policy enforces email uniqueness constraint across all tenant schemas",
+            "policy requires password minimum length of eight characters with complexity rules",
+            "policy sets access token lifetime to fifteen minutes for security best practice",
+            "policy sets refresh token lifetime to seven days with rotation on each use",
+            "policy applies rate limiting to authentication endpoints to prevent brute force",
+            "policy documentation is maintained in docs/users/ alongside API reference files",
+        ],
+    }
+    logger.debug(
+        "authentication documentation config: flow_details=%d, endpoint_details=%d",
+        len(config["flow_details"]),
+        len(config["endpoint_details"]),
     )
     return config

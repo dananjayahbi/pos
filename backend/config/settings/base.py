@@ -71,6 +71,7 @@ THIRD_PARTY_APPS: list[str] = [
     "django_filters",                    # Query filtering
     "rest_framework_simplejwt",          # JWT authentication
     "drf_spectacular",                   # OpenAPI documentation
+    "drf_spectacular_sidecar",            # Self-hosted Swagger/ReDoc assets
     "corsheaders",                       # CORS handling
     "django_celery_beat",                # Periodic task scheduling
     "django_celery_results",             # Task result storage
@@ -128,7 +129,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Custom middleware will be added here (Phase 3)
+    # ── LankaCommerce custom middleware (Phase 3) ──
+    "apps.core.middleware.request_logging.RequestLoggingMiddleware",
+    "apps.core.middleware.security.SecurityHeadersMiddleware",
+    "apps.core.middleware.sentry.SentryContextMiddleware",
+    "apps.core.middleware.timezone.TimezoneMiddleware",
+    # "apps.core.middleware.rate_limiting.RateLimitingMiddleware",  # Enable when needed
     # "apps.platform.middleware.feature_flags.FeatureFlagMiddleware",  # Phase 3
 ]
 
@@ -181,13 +187,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "EXCEPTION_HANDLER": "apps.core.exceptions.handlers.custom_exception_handler",
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "apps.core.pagination.StandardPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
@@ -239,16 +246,9 @@ SIMPLE_JWT = {
 
 
 # ════════════════════════════════════════════════════════════════════════
-# DRF SPECTACULAR — OpenAPI 3.0  (Task 43)
+# API DOCUMENTATION — drf-spectacular  (SP11)
 # ════════════════════════════════════════════════════════════════════════
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "LankaCommerce Cloud API",
-    "DESCRIPTION": "Multi-tenant ERP, POS & E-commerce REST API for Sri Lanka",
-    "VERSION": "1.0.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    "SCHEMA_PATH_PREFIX": r"/api/v[0-9]",
-}
+from config.settings.api_docs import *  # noqa: E402, F401, F403
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -263,6 +263,62 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = env("TIME_ZONE")
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+# Task execution safeguards
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60        # 30 minutes hard kill
+CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60   # 25 minutes graceful timeout
+
+# ── Retry Policies (SP08 Tasks 67-73) ──────────────────────────────
+CELERY_TASK_DEFAULT_RETRY_DELAY = 60       # 60 seconds before first retry
+CELERY_TASK_MAX_RETRIES = 3                # Max 3 retries per task
+CELERY_TASK_RETRY_BACKOFF = True           # Exponential backoff
+CELERY_TASK_RETRY_BACKOFF_MAX = 600        # Max 10 minutes between retries
+CELERY_TASK_RETRY_JITTER = True            # Add jitter to avoid thundering herd
+
+# ── Task Queues (SP08 Tasks 74-78) ─────────────────────────────────
+from kombu import Exchange, Queue  # noqa: E402
+
+default_exchange = Exchange("default", type="direct")
+
+CELERY_TASK_QUEUES = (
+    Queue("high_priority", default_exchange, routing_key="high"),
+    Queue("default", default_exchange, routing_key="default"),
+    Queue("low_priority", default_exchange, routing_key="low"),
+)
+
+CELERY_TASK_DEFAULT_QUEUE = "default"
+CELERY_TASK_DEFAULT_EXCHANGE = "default"
+CELERY_TASK_DEFAULT_ROUTING_KEY = "default"
+
+CELERY_TASK_ROUTES = {
+    "apps.core.tasks.email_tasks.*": {"queue": "default"},
+    "apps.core.tasks.notification_tasks.*": {"queue": "default"},
+    "apps.core.tasks.report_tasks.*": {"queue": "low_priority"},
+    "apps.core.tasks.scheduled_tasks.*": {"queue": "low_priority"},
+}
+
+# ── Beat Schedule (periodic tasks) ─────────────────────────────────
+from celery.schedules import crontab  # noqa: E402
+
+CELERY_BEAT_SCHEDULE = {
+    "daily-sales-report": {
+        "task": "apps.core.tasks.scheduled_tasks.daily_sales_report_task",
+        "schedule": crontab(hour=6, minute=0),
+    },
+    "check-low-stock": {
+        "task": "apps.core.tasks.scheduled_tasks.check_low_stock_task",
+        "schedule": crontab(hour="*/4", minute=0),
+    },
+    "cleanup-sessions": {
+        "task": "apps.core.tasks.scheduled_tasks.cleanup_old_sessions_task",
+        "schedule": crontab(hour=0, minute=0),
+    },
+    "cleanup-tokens": {
+        "task": "apps.core.tasks.scheduled_tasks.cleanup_expired_tokens_task",
+        "schedule": crontab(hour=2, minute=0),
+    },
+}
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -280,6 +336,17 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+# ════════════════════════════════════════════════════════════════════════
+# CACHING — Redis  (SP09)
+# ════════════════════════════════════════════════════════════════════════
+from config.settings.cache import *  # noqa: E402, F401, F403
+
+# ════════════════════════════════════════════════════════════════════════
+# FILE STORAGE — Local / S3  (SP10)
+# ════════════════════════════════════════════════════════════════════════
+from config.settings.storage import *  # noqa: E402, F401, F403  (SP10)
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -366,41 +433,27 @@ LOCALE_PATHS = [
 # ════════════════════════════════════════════════════════════════════════
 # STATIC FILES  (Task 26)
 # ════════════════════════════════════════════════════════════════════════
-
-STATIC_URL = "/static/"
+# STATIC_URL and STATIC_ROOT are defined in config/settings/storage.py
+# and imported via ``from config.settings.storage import *`` above.
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
-# WhiteNoise: Serve static files with compression and caching
-# Media storage: Tenant-aware partitioning (each tenant gets MEDIA_ROOT/<schema_name>/)
-STORAGES = {
-    "default": {
-        "BACKEND": "django_tenants.files.storage.TenantFileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+# STORAGES is defined in config/settings/storage.py (local or S3 mode).
 
 
 # ════════════════════════════════════════════════════════════════════════
 # MEDIA FILES  (Task 27)
 # ════════════════════════════════════════════════════════════════════════
+# MEDIA_URL and MEDIA_ROOT are defined in config/settings/storage.py.
 # User-uploaded content (product images, documents, avatars, logos).
 # Development: local filesystem.  Production: S3/cloud (overridden).
-
-MEDIA_URL = "/media/"
-
-MEDIA_ROOT = BASE_DIR / "media"
 
 # Upload size limits (10 MB)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB

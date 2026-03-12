@@ -2,15 +2,23 @@
 Category model for the products application.
 
 Defines the Category model which supports hierarchical product
-categorization using a self-referential foreign key pattern.
+categorization using MPTT (Modified Preorder Tree Traversal).
 Categories are tenant-specific — each tenant has its own
-independent category tree.
+independent category tree managed via django-tenants schema
+isolation.
+
+MPTT provides efficient tree queries (ancestors, descendants,
+siblings) without recursive SQL. The tree structure is maintained
+via four auto-managed fields: lft, rght, tree_id, level.
 """
 
 from django.db import models
 from django.utils.text import slugify
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 from apps.core.mixins import UUIDMixin, TimestampMixin
+from apps.products.models.managers import CategoryManager
 
 
 def category_image_upload_path(instance, filename):
@@ -18,30 +26,45 @@ def category_image_upload_path(instance, filename):
     return f"categories/{instance.slug}/{filename}"
 
 
-class Category(UUIDMixin, TimestampMixin, models.Model):
+class Category(UUIDMixin, TimestampMixin, MPTTModel):
     """
-    Product category with hierarchical support.
+    Product category with MPTT-powered hierarchical support.
 
-    Supports a tree structure via the self-referential parent field.
-    Root categories have parent=None. Each category has a unique
-    slug within its tenant schema for URL-friendly identification.
+    Uses django-mptt for efficient tree operations. The tree
+    structure is maintained via auto-managed fields (lft, rght,
+    tree_id, level). Root categories have parent=None.
+
+    Each category has a unique slug within its tenant schema
+    (django-tenants provides schema isolation).
 
     Fields:
         name: Display name of the category (max 255 chars).
         slug: URL-friendly identifier, unique per tenant schema.
-        parent: Self-referential FK for category hierarchy.
+        parent: TreeForeignKey for MPTT-managed category hierarchy.
             Null for root categories.
+        description: Optional rich-text description.
         image: Optional category image for branding/display.
+        icon: Optional CSS icon class for UI rendering.
         is_active: Controls category visibility. Inactive categories
             and their products are hidden from the storefront but
             remain accessible in the admin.
-        description: Optional description for the category.
-        sort_order: Integer for controlling display order.
+        display_order: Integer for controlling display order within
+            the same tree level.
+        seo_title: Meta title for search engine optimization.
+        seo_description: Meta description for search results.
+        seo_keywords: Comma-separated keywords (legacy SEO).
+
+    MPTT auto-managed fields (do not set manually):
+        level: Depth in the tree (0 for root).
+        lft: Left value for nested-set traversal.
+        rght: Right value for nested-set traversal.
+        tree_id: Identifier grouping nodes in the same tree.
     """
 
     # ── Core Fields ─────────────────────────────────────────────────
     name = models.CharField(
         max_length=255,
+        db_index=True,
         verbose_name="Category Name",
         help_text="Display name of the category.",
     )
@@ -49,7 +72,7 @@ class Category(UUIDMixin, TimestampMixin, models.Model):
         max_length=255,
         unique=True,
         verbose_name="Slug",
-        help_text="URL-friendly identifier. Unique per tenant.",
+        help_text="URL-friendly identifier. Unique per tenant schema.",
     )
     description = models.TextField(
         blank=True,
@@ -58,8 +81,8 @@ class Category(UUIDMixin, TimestampMixin, models.Model):
         help_text="Optional description for the category.",
     )
 
-    # ── Hierarchy ───────────────────────────────────────────────────
-    parent = models.ForeignKey(
+    # ── Hierarchy (MPTT) ────────────────────────────────────────────
+    parent = TreeForeignKey(
         "self",
         on_delete=models.CASCADE,
         null=True,
@@ -77,6 +100,13 @@ class Category(UUIDMixin, TimestampMixin, models.Model):
         verbose_name="Category Image",
         help_text="Optional image for category branding.",
     )
+    icon = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        verbose_name="Icon Class",
+        help_text="CSS icon class (e.g., 'fas fa-mobile-alt').",
+    )
 
     # ── Visibility & Ordering ───────────────────────────────────────
     is_active = models.BooleanField(
@@ -85,33 +115,64 @@ class Category(UUIDMixin, TimestampMixin, models.Model):
         verbose_name="Active",
         help_text="Controls category visibility on the storefront.",
     )
-    sort_order = models.PositiveIntegerField(
+    display_order = models.PositiveIntegerField(
         default=0,
-        verbose_name="Sort Order",
+        db_index=True,
+        verbose_name="Display Order",
         help_text="Controls display order. Lower values appear first.",
     )
+
+    # ── SEO Fields ──────────────────────────────────────────────────
+    seo_title = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        verbose_name="SEO Title",
+        help_text="Meta title for search engines (60 chars optimal).",
+    )
+    seo_description = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        verbose_name="SEO Description",
+        help_text="Meta description for search results (155 chars optimal).",
+    )
+    seo_keywords = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="SEO Keywords",
+        help_text="Comma-separated keywords (optional, legacy SEO).",
+    )
+
+    objects = CategoryManager()
+
+    class MPTTMeta:
+        order_insertion_by = ["display_order", "name"]
 
     class Meta:
         app_label = "products"
         db_table = "products_category"
         verbose_name = "Category"
         verbose_name_plural = "Categories"
-        ordering = ["sort_order", "name"]
+        ordering = ["tree_id", "lft"]
         indexes = [
             models.Index(
-                fields=["is_active", "sort_order"],
-                name="idx_category_active_sort",
+                fields=["is_active", "display_order"],
+                name="idx_category_active_order",
             ),
             models.Index(
-                fields=["parent"],
-                name="idx_category_parent",
+                fields=["tree_id", "lft"],
+                name="idx_category_tree_lft",
+            ),
+            models.Index(
+                fields=["slug"],
+                name="idx_category_slug",
             ),
         ]
 
     def __str__(self):
-        """Return the full category path (e.g., 'Electronics > Phones')."""
-        if self.parent:
-            return f"{self.parent} > {self.name}"
+        """Return the category name."""
         return self.name
 
     def save(self, *args, **kwargs):
@@ -123,14 +184,31 @@ class Category(UUIDMixin, TimestampMixin, models.Model):
     @property
     def is_root(self):
         """Return True if this is a root category (no parent)."""
-        return self.parent_id is None
+        return self.is_root_node()
+
+    def get_full_path(self, separator=" > "):
+        """
+        Return the full ancestor path as a string.
+
+        Example: "Electronics > Phones > Smartphones"
+
+        Uses MPTT's ``get_ancestors()`` for an efficient single query
+        instead of recursive parent traversal.
+        """
+        ancestors = self.get_ancestors(include_self=True)
+        return separator.join(a.name for a in ancestors)
 
     @property
-    def depth(self):
-        """Return the depth of this category in the tree (0 for root)."""
-        level = 0
-        current = self
-        while current.parent_id is not None:
-            level += 1
-            current = current.parent
-        return level
+    def is_leaf(self):
+        """Return True if this category has no children (leaf node)."""
+        return self.is_leaf_node()
+
+    @property
+    def children_count(self):
+        """Return the number of direct children."""
+        return self.get_children().count()
+
+    @property
+    def descendants_count(self):
+        """Return the total number of descendants at all levels."""
+        return self.get_descendants().count()

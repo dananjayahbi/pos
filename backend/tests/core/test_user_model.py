@@ -1,6 +1,6 @@
 """Tests for user model utilities (SubPhase-04).
 
-Covers Group-A (Tasks 01-16) and Group-B (Tasks 17-32) and Group-C (Tasks 33-48) and Group-D (Tasks 49-64).
+Covers Group-A (Tasks 01-16) and Group-B (Tasks 17-32) and Group-C (Tasks 33-48) and Group-D (Tasks 49-64) and Group-E (Tasks 65-80) and Group-F (Tasks 81-96).
 """
 
 import pytest
@@ -2609,3 +2609,1313 @@ class TestGetMeEndpointConfig:
     def test_docstring_ref(self):
         from apps.core.utils.user_model_utils import get_me_endpoint_config
         assert "Task 64" in get_me_endpoint_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-E: Password Reset Flow – Tasks 65-70 (Token Model)
+# ---------------------------------------------------------------------------
+
+
+class TestGetPasswordResetTokenModelConfig:
+    """Tests for get_password_reset_token_model_config (Task 65)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_token_model_config
+        result = get_password_reset_token_model_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_token_model_config
+        result = get_password_reset_token_model_config()
+        assert result["configured"] is True
+
+    def test_model_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_token_model_config
+        result = get_password_reset_token_model_config()
+        assert isinstance(result["model_details"], list)
+        assert len(result["model_details"]) >= 6
+
+    def test_purpose_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_token_model_config
+        result = get_password_reset_token_model_config()
+        assert isinstance(result["purpose_details"], list)
+        assert len(result["purpose_details"]) >= 6
+
+    def test_structure_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_token_model_config
+        result = get_password_reset_token_model_config()
+        assert isinstance(result["structure_details"], list)
+        assert len(result["structure_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_token_model_config
+        assert callable(get_password_reset_token_model_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_token_model_config
+        assert "Task 65" in get_password_reset_token_model_config.__doc__
+
+
+class TestGetUserForeignKeyConfig:
+    """Tests for get_user_foreign_key_config (Task 66)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_user_foreign_key_config
+        result = get_user_foreign_key_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_user_foreign_key_config
+        result = get_user_foreign_key_config()
+        assert result["configured"] is True
+
+    def test_relationship_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_foreign_key_config
+        result = get_user_foreign_key_config()
+        assert isinstance(result["relationship_details"], list)
+        assert len(result["relationship_details"]) >= 6
+
+    def test_cardinality_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_foreign_key_config
+        result = get_user_foreign_key_config()
+        assert isinstance(result["cardinality_details"], list)
+        assert len(result["cardinality_details"]) >= 6
+
+    def test_constraint_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_foreign_key_config
+        result = get_user_foreign_key_config()
+        assert isinstance(result["constraint_details"], list)
+        assert len(result["constraint_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_user_foreign_key_config
+        assert callable(get_user_foreign_key_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_user_foreign_key_config
+        assert "Task 66" in get_user_foreign_key_config.__doc__
+
+
+class TestGetTokenFieldConfig:
+    """Tests for get_token_field_config (Task 67)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_token_field_config
+        result = get_token_field_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_token_field_config
+        result = get_token_field_config()
+        assert result["configured"] is True
+
+    def test_field_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_field_config
+        result = get_token_field_config()
+        assert isinstance(result["field_details"], list)
+        assert len(result["field_details"]) >= 6
+
+    def test_security_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_field_config
+        result = get_token_field_config()
+        assert isinstance(result["security_details"], list)
+        assert len(result["security_details"]) >= 6
+
+    def test_indexing_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_field_config
+        result = get_token_field_config()
+        assert isinstance(result["indexing_details"], list)
+        assert len(result["indexing_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_token_field_config
+        assert callable(get_token_field_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_token_field_config
+        assert "Task 67" in get_token_field_config.__doc__
+
+
+class TestGetExpiresAtFieldConfig:
+    """Tests for get_expires_at_field_config (Task 68)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_expires_at_field_config
+        result = get_expires_at_field_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_expires_at_field_config
+        result = get_expires_at_field_config()
+        assert result["configured"] is True
+
+    def test_field_details_list(self):
+        from apps.core.utils.user_model_utils import get_expires_at_field_config
+        result = get_expires_at_field_config()
+        assert isinstance(result["field_details"], list)
+        assert len(result["field_details"]) >= 6
+
+    def test_policy_details_list(self):
+        from apps.core.utils.user_model_utils import get_expires_at_field_config
+        result = get_expires_at_field_config()
+        assert isinstance(result["policy_details"], list)
+        assert len(result["policy_details"]) >= 6
+
+    def test_validation_details_list(self):
+        from apps.core.utils.user_model_utils import get_expires_at_field_config
+        result = get_expires_at_field_config()
+        assert isinstance(result["validation_details"], list)
+        assert len(result["validation_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_expires_at_field_config
+        assert callable(get_expires_at_field_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_expires_at_field_config
+        assert "Task 68" in get_expires_at_field_config.__doc__
+
+
+class TestGetIsUsedFieldConfig:
+    """Tests for get_is_used_field_config (Task 69)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_is_used_field_config
+        result = get_is_used_field_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_is_used_field_config
+        result = get_is_used_field_config()
+        assert result["configured"] is True
+
+    def test_field_details_list(self):
+        from apps.core.utils.user_model_utils import get_is_used_field_config
+        result = get_is_used_field_config()
+        assert isinstance(result["field_details"], list)
+        assert len(result["field_details"]) >= 6
+
+    def test_behavior_details_list(self):
+        from apps.core.utils.user_model_utils import get_is_used_field_config
+        result = get_is_used_field_config()
+        assert isinstance(result["behavior_details"], list)
+        assert len(result["behavior_details"]) >= 6
+
+    def test_tracking_details_list(self):
+        from apps.core.utils.user_model_utils import get_is_used_field_config
+        result = get_is_used_field_config()
+        assert isinstance(result["tracking_details"], list)
+        assert len(result["tracking_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_is_used_field_config
+        assert callable(get_is_used_field_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_is_used_field_config
+        assert "Task 69" in get_is_used_field_config.__doc__
+
+
+class TestGetTokenGenerationUtilityConfig:
+    """Tests for get_token_generation_utility_config (Task 70)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_token_generation_utility_config
+        result = get_token_generation_utility_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_token_generation_utility_config
+        result = get_token_generation_utility_config()
+        assert result["configured"] is True
+
+    def test_utility_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_generation_utility_config
+        result = get_token_generation_utility_config()
+        assert isinstance(result["utility_details"], list)
+        assert len(result["utility_details"]) >= 6
+
+    def test_security_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_generation_utility_config
+        result = get_token_generation_utility_config()
+        assert isinstance(result["security_details"], list)
+        assert len(result["security_details"]) >= 6
+
+    def test_usage_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_generation_utility_config
+        result = get_token_generation_utility_config()
+        assert isinstance(result["usage_details"], list)
+        assert len(result["usage_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_token_generation_utility_config
+        assert callable(get_token_generation_utility_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_token_generation_utility_config
+        assert "Task 70" in get_token_generation_utility_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-E: Password Reset Flow – Tasks 71-76 (Views & Email)
+# ---------------------------------------------------------------------------
+
+
+class TestGetPasswordResetRequestSerializerConfig:
+    """Tests for get_password_reset_request_serializer_config (Task 71)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_serializer_config
+        result = get_password_reset_request_serializer_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_serializer_config
+        result = get_password_reset_request_serializer_config()
+        assert result["configured"] is True
+
+    def test_serializer_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_serializer_config
+        result = get_password_reset_request_serializer_config()
+        assert isinstance(result["serializer_details"], list)
+        assert len(result["serializer_details"]) >= 6
+
+    def test_validation_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_serializer_config
+        result = get_password_reset_request_serializer_config()
+        assert isinstance(result["validation_details"], list)
+        assert len(result["validation_details"]) >= 6
+
+    def test_security_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_serializer_config
+        result = get_password_reset_request_serializer_config()
+        assert isinstance(result["security_details"], list)
+        assert len(result["security_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_request_serializer_config
+        assert callable(get_password_reset_request_serializer_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_serializer_config
+        assert "Task 71" in get_password_reset_request_serializer_config.__doc__
+
+
+class TestGetPasswordResetConfirmSerializerConfig:
+    """Tests for get_password_reset_confirm_serializer_config (Task 72)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_serializer_config
+        result = get_password_reset_confirm_serializer_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_serializer_config
+        result = get_password_reset_confirm_serializer_config()
+        assert result["configured"] is True
+
+    def test_serializer_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_serializer_config
+        result = get_password_reset_confirm_serializer_config()
+        assert isinstance(result["serializer_details"], list)
+        assert len(result["serializer_details"]) >= 6
+
+    def test_validation_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_serializer_config
+        result = get_password_reset_confirm_serializer_config()
+        assert isinstance(result["validation_details"], list)
+        assert len(result["validation_details"]) >= 6
+
+    def test_field_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_serializer_config
+        result = get_password_reset_confirm_serializer_config()
+        assert isinstance(result["field_details"], list)
+        assert len(result["field_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_confirm_serializer_config
+        assert callable(get_password_reset_confirm_serializer_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_serializer_config
+        assert "Task 72" in get_password_reset_confirm_serializer_config.__doc__
+
+
+class TestGetPasswordResetRequestViewConfig:
+    """Tests for get_password_reset_request_view_config (Task 73)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_view_config
+        result = get_password_reset_request_view_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_view_config
+        result = get_password_reset_request_view_config()
+        assert result["configured"] is True
+
+    def test_view_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_view_config
+        result = get_password_reset_request_view_config()
+        assert isinstance(result["view_details"], list)
+        assert len(result["view_details"]) >= 6
+
+    def test_response_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_view_config
+        result = get_password_reset_request_view_config()
+        assert isinstance(result["response_details"], list)
+        assert len(result["response_details"]) >= 6
+
+    def test_flow_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_view_config
+        result = get_password_reset_request_view_config()
+        assert isinstance(result["flow_details"], list)
+        assert len(result["flow_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_request_view_config
+        assert callable(get_password_reset_request_view_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_request_view_config
+        assert "Task 73" in get_password_reset_request_view_config.__doc__
+
+
+class TestGetPasswordResetConfirmViewConfig:
+    """Tests for get_password_reset_confirm_view_config (Task 74)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_view_config
+        result = get_password_reset_confirm_view_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_view_config
+        result = get_password_reset_confirm_view_config()
+        assert result["configured"] is True
+
+    def test_view_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_view_config
+        result = get_password_reset_confirm_view_config()
+        assert isinstance(result["view_details"], list)
+        assert len(result["view_details"]) >= 6
+
+    def test_token_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_view_config
+        result = get_password_reset_confirm_view_config()
+        assert isinstance(result["token_details"], list)
+        assert len(result["token_details"]) >= 6
+
+    def test_response_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_view_config
+        result = get_password_reset_confirm_view_config()
+        assert isinstance(result["response_details"], list)
+        assert len(result["response_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_confirm_view_config
+        assert callable(get_password_reset_confirm_view_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_view_config
+        assert "Task 74" in get_password_reset_confirm_view_config.__doc__
+
+
+class TestGetEmailServiceConfig:
+    """Tests for get_email_service_config (Task 75)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_email_service_config
+        result = get_email_service_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_email_service_config
+        result = get_email_service_config()
+        assert result["configured"] is True
+
+    def test_service_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_service_config
+        result = get_email_service_config()
+        assert isinstance(result["service_details"], list)
+        assert len(result["service_details"]) >= 6
+
+    def test_configuration_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_service_config
+        result = get_email_service_config()
+        assert isinstance(result["configuration_details"], list)
+        assert len(result["configuration_details"]) >= 6
+
+    def test_delivery_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_service_config
+        result = get_email_service_config()
+        assert isinstance(result["delivery_details"], list)
+        assert len(result["delivery_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_email_service_config
+        assert callable(get_email_service_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_email_service_config
+        assert "Task 75" in get_email_service_config.__doc__
+
+
+class TestGetResetEmailTemplateConfig:
+    """Tests for get_reset_email_template_config (Task 76)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_reset_email_template_config
+        result = get_reset_email_template_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_reset_email_template_config
+        result = get_reset_email_template_config()
+        assert result["configured"] is True
+
+    def test_template_details_list(self):
+        from apps.core.utils.user_model_utils import get_reset_email_template_config
+        result = get_reset_email_template_config()
+        assert isinstance(result["template_details"], list)
+        assert len(result["template_details"]) >= 6
+
+    def test_content_details_list(self):
+        from apps.core.utils.user_model_utils import get_reset_email_template_config
+        result = get_reset_email_template_config()
+        assert isinstance(result["content_details"], list)
+        assert len(result["content_details"]) >= 6
+
+    def test_tone_details_list(self):
+        from apps.core.utils.user_model_utils import get_reset_email_template_config
+        result = get_reset_email_template_config()
+        assert isinstance(result["tone_details"], list)
+        assert len(result["tone_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_reset_email_template_config
+        assert callable(get_reset_email_template_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_reset_email_template_config
+        assert "Task 76" in get_reset_email_template_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-E: Password Reset Flow – Tasks 77-80 (URLs, Validation & Docs)
+# ---------------------------------------------------------------------------
+
+
+class TestGetPasswordResetEndpointConfig:
+    """Tests for get_password_reset_endpoint_config (Task 77)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_endpoint_config
+        result = get_password_reset_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_endpoint_config
+        result = get_password_reset_endpoint_config()
+        assert result["configured"] is True
+
+    def test_endpoint_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_endpoint_config
+        result = get_password_reset_endpoint_config()
+        assert isinstance(result["endpoint_details"], list)
+        assert len(result["endpoint_details"]) >= 6
+
+    def test_route_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_endpoint_config
+        result = get_password_reset_endpoint_config()
+        assert isinstance(result["route_details"], list)
+        assert len(result["route_details"]) >= 6
+
+    def test_request_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_endpoint_config
+        result = get_password_reset_endpoint_config()
+        assert isinstance(result["request_details"], list)
+        assert len(result["request_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_endpoint_config
+        assert callable(get_password_reset_endpoint_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_endpoint_config
+        assert "Task 77" in get_password_reset_endpoint_config.__doc__
+
+
+class TestGetPasswordResetConfirmEndpointConfig:
+    """Tests for get_password_reset_confirm_endpoint_config (Task 78)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_endpoint_config
+        result = get_password_reset_confirm_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_endpoint_config
+        result = get_password_reset_confirm_endpoint_config()
+        assert result["configured"] is True
+
+    def test_endpoint_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_endpoint_config
+        result = get_password_reset_confirm_endpoint_config()
+        assert isinstance(result["endpoint_details"], list)
+        assert len(result["endpoint_details"]) >= 6
+
+    def test_route_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_endpoint_config
+        result = get_password_reset_confirm_endpoint_config()
+        assert isinstance(result["route_details"], list)
+        assert len(result["route_details"]) >= 6
+
+    def test_validation_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_endpoint_config
+        result = get_password_reset_confirm_endpoint_config()
+        assert isinstance(result["validation_details"], list)
+        assert len(result["validation_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_confirm_endpoint_config
+        assert callable(get_password_reset_confirm_endpoint_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_confirm_endpoint_config
+        assert "Task 78" in get_password_reset_confirm_endpoint_config.__doc__
+
+
+class TestGetTokenExpirationCheckConfig:
+    """Tests for get_token_expiration_check_config (Task 79)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_token_expiration_check_config
+        result = get_token_expiration_check_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_token_expiration_check_config
+        result = get_token_expiration_check_config()
+        assert result["configured"] is True
+
+    def test_validation_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_expiration_check_config
+        result = get_token_expiration_check_config()
+        assert isinstance(result["validation_details"], list)
+        assert len(result["validation_details"]) >= 6
+
+    def test_error_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_expiration_check_config
+        result = get_token_expiration_check_config()
+        assert isinstance(result["error_details"], list)
+        assert len(result["error_details"]) >= 6
+
+    def test_enforcement_details_list(self):
+        from apps.core.utils.user_model_utils import get_token_expiration_check_config
+        result = get_token_expiration_check_config()
+        assert isinstance(result["enforcement_details"], list)
+        assert len(result["enforcement_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_token_expiration_check_config
+        assert callable(get_token_expiration_check_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_token_expiration_check_config
+        assert "Task 79" in get_token_expiration_check_config.__doc__
+
+
+class TestGetPasswordResetDocumentationConfig:
+    """Tests for get_password_reset_documentation_config (Task 80)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_documentation_config
+        result = get_password_reset_documentation_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_documentation_config
+        result = get_password_reset_documentation_config()
+        assert result["configured"] is True
+
+    def test_flow_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_documentation_config
+        result = get_password_reset_documentation_config()
+        assert isinstance(result["flow_details"], list)
+        assert len(result["flow_details"]) >= 6
+
+    def test_security_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_documentation_config
+        result = get_password_reset_documentation_config()
+        assert isinstance(result["security_details"], list)
+        assert len(result["security_details"]) >= 6
+
+    def test_documentation_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_documentation_config
+        result = get_password_reset_documentation_config()
+        assert isinstance(result["documentation_details"], list)
+        assert len(result["documentation_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_documentation_config
+        assert callable(get_password_reset_documentation_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_documentation_config
+        assert "Task 80" in get_password_reset_documentation_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-F: Email Verification & Testing – Tasks 81-88 (Verification Flow)
+# ---------------------------------------------------------------------------
+
+
+class TestGetEmailVerificationTokenModelConfig:
+    """Tests for get_email_verification_token_model_config (Task 81)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_email_verification_token_model_config
+        result = get_email_verification_token_model_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_email_verification_token_model_config
+        result = get_email_verification_token_model_config()
+        assert result["configured"] is True
+
+    def test_model_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_verification_token_model_config
+        result = get_email_verification_token_model_config()
+        assert isinstance(result["model_details"], list)
+        assert len(result["model_details"]) >= 6
+
+    def test_purpose_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_verification_token_model_config
+        result = get_email_verification_token_model_config()
+        assert isinstance(result["purpose_details"], list)
+        assert len(result["purpose_details"]) >= 6
+
+    def test_structure_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_verification_token_model_config
+        result = get_email_verification_token_model_config()
+        assert isinstance(result["structure_details"], list)
+        assert len(result["structure_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_email_verification_token_model_config
+        assert callable(get_email_verification_token_model_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_email_verification_token_model_config
+        assert "Task 81" in get_email_verification_token_model_config.__doc__
+
+
+class TestGetVerificationFieldsConfig:
+    """Tests for get_verification_fields_config (Task 82)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_verification_fields_config
+        result = get_verification_fields_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_verification_fields_config
+        result = get_verification_fields_config()
+        assert result["configured"] is True
+
+    def test_field_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_fields_config
+        result = get_verification_fields_config()
+        assert isinstance(result["field_details"], list)
+        assert len(result["field_details"]) >= 6
+
+    def test_default_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_fields_config
+        result = get_verification_fields_config()
+        assert isinstance(result["default_details"], list)
+        assert len(result["default_details"]) >= 6
+
+    def test_constraint_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_fields_config
+        result = get_verification_fields_config()
+        assert isinstance(result["constraint_details"], list)
+        assert len(result["constraint_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_verification_fields_config
+        assert callable(get_verification_fields_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_verification_fields_config
+        assert "Task 82" in get_verification_fields_config.__doc__
+
+
+class TestGetVerificationEmailServiceConfig:
+    """Tests for get_verification_email_service_config (Task 83)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_verification_email_service_config
+        result = get_verification_email_service_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_verification_email_service_config
+        result = get_verification_email_service_config()
+        assert result["configured"] is True
+
+    def test_service_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_email_service_config
+        result = get_verification_email_service_config()
+        assert isinstance(result["service_details"], list)
+        assert len(result["service_details"]) >= 6
+
+    def test_configuration_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_email_service_config
+        result = get_verification_email_service_config()
+        assert isinstance(result["configuration_details"], list)
+        assert len(result["configuration_details"]) >= 6
+
+    def test_delivery_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_email_service_config
+        result = get_verification_email_service_config()
+        assert isinstance(result["delivery_details"], list)
+        assert len(result["delivery_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_verification_email_service_config
+        assert callable(get_verification_email_service_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_verification_email_service_config
+        assert "Task 83" in get_verification_email_service_config.__doc__
+
+
+class TestGetVerificationEmailTemplateConfig:
+    """Tests for get_verification_email_template_config (Task 84)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_verification_email_template_config
+        result = get_verification_email_template_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_verification_email_template_config
+        result = get_verification_email_template_config()
+        assert result["configured"] is True
+
+    def test_template_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_email_template_config
+        result = get_verification_email_template_config()
+        assert isinstance(result["template_details"], list)
+        assert len(result["template_details"]) >= 6
+
+    def test_content_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_email_template_config
+        result = get_verification_email_template_config()
+        assert isinstance(result["content_details"], list)
+        assert len(result["content_details"]) >= 6
+
+    def test_tone_details_list(self):
+        from apps.core.utils.user_model_utils import get_verification_email_template_config
+        result = get_verification_email_template_config()
+        assert isinstance(result["tone_details"], list)
+        assert len(result["tone_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_verification_email_template_config
+        assert callable(get_verification_email_template_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_verification_email_template_config
+        assert "Task 84" in get_verification_email_template_config.__doc__
+
+
+class TestGetEmailVerificationViewConfig:
+    """Tests for get_email_verification_view_config (Task 85)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_email_verification_view_config
+        result = get_email_verification_view_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_email_verification_view_config
+        result = get_email_verification_view_config()
+        assert result["configured"] is True
+
+    def test_view_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_verification_view_config
+        result = get_email_verification_view_config()
+        assert isinstance(result["view_details"], list)
+        assert len(result["view_details"]) >= 6
+
+    def test_outcome_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_verification_view_config
+        result = get_email_verification_view_config()
+        assert isinstance(result["outcome_details"], list)
+        assert len(result["outcome_details"]) >= 6
+
+    def test_validation_details_list(self):
+        from apps.core.utils.user_model_utils import get_email_verification_view_config
+        result = get_email_verification_view_config()
+        assert isinstance(result["validation_details"], list)
+        assert len(result["validation_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_email_verification_view_config
+        assert callable(get_email_verification_view_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_email_verification_view_config
+        assert "Task 85" in get_email_verification_view_config.__doc__
+
+
+class TestGetResendVerificationViewConfig:
+    """Tests for get_resend_verification_view_config (Task 86)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_view_config
+        result = get_resend_verification_view_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_view_config
+        result = get_resend_verification_view_config()
+        assert result["configured"] is True
+
+    def test_view_details_list(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_view_config
+        result = get_resend_verification_view_config()
+        assert isinstance(result["view_details"], list)
+        assert len(result["view_details"]) >= 6
+
+    def test_guardrail_details_list(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_view_config
+        result = get_resend_verification_view_config()
+        assert isinstance(result["guardrail_details"], list)
+        assert len(result["guardrail_details"]) >= 6
+
+    def test_flow_details_list(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_view_config
+        result = get_resend_verification_view_config()
+        assert isinstance(result["flow_details"], list)
+        assert len(result["flow_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_resend_verification_view_config
+        assert callable(get_resend_verification_view_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_view_config
+        assert "Task 86" in get_resend_verification_view_config.__doc__
+
+
+class TestGetVerifyEmailEndpointConfig:
+    """Tests for get_verify_email_endpoint_config (Task 87)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_verify_email_endpoint_config
+        result = get_verify_email_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_verify_email_endpoint_config
+        result = get_verify_email_endpoint_config()
+        assert result["configured"] is True
+
+    def test_endpoint_details_list(self):
+        from apps.core.utils.user_model_utils import get_verify_email_endpoint_config
+        result = get_verify_email_endpoint_config()
+        assert isinstance(result["endpoint_details"], list)
+        assert len(result["endpoint_details"]) >= 6
+
+    def test_route_details_list(self):
+        from apps.core.utils.user_model_utils import get_verify_email_endpoint_config
+        result = get_verify_email_endpoint_config()
+        assert isinstance(result["route_details"], list)
+        assert len(result["route_details"]) >= 6
+
+    def test_access_details_list(self):
+        from apps.core.utils.user_model_utils import get_verify_email_endpoint_config
+        result = get_verify_email_endpoint_config()
+        assert isinstance(result["access_details"], list)
+        assert len(result["access_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_verify_email_endpoint_config
+        assert callable(get_verify_email_endpoint_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_verify_email_endpoint_config
+        assert "Task 87" in get_verify_email_endpoint_config.__doc__
+
+
+class TestGetResendVerificationEndpointConfig:
+    """Tests for get_resend_verification_endpoint_config (Task 88)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_endpoint_config
+        result = get_resend_verification_endpoint_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_endpoint_config
+        result = get_resend_verification_endpoint_config()
+        assert result["configured"] is True
+
+    def test_endpoint_details_list(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_endpoint_config
+        result = get_resend_verification_endpoint_config()
+        assert isinstance(result["endpoint_details"], list)
+        assert len(result["endpoint_details"]) >= 6
+
+    def test_route_details_list(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_endpoint_config
+        result = get_resend_verification_endpoint_config()
+        assert isinstance(result["route_details"], list)
+        assert len(result["route_details"]) >= 6
+
+    def test_access_details_list(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_endpoint_config
+        result = get_resend_verification_endpoint_config()
+        assert isinstance(result["access_details"], list)
+        assert len(result["access_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_resend_verification_endpoint_config
+        assert callable(get_resend_verification_endpoint_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_resend_verification_endpoint_config
+        assert "Task 88" in get_resend_verification_endpoint_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-F: Email Verification & Testing – Tasks 89-92 (Admin & Model Tests)
+# ---------------------------------------------------------------------------
+
+
+class TestGetUserAdminClassConfig:
+    """Tests for get_user_admin_class_config (Task 89)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_user_admin_class_config
+        result = get_user_admin_class_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_user_admin_class_config
+        result = get_user_admin_class_config()
+        assert result["configured"] is True
+
+    def test_admin_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_admin_class_config
+        result = get_user_admin_class_config()
+        assert isinstance(result["admin_details"], list)
+        assert len(result["admin_details"]) >= 6
+
+    def test_display_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_admin_class_config
+        result = get_user_admin_class_config()
+        assert isinstance(result["display_details"], list)
+        assert len(result["display_details"]) >= 6
+
+    def test_organization_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_admin_class_config
+        result = get_user_admin_class_config()
+        assert isinstance(result["organization_details"], list)
+        assert len(result["organization_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_user_admin_class_config
+        assert callable(get_user_admin_class_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_user_admin_class_config
+        assert "Task 89" in get_user_admin_class_config.__doc__
+
+
+class TestGetUserAdminRegistrationConfig:
+    """Tests for get_user_admin_registration_config (Task 90)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_user_admin_registration_config
+        result = get_user_admin_registration_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_user_admin_registration_config
+        result = get_user_admin_registration_config()
+        assert result["configured"] is True
+
+    def test_registration_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_admin_registration_config
+        result = get_user_admin_registration_config()
+        assert isinstance(result["registration_details"], list)
+        assert len(result["registration_details"]) >= 6
+
+    def test_accessibility_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_admin_registration_config
+        result = get_user_admin_registration_config()
+        assert isinstance(result["accessibility_details"], list)
+        assert len(result["accessibility_details"]) >= 6
+
+    def test_interface_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_admin_registration_config
+        result = get_user_admin_registration_config()
+        assert isinstance(result["interface_details"], list)
+        assert len(result["interface_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_user_admin_registration_config
+        assert callable(get_user_admin_registration_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_user_admin_registration_config
+        assert "Task 90" in get_user_admin_registration_config.__doc__
+
+
+class TestGetUserModelTestsConfig:
+    """Tests for get_user_model_tests_config (Task 91)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_user_model_tests_config
+        result = get_user_model_tests_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_user_model_tests_config
+        result = get_user_model_tests_config()
+        assert result["configured"] is True
+
+    def test_test_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_model_tests_config
+        result = get_user_model_tests_config()
+        assert isinstance(result["test_details"], list)
+        assert len(result["test_details"]) >= 6
+
+    def test_assertion_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_model_tests_config
+        result = get_user_model_tests_config()
+        assert isinstance(result["assertion_details"], list)
+        assert len(result["assertion_details"]) >= 6
+
+    def test_coverage_details_list(self):
+        from apps.core.utils.user_model_utils import get_user_model_tests_config
+        result = get_user_model_tests_config()
+        assert isinstance(result["coverage_details"], list)
+        assert len(result["coverage_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_user_model_tests_config
+        assert callable(get_user_model_tests_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_user_model_tests_config
+        assert "Task 91" in get_user_model_tests_config.__doc__
+
+
+class TestGetAuthEndpointTestsConfig:
+    """Tests for get_auth_endpoint_tests_config (Task 92)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_auth_endpoint_tests_config
+        result = get_auth_endpoint_tests_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_auth_endpoint_tests_config
+        result = get_auth_endpoint_tests_config()
+        assert result["configured"] is True
+
+    def test_test_details_list(self):
+        from apps.core.utils.user_model_utils import get_auth_endpoint_tests_config
+        result = get_auth_endpoint_tests_config()
+        assert isinstance(result["test_details"], list)
+        assert len(result["test_details"]) >= 6
+
+    def test_expectation_details_list(self):
+        from apps.core.utils.user_model_utils import get_auth_endpoint_tests_config
+        result = get_auth_endpoint_tests_config()
+        assert isinstance(result["expectation_details"], list)
+        assert len(result["expectation_details"]) >= 6
+
+    def test_scenario_details_list(self):
+        from apps.core.utils.user_model_utils import get_auth_endpoint_tests_config
+        result = get_auth_endpoint_tests_config()
+        assert isinstance(result["scenario_details"], list)
+        assert len(result["scenario_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_auth_endpoint_tests_config
+        assert callable(get_auth_endpoint_tests_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_auth_endpoint_tests_config
+        assert "Task 92" in get_auth_endpoint_tests_config.__doc__
+
+
+# ---------------------------------------------------------------------------
+# Group-F: Email Verification & Testing – Tasks 93-96 (JWT, Reset Tests & Docs)
+# ---------------------------------------------------------------------------
+
+
+class TestGetJwtTokenTestsConfig:
+    """Tests for get_jwt_token_tests_config (Task 93)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_jwt_token_tests_config
+        result = get_jwt_token_tests_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_jwt_token_tests_config
+        result = get_jwt_token_tests_config()
+        assert result["configured"] is True
+
+    def test_test_details_list(self):
+        from apps.core.utils.user_model_utils import get_jwt_token_tests_config
+        result = get_jwt_token_tests_config()
+        assert isinstance(result["test_details"], list)
+        assert len(result["test_details"]) >= 6
+
+    def test_assertion_details_list(self):
+        from apps.core.utils.user_model_utils import get_jwt_token_tests_config
+        result = get_jwt_token_tests_config()
+        assert isinstance(result["assertion_details"], list)
+        assert len(result["assertion_details"]) >= 6
+
+    def test_coverage_details_list(self):
+        from apps.core.utils.user_model_utils import get_jwt_token_tests_config
+        result = get_jwt_token_tests_config()
+        assert isinstance(result["coverage_details"], list)
+        assert len(result["coverage_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_jwt_token_tests_config
+        assert callable(get_jwt_token_tests_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_jwt_token_tests_config
+        assert "Task 93" in get_jwt_token_tests_config.__doc__
+
+
+class TestGetPasswordResetTestsConfig:
+    """Tests for get_password_reset_tests_config (Task 94)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_password_reset_tests_config
+        result = get_password_reset_tests_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_password_reset_tests_config
+        result = get_password_reset_tests_config()
+        assert result["configured"] is True
+
+    def test_test_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_tests_config
+        result = get_password_reset_tests_config()
+        assert isinstance(result["test_details"], list)
+        assert len(result["test_details"]) >= 6
+
+    def test_expectation_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_tests_config
+        result = get_password_reset_tests_config()
+        assert isinstance(result["expectation_details"], list)
+        assert len(result["expectation_details"]) >= 6
+
+    def test_scenario_details_list(self):
+        from apps.core.utils.user_model_utils import get_password_reset_tests_config
+        result = get_password_reset_tests_config()
+        assert isinstance(result["scenario_details"], list)
+        assert len(result["scenario_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_password_reset_tests_config
+        assert callable(get_password_reset_tests_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_password_reset_tests_config
+        assert "Task 94" in get_password_reset_tests_config.__doc__
+
+
+class TestGetRunAllMigrationsConfig:
+    """Tests for get_run_all_migrations_config (Task 95)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_run_all_migrations_config
+        result = get_run_all_migrations_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_run_all_migrations_config
+        result = get_run_all_migrations_config()
+        assert result["configured"] is True
+
+    def test_migration_details_list(self):
+        from apps.core.utils.user_model_utils import get_run_all_migrations_config
+        result = get_run_all_migrations_config()
+        assert isinstance(result["migration_details"], list)
+        assert len(result["migration_details"]) >= 6
+
+    def test_result_details_list(self):
+        from apps.core.utils.user_model_utils import get_run_all_migrations_config
+        result = get_run_all_migrations_config()
+        assert isinstance(result["result_details"], list)
+        assert len(result["result_details"]) >= 6
+
+    def test_schema_details_list(self):
+        from apps.core.utils.user_model_utils import get_run_all_migrations_config
+        result = get_run_all_migrations_config()
+        assert isinstance(result["schema_details"], list)
+        assert len(result["schema_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_run_all_migrations_config
+        assert callable(get_run_all_migrations_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_run_all_migrations_config
+        assert "Task 95" in get_run_all_migrations_config.__doc__
+
+
+class TestGetAuthenticationDocumentationConfig:
+    """Tests for get_authentication_documentation_config (Task 96)."""
+
+    def test_returns_dict(self):
+        from apps.core.utils.user_model_utils import get_authentication_documentation_config
+        result = get_authentication_documentation_config()
+        assert isinstance(result, dict)
+
+    def test_configured_flag(self):
+        from apps.core.utils.user_model_utils import get_authentication_documentation_config
+        result = get_authentication_documentation_config()
+        assert result["configured"] is True
+
+    def test_flow_details_list(self):
+        from apps.core.utils.user_model_utils import get_authentication_documentation_config
+        result = get_authentication_documentation_config()
+        assert isinstance(result["flow_details"], list)
+        assert len(result["flow_details"]) >= 6
+
+    def test_endpoint_details_list(self):
+        from apps.core.utils.user_model_utils import get_authentication_documentation_config
+        result = get_authentication_documentation_config()
+        assert isinstance(result["endpoint_details"], list)
+        assert len(result["endpoint_details"]) >= 6
+
+    def test_policy_details_list(self):
+        from apps.core.utils.user_model_utils import get_authentication_documentation_config
+        result = get_authentication_documentation_config()
+        assert isinstance(result["policy_details"], list)
+        assert len(result["policy_details"]) >= 6
+
+    def test_importable_from_package(self):
+        from apps.core.utils import get_authentication_documentation_config
+        assert callable(get_authentication_documentation_config)
+
+    def test_docstring_ref(self):
+        from apps.core.utils.user_model_utils import get_authentication_documentation_config
+        assert "Task 96" in get_authentication_documentation_config.__doc__

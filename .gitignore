@@ -310,6 +310,9 @@ uploads/
 static/collected/
 backend/media/*
 !backend/media/.gitkeep
+!backend/media/public/
+backend/media/public/*
+!backend/media/public/.gitkeep
 
 # -------------------------------------------------
 # Document Series (development reference)

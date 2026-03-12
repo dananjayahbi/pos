@@ -22,7 +22,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 
 
 # ---------------------------------------------------------------------------
@@ -128,7 +128,7 @@ class TestMiddleware:
             "process_request",
             return_value=None,
         ), patch(
-            "apps.tenants.middleware.tenant_middleware.connection"
+            "django.db.connection"
         ) as mock_conn:
             mock_conn.tenant = mock_tenant
             mock_conn.schema_name = "acme"
@@ -155,7 +155,7 @@ class TestMiddleware:
             "process_request",
             return_value=None,
         ), patch(
-            "apps.tenants.middleware.tenant_middleware.connection"
+            "django.db.connection"
         ) as mock_conn:
             mock_conn.tenant = None
             mock_conn.schema_name = None
@@ -234,7 +234,7 @@ class TestSubdomainResolution:
         assert is_valid_subdomain("-bad") is False
         assert is_valid_subdomain("BAD") is False
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_resolver_returns_none_for_reserved(self, mock_cache):
         """Reserved subdomains return None without DB lookup."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -253,7 +253,7 @@ class TestSubdomainResolution:
         result = resolver.resolve_tenant("")
         assert result is None
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_resolver_cache_hit(self, mock_cache):
         """Cached tenant is returned without DB query."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -265,7 +265,7 @@ class TestSubdomainResolution:
         result = resolver.resolve_tenant("cached")
         assert result is tenant
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_resolver_cache_miss_sentinel(self, mock_cache):
         """Cache miss sentinel returns None without DB query."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -322,6 +322,7 @@ class TestCustomDomainResolution:
         from apps.tenants.middleware import CustomDomainResolver
         assert hasattr(CustomDomainResolver, "resolve_by_domain")
 
+    @override_settings(ALLOWED_HOSTS=["*"])
     def test_platform_domain_is_skipped(self):
         """Platform base domains are not resolved as custom domains."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -332,7 +333,7 @@ class TestCustomDomainResolution:
         result = resolver.resolve(request)
         assert result is None
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_cache_hit_returns_tenant(self, mock_cache):
         """Cached custom domain returns tenant."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -344,7 +345,7 @@ class TestCustomDomainResolution:
         result = resolver.resolve_by_domain("shop.mybusiness.lk")
         assert result is tenant
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_cache_miss_sentinel_returns_none(self, mock_cache):
         """Cache miss sentinel returns None."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -368,7 +369,7 @@ class TestCustomDomainResolution:
         from apps.tenants.middleware import invalidate_custom_domain_cache
         assert callable(invalidate_custom_domain_cache)
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_invalidate_deletes_cache_key(self, mock_cache):
         """invalidate_custom_domain_cache deletes the correct cache key."""
         from apps.tenants.middleware import invalidate_custom_domain_cache
@@ -469,7 +470,7 @@ class TestHeaderResolution:
         from apps.tenants.middleware import invalidate_header_cache
         assert callable(invalidate_header_cache)
 
-    @patch("apps.tenants.middleware.header_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_invalidate_deletes_cache_key(self, mock_cache):
         """invalidate_header_cache deletes the correct cache key."""
         from apps.tenants.middleware import invalidate_header_cache
@@ -699,7 +700,7 @@ class TestCacheBehavior:
     Covers cache hit, miss, invalidation, and TTL expectations.
     """
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_subdomain_cache_hit(self, mock_cache):
         """Subdomain resolver returns cached tenant on cache hit."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -712,7 +713,7 @@ class TestCacheBehavior:
         assert result is tenant
         mock_cache.set.assert_not_called()
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_subdomain_cache_miss_sentinel(self, mock_cache):
         """Subdomain resolver returns None for miss sentinel."""
         from apps.tenants.middleware.subdomain_resolver import SubdomainResolver
@@ -723,7 +724,7 @@ class TestCacheBehavior:
         result = resolver.resolve_tenant("missing")
         assert result is None
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_custom_domain_cache_hit(self, mock_cache):
         """Custom domain resolver returns cached tenant on cache hit."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -735,7 +736,7 @@ class TestCacheBehavior:
         result = resolver.resolve_by_domain("shop.example.com")
         assert result is tenant
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_custom_domain_cache_miss_sentinel(self, mock_cache):
         """Custom domain resolver returns None for miss sentinel."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -746,7 +747,7 @@ class TestCacheBehavior:
         result = resolver.resolve_by_domain("missing.example.com")
         assert result is None
 
-    @patch("apps.tenants.middleware.subdomain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_subdomain_invalidation(self, mock_cache):
         """invalidate_subdomain_cache calls cache.delete."""
         from apps.tenants.middleware.subdomain_resolver import (
@@ -763,7 +764,7 @@ class TestCacheBehavior:
 
             invalidate_subdomain_cache("acme.lcc.example.com")
 
-    @patch("apps.tenants.middleware.domain_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_custom_domain_invalidation(self, mock_cache):
         """invalidate_custom_domain_cache calls cache.delete."""
         from apps.tenants.middleware import invalidate_custom_domain_cache
@@ -771,7 +772,7 @@ class TestCacheBehavior:
         invalidate_custom_domain_cache("shop.mybusiness.lk")
         mock_cache.delete.assert_called_once()
 
-    @patch("apps.tenants.middleware.header_resolver.cache")
+    @patch("django.core.cache.cache")
     def test_header_cache_invalidation(self, mock_cache):
         """invalidate_header_cache calls cache.delete."""
         from apps.tenants.middleware import invalidate_header_cache

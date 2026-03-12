@@ -15,3 +15,7 @@ class UsersConfig(AppConfig):
     name = "apps.users"
     label = "users"
     verbose_name = "User Management"
+
+    def ready(self):
+        """Import signal handlers when the app is ready."""
+        import apps.users.signals  # noqa: F401

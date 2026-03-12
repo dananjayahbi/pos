@@ -70,6 +70,14 @@ SELECT 'CREATE DATABASE lankacommerce_test WITH OWNER = postgres ENCODING = ''UT
 WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce_test')
 \gexec
 
+-- Transfer test database ownership to lcc_user so pytest can
+-- drop/recreate it when @pytest.mark.django_db tests run.
+-- (This runs idempotently — safe if lcc_user is already owner.)
+SELECT 'ALTER DATABASE lankacommerce_test OWNER TO lcc_user'
+WHERE EXISTS (SELECT FROM pg_database WHERE datname = 'lankacommerce_test')
+  AND EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'lcc_user')
+\gexec
+
 -- ---------------------------------------------------
 -- 4. Create application user
 -- ---------------------------------------------------

@@ -7,13 +7,9 @@ The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
 """
 
+from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path  # noqa: F401
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from django.urls import include, path
 
 urlpatterns = [
     # ──────────────────────────────────────────────
@@ -22,22 +18,31 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # ──────────────────────────────────────────────
-    # API v1 (to be added with DRF)
+    # API v1
     # ──────────────────────────────────────────────
+    path("api/v1/users/", include("apps.users.api.urls", namespace="users")),
+    path("api/v1/", include("apps.products.api.urls", namespace="products")),
+    path("api/v1/", include("apps.attributes.urls", namespace="attributes")),
     # path("api/v1/auth/", include("apps.authentication.urls")),
     # path("api/v1/tenants/", include("apps.tenants.urls")),
     # path("api/v1/inventory/", include("apps.inventory.urls")),
     # path("api/v1/pos/", include("apps.pos.urls")),
 
     # ──────────────────────────────────────────────
-    # API Documentation — drf-spectacular
+    # API Documentation — drf-spectacular (SP11)
     # ──────────────────────────────────────────────
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path("api/", include("apps.core.api_docs.urls")),
 
     # ──────────────────────────────────────────────
     # Health Checks
     # ──────────────────────────────────────────────
     path("health/", include("apps.core.urls")),
 ]
+
+# ──────────────────────────────────────────────────────────────────────
+# Media file serving (development only)
+# ──────────────────────────────────────────────────────────────────────
+if settings.DEBUG:
+    from django.conf.urls.static import static
+
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

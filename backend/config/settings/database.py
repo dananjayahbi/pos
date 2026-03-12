@@ -253,10 +253,12 @@ SHARED_APPS: list[str] = [
     "django_filters",                    # Query filtering (config is global)
     "rest_framework_simplejwt",          # JWT auth (token handling is global)
     "drf_spectacular",                   # OpenAPI docs (schema generation is global)
+    "drf_spectacular_sidecar",            # Self-hosted Swagger/ReDoc assets
     "corsheaders",                       # CORS handling (middleware is global)
     "channels",                          # Django Channels / WebSocket (global routing)
     "django_celery_beat",                # Celery beat scheduler (shared task schedule)
     "django_celery_results",             # Celery results backend (shared result storage)
+    "mptt",                              # MPTT — Hierarchical tree structure for categories
 ]
 
 # TENANT_APPS CRITERIA (how to decide if an app belongs here):
@@ -292,6 +294,7 @@ TENANT_APPS: list[str] = [
     "django.contrib.auth",               # Per-tenant users, groups, permissions
     # ── LankaCommerce Business Modules (per-tenant data) ────────────
     "apps.products",                     # Product catalog — tenant-specific SKUs & pricing
+    "apps.attributes",                   # Product attributes — tenant-specific attribute definitions
     "apps.inventory",                    # Stock & warehouse — tenant-specific stock levels
     "apps.vendors",                      # Supplier management — tenant-specific vendors
     "apps.sales",                        # Orders, invoicing, POS — tenant-specific transactions

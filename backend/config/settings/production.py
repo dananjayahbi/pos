@@ -169,6 +169,26 @@ EMAIL_SUBJECT_PREFIX = "[LCC] "
 
 
 # ════════════════════════════════════════════════════════════════════════
+# S3 PRODUCTION STORAGE (SP10 Group C — Task 46)
+# ════════════════════════════════════════════════════════════════════════
+# In production the STORAGE_BACKEND env-var should be "s3".
+# storage.py already validates credentials when STORAGE_BACKEND=s3 and
+# wires up TenantS3Storage as the default backend automatically.
+#
+# This block emits a loud warning if production is running on local
+# filesystem storage — it should never happen in a real deployment.
+
+if STORAGE_BACKEND == "local":  # noqa: F405 (imported via base *)
+    import warnings
+
+    warnings.warn(
+        "STORAGE_BACKEND is 'local' in production settings. "
+        "Set STORAGE_BACKEND=s3 and provide AWS credentials for production.",
+        stacklevel=1,
+    )
+
+
+# ════════════════════════════════════════════════════════════════════════
 # ERROR TRACKING — Sentry (optional)
 # ════════════════════════════════════════════════════════════════════════
 

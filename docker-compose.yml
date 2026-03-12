@@ -28,6 +28,15 @@ services:
       - DATABASE_URL=${DATABASE_URL:-postgres://lcc_user:dev_password_change_me@pgbouncer:6432/lankacommerce}
       - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
       - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      # Storage (default: local filesystem; set to "s3" for AWS S3)
+      - STORAGE_BACKEND=${STORAGE_BACKEND:-local}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_STORAGE_BUCKET_NAME=${AWS_STORAGE_BUCKET_NAME:-}
+      - AWS_S3_REGION_NAME=${AWS_S3_REGION_NAME:-ap-south-1}
+      - AWS_S3_CUSTOM_DOMAIN=${AWS_S3_CUSTOM_DOMAIN:-}
+      - AWS_PRIVATE_BUCKET_NAME=${AWS_PRIVATE_BUCKET_NAME:-}
+      - AWS_PUBLIC_BUCKET_NAME=${AWS_PUBLIC_BUCKET_NAME:-}
     env_file:
       - .env.docker
     networks:

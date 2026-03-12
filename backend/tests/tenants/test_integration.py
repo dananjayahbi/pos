@@ -24,7 +24,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +120,7 @@ class TestEndToEndSubdomainResolution:
 
         resolver = SubdomainResolver(base_domain="lcc.example.com")
 
-        with patch("apps.tenants.middleware.subdomain_resolver.cache") as mock_cache:
+        with patch("django.core.cache.cache") as mock_cache:
             result = resolver.resolve_tenant("www")
             assert result is None
             mock_cache.get.assert_not_called()
@@ -140,7 +140,7 @@ class TestEndToEndCustomDomainResolution:
 
         resolver = CustomDomainResolver(base_domain="lcc.example.com")
 
-        with patch("apps.tenants.middleware.domain_resolver.cache") as mock_cache:
+        with patch("django.core.cache.cache") as mock_cache:
             tenant = _make_tenant(name="custom-co", schema_name="custom_co")
             mock_cache.get.return_value = tenant
 
@@ -148,6 +148,7 @@ class TestEndToEndCustomDomainResolution:
             assert result is tenant
             assert result.schema_name == "custom_co"
 
+    @override_settings(ALLOWED_HOSTS=["*"])
     def test_platform_domain_skips_custom_lookup(self):
         """Full flow: platform subdomain is not treated as custom domain."""
         from apps.tenants.middleware.domain_resolver import CustomDomainResolver
@@ -179,7 +180,7 @@ class TestEndToEndHeaderResolution:
         )
 
         with patch.object(
-            resolver, "resolve_by_identifier", return_value=_make_tenant()
+            resolver, "lookup_tenant", return_value=_make_tenant()
         ) as mock_resolve:
             result = resolver.resolve(request)
             assert result is not None
@@ -329,7 +330,7 @@ class TestMultiTenantIsolation:
         with patch.object(
             sub_resolver, "resolve_tenant", return_value=tenant_sub
         ), patch(
-            "apps.tenants.middleware.domain_resolver.cache"
+            "django.core.cache.cache"
         ) as mock_cache:
             mock_cache.get.return_value = tenant_dom
 
@@ -354,7 +355,7 @@ class TestMultiTenantIsolation:
         with patch.object(
             sub_resolver, "resolve_tenant", return_value=tenant_sub
         ), patch.object(
-            hdr_resolver, "resolve_by_identifier", return_value=tenant_hdr
+            hdr_resolver, "lookup_tenant", return_value=tenant_hdr
         ):
             result_sub = sub_resolver.resolve_tenant("sub-t")
             factory = RequestFactory()
@@ -460,15 +461,15 @@ class TestMultiTenantIsolation:
     def test_cache_invalidation_does_not_affect_other_resolvers(self):
         """Invalidating one resolver cache does not affect others."""
         with patch(
-            "apps.tenants.middleware.domain_resolver.cache"
-        ) as mock_dom_cache, patch(
-            "apps.tenants.middleware.header_resolver.cache"
-        ) as mock_hdr_cache:
+            "django.core.cache.cache"
+        ) as mock_cache:
             from apps.tenants.middleware import invalidate_custom_domain_cache
 
             invalidate_custom_domain_cache("shop.example.com")
-            mock_dom_cache.delete.assert_called_once()
-            mock_hdr_cache.delete.assert_not_called()
+            mock_cache.delete.assert_called_once()
+            call_arg = mock_cache.delete.call_args[0][0]
+            assert "custom_domain" in call_arg
+            assert "header" not in call_arg
 
     def test_public_path_does_not_affect_tenant_resolution(self):
         """Public path check does not modify resolver state."""

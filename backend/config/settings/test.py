@@ -19,7 +19,7 @@ DEBUG = False  # Match production behaviour
 
 SECRET_KEY = "django-insecure-test-key-for-ci-only"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver", ".testserver"]
 
 
 # ════════════════════════════════════════════════════════════════════════
@@ -65,7 +65,15 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "lcc-test",
-    }
+    },
+    "sessions": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "lcc-test-sessions",
+    },
+    "ratelimit": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "lcc-test-ratelimit",
+    },
 }
 
 

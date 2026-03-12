@@ -46,6 +46,7 @@ class MockMeta:
 
     def __init__(self, app_label):
         self.app_label = app_label
+        self.model_name = "mock_model"
 
 
 class MockObj:
