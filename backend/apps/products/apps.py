@@ -10,3 +10,8 @@ class ProductsConfig(AppConfig):
     name = "apps.products"
     label = "products"
     verbose_name = "Product Management"
+
+    def ready(self):
+        """Register signal handlers when the app is ready."""
+        import apps.products.signals  # noqa: F401
+        import apps.products.media.signals  # noqa: F401

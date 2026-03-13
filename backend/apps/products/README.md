@@ -10,13 +10,13 @@ pricing, SEO fields, and dual-channel visibility (webstore + POS).
 
 ## Overview
 
-| Module           | Description                                                |
-| ---------------- | ---------------------------------------------------------- |
-| **Category**     | MPTT tree with unlimited nesting, drag-drop admin          |
-| **Brand**        | Product brands with auto-slugs and logo support            |
-| **TaxClass**     | Tax rates with single-default enforcement per tenant       |
-| **UnitOfMeasure**| Base/derived units with conversion factors                 |
-| **Product**      | Core product model — 27+ fields, 4 types, 4 statuses      |
+| Module            | Description                                          |
+| ----------------- | ---------------------------------------------------- |
+| **Category**      | MPTT tree with unlimited nesting, drag-drop admin    |
+| **Brand**         | Product brands with auto-slugs and logo support      |
+| **TaxClass**      | Tax rates with single-default enforcement per tenant |
+| **UnitOfMeasure** | Base/derived units with conversion factors           |
+| **Product**       | Core product model — 27+ fields, 4 types, 4 statuses |
 
 ### Key capabilities
 
@@ -74,38 +74,38 @@ Navigate to `/admin/products/` for the admin interface.
 
 ### Brands
 
-| Method   | Endpoint                  | Description                         |
-| -------- | ------------------------- | ----------------------------------- |
-| `GET`    | `/api/v1/brands/`         | List brands (search, filter active) |
-| `POST`   | `/api/v1/brands/`         | Create a brand                      |
-| `GET`    | `/api/v1/brands/{id}/`    | Retrieve brand detail               |
-| `PUT`    | `/api/v1/brands/{id}/`    | Full update                         |
-| `PATCH`  | `/api/v1/brands/{id}/`    | Partial update                      |
-| `DELETE` | `/api/v1/brands/{id}/`    | Delete                              |
+| Method   | Endpoint               | Description                         |
+| -------- | ---------------------- | ----------------------------------- |
+| `GET`    | `/api/v1/brands/`      | List brands (search, filter active) |
+| `POST`   | `/api/v1/brands/`      | Create a brand                      |
+| `GET`    | `/api/v1/brands/{id}/` | Retrieve brand detail               |
+| `PUT`    | `/api/v1/brands/{id}/` | Full update                         |
+| `PATCH`  | `/api/v1/brands/{id}/` | Partial update                      |
+| `DELETE` | `/api/v1/brands/{id}/` | Delete                              |
 
 ### Tax Classes
 
-| Method   | Endpoint                     | Description                           |
-| -------- | ---------------------------- | ------------------------------------- |
-| `GET`    | `/api/v1/tax-classes/`       | List tax classes (filter by default)  |
-| `POST`   | `/api/v1/tax-classes/`       | Create a tax class                    |
-| `GET`    | `/api/v1/tax-classes/{id}/`  | Retrieve tax class detail             |
-| `PUT`    | `/api/v1/tax-classes/{id}/`  | Full update                           |
-| `PATCH`  | `/api/v1/tax-classes/{id}/`  | Partial update                        |
-| `DELETE` | `/api/v1/tax-classes/{id}/`  | Delete                                |
+| Method   | Endpoint                    | Description                          |
+| -------- | --------------------------- | ------------------------------------ |
+| `GET`    | `/api/v1/tax-classes/`      | List tax classes (filter by default) |
+| `POST`   | `/api/v1/tax-classes/`      | Create a tax class                   |
+| `GET`    | `/api/v1/tax-classes/{id}/` | Retrieve tax class detail            |
+| `PUT`    | `/api/v1/tax-classes/{id}/` | Full update                          |
+| `PATCH`  | `/api/v1/tax-classes/{id}/` | Partial update                       |
+| `DELETE` | `/api/v1/tax-classes/{id}/` | Delete                               |
 
 ### Products
 
-| Method   | Endpoint                      | Description                                  |
-| -------- | ----------------------------- | -------------------------------------------- |
-| `GET`    | `/api/v1/products/`           | List products (filter, search, paginate)     |
-| `POST`   | `/api/v1/products/`           | Create product (auto SKU/slug generation)    |
-| `GET`    | `/api/v1/products/{id}/`      | Retrieve product detail (nested serializer)  |
-| `PUT`    | `/api/v1/products/{id}/`      | Full update                                  |
-| `PATCH`  | `/api/v1/products/{id}/`      | Partial update                               |
-| `DELETE` | `/api/v1/products/{id}/`      | Delete                                       |
-| `GET`    | `/api/v1/products/published/` | Active + webstore-visible products           |
-| `GET`    | `/api/v1/products/featured/`  | Active + featured products                   |
+| Method   | Endpoint                      | Description                                 |
+| -------- | ----------------------------- | ------------------------------------------- |
+| `GET`    | `/api/v1/products/`           | List products (filter, search, paginate)    |
+| `POST`   | `/api/v1/products/`           | Create product (auto SKU/slug generation)   |
+| `GET`    | `/api/v1/products/{id}/`      | Retrieve product detail (nested serializer) |
+| `PUT`    | `/api/v1/products/{id}/`      | Full update                                 |
+| `PATCH`  | `/api/v1/products/{id}/`      | Partial update                              |
+| `DELETE` | `/api/v1/products/{id}/`      | Delete                                      |
+| `GET`    | `/api/v1/products/published/` | Active + webstore-visible products          |
+| `GET`    | `/api/v1/products/featured/`  | Active + featured products                  |
 
 **Product query parameters:** `?category=`, `?brand=`, `?product_type=`, `?status=`, `?featured=`,
 `?is_webstore_visible=`, `?is_pos_visible=`, `?min_price=`, `?max_price=`, `?search=`, `?ordering=`
@@ -118,30 +118,30 @@ Navigate to `/admin/products/` for the admin interface.
 
 The core product model with 27+ fields supporting 4 product types (Simple, Variable, Bundle, Composite) and 4 statuses (Draft, Active, Archived, Discontinued).
 
-| Field                 | Type                    | Description                        |
-| --------------------- | ----------------------- | ---------------------------------- |
-| `name`                | `CharField(255)`        | Display name                       |
-| `slug`                | `SlugField(255)`        | Unique per tenant, auto-generated  |
-| `sku`                 | `CharField(50)`         | Stock Keeping Unit, auto-generated |
-| `barcode`             | `CharField(50)`         | Optional barcode (EAN/UPC)         |
-| `description`         | `TextField`             | Full description                   |
-| `short_description`   | `CharField(500)`        | Brief summary                      |
-| `category`            | `ForeignKey(Category)`  | Required, PROTECT on delete        |
-| `brand`               | `ForeignKey(Brand)`     | Optional, SET_NULL on delete       |
-| `product_type`        | `CharField(20)`         | simple/variable/bundle/composite   |
-| `status`              | `CharField(15)`         | draft/active/archived/discontinued |
-| `tax_class`           | `ForeignKey(TaxClass)`  | Optional, SET_NULL on delete       |
-| `unit_of_measure`     | `ForeignKey(UOM)`       | Optional, SET_NULL on delete       |
-| `cost_price`          | `DecimalField(12,2)`    | Purchase cost                      |
-| `selling_price`       | `DecimalField(12,2)`    | Customer selling price             |
-| `mrp`                 | `DecimalField(12,2)`    | Maximum retail price               |
-| `wholesale_price`     | `DecimalField(12,2)`    | Wholesale/bulk price               |
-| `weight`/`length`/`width`/`height` | `DecimalField` | Physical dimensions      |
-| `seo_title`           | `CharField(100)`        | Meta title for SEO                 |
-| `seo_description`     | `CharField(300)`        | Meta description for SEO           |
-| `is_webstore_visible` | `BooleanField`          | Webstore display toggle (indexed)  |
-| `is_pos_visible`      | `BooleanField`          | POS display toggle (indexed)       |
-| `featured`            | `BooleanField`          | Featured product flag              |
+| Field                              | Type                   | Description                        |
+| ---------------------------------- | ---------------------- | ---------------------------------- |
+| `name`                             | `CharField(255)`       | Display name                       |
+| `slug`                             | `SlugField(255)`       | Unique per tenant, auto-generated  |
+| `sku`                              | `CharField(50)`        | Stock Keeping Unit, auto-generated |
+| `barcode`                          | `CharField(50)`        | Optional barcode (EAN/UPC)         |
+| `description`                      | `TextField`            | Full description                   |
+| `short_description`                | `CharField(500)`       | Brief summary                      |
+| `category`                         | `ForeignKey(Category)` | Required, PROTECT on delete        |
+| `brand`                            | `ForeignKey(Brand)`    | Optional, SET_NULL on delete       |
+| `product_type`                     | `CharField(20)`        | simple/variable/bundle/composite   |
+| `status`                           | `CharField(15)`        | draft/active/archived/discontinued |
+| `tax_class`                        | `ForeignKey(TaxClass)` | Optional, SET_NULL on delete       |
+| `unit_of_measure`                  | `ForeignKey(UOM)`      | Optional, SET_NULL on delete       |
+| `cost_price`                       | `DecimalField(12,2)`   | Purchase cost                      |
+| `selling_price`                    | `DecimalField(12,2)`   | Customer selling price             |
+| `mrp`                              | `DecimalField(12,2)`   | Maximum retail price               |
+| `wholesale_price`                  | `DecimalField(12,2)`   | Wholesale/bulk price               |
+| `weight`/`length`/`width`/`height` | `DecimalField`         | Physical dimensions                |
+| `seo_title`                        | `CharField(100)`       | Meta title for SEO                 |
+| `seo_description`                  | `CharField(300)`       | Meta description for SEO           |
+| `is_webstore_visible`              | `BooleanField`         | Webstore display toggle (indexed)  |
+| `is_pos_visible`                   | `BooleanField`         | POS display toggle (indexed)       |
+| `featured`                         | `BooleanField`         | Featured product flag              |
 
 **Auto-generated fields:** `slug` (from name), `sku` (PRD-{category}-{uuid})
 
@@ -149,32 +149,32 @@ The core product model with 27+ fields supporting 4 product types (Simple, Varia
 
 ### Brand
 
-| Field         | Type              | Description                       |
-| ------------- | ----------------- | --------------------------------- |
-| `name`        | `CharField(255)`  | Brand name                        |
-| `slug`        | `SlugField(255)`  | Auto-generated from name          |
-| `description` | `TextField`       | Optional description              |
-| `website`     | `URLField`        | Brand website                     |
-| `logo`        | `ImageField`      | Brand logo                        |
+| Field         | Type             | Description              |
+| ------------- | ---------------- | ------------------------ |
+| `name`        | `CharField(255)` | Brand name               |
+| `slug`        | `SlugField(255)` | Auto-generated from name |
+| `description` | `TextField`      | Optional description     |
+| `website`     | `URLField`       | Brand website            |
+| `logo`        | `ImageField`     | Brand logo               |
 
 ### TaxClass
 
-| Field        | Type                 | Description                                |
-| ------------ | -------------------- | ------------------------------------------ |
-| `name`       | `CharField(100)`     | Tax class name                             |
-| `rate`       | `DecimalField(5,2)`  | Tax rate percentage                        |
-| `is_default` | `BooleanField`       | Single default per tenant (auto-enforced)  |
-| `description`| `TextField`          | Optional description                       |
+| Field         | Type                | Description                               |
+| ------------- | ------------------- | ----------------------------------------- |
+| `name`        | `CharField(100)`    | Tax class name                            |
+| `rate`        | `DecimalField(5,2)` | Tax rate percentage                       |
+| `is_default`  | `BooleanField`      | Single default per tenant (auto-enforced) |
+| `description` | `TextField`         | Optional description                      |
 
 ### UnitOfMeasure
 
-| Field              | Type                | Description                     |
-| ------------------ | ------------------- | ------------------------------- |
-| `name`             | `CharField(100)`    | Unit name                       |
-| `symbol`           | `CharField(10)`     | Short symbol (kg, pcs, etc.)    |
-| `is_base_unit`     | `BooleanField`      | Whether this is a base unit     |
-| `conversion_factor`| `DecimalField(10,4)`| Conversion to base unit         |
-| `description`      | `TextField`         | Optional description            |
+| Field               | Type                 | Description                  |
+| ------------------- | -------------------- | ---------------------------- |
+| `name`              | `CharField(100)`     | Unit name                    |
+| `symbol`            | `CharField(10)`      | Short symbol (kg, pcs, etc.) |
+| `is_base_unit`      | `BooleanField`       | Whether this is a base unit  |
+| `conversion_factor` | `DecimalField(10,4)` | Conversion to base unit      |
+| `description`       | `TextField`          | Optional description         |
 
 ### Category (MPTT)
 
@@ -202,38 +202,38 @@ The core product model with 27+ fields supporting 4 product types (Simple, Varia
 
 ### ProductQuerySet methods (chainable)
 
-| Method              | Returns                               |
-| ------------------- | ------------------------------------- |
-| `active()`          | Active, non-deleted products          |
-| `published()`       | Active + webstore visible             |
-| `in_stock()`        | Placeholder (returns active)          |
-| `by_category(cat)`  | Filter by category (object or UUID)   |
-| `by_brand(brand)`   | Filter by brand (object or UUID)      |
-| `by_status(status)` | Filter by status choice               |
-| `simple_products()` | Simple type only                      |
-| `variable_products()`| Variable type only                   |
-| `featured()`        | Featured products only                |
-| `for_pos()`         | Active + POS visible                  |
-| `for_webstore()`    | Active + webstore visible             |
+| Method                | Returns                             |
+| --------------------- | ----------------------------------- |
+| `active()`            | Active, non-deleted products        |
+| `published()`         | Active + webstore visible           |
+| `in_stock()`          | Placeholder (returns active)        |
+| `by_category(cat)`    | Filter by category (object or UUID) |
+| `by_brand(brand)`     | Filter by brand (object or UUID)    |
+| `by_status(status)`   | Filter by status choice             |
+| `simple_products()`   | Simple type only                    |
+| `variable_products()` | Variable type only                  |
+| `featured()`          | Featured products only              |
+| `for_pos()`           | Active + POS visible                |
+| `for_webstore()`      | Active + webstore visible           |
 
 ### ProductManager methods
 
-| Method            | Description                                        |
-| ----------------- | -------------------------------------------------- |
-| `search(query)`   | PostgreSQL full-text search with icontains fallback |
-| `active()`        | Proxy to QuerySet.active()                         |
-| `published()`     | Proxy to QuerySet.published()                      |
-| `for_pos()`       | Proxy to QuerySet.for_pos()                        |
-| `for_webstore()`  | Proxy to QuerySet.for_webstore()                   |
+| Method           | Description                                         |
+| ---------------- | --------------------------------------------------- |
+| `search(query)`  | PostgreSQL full-text search with icontains fallback |
+| `active()`       | Proxy to QuerySet.active()                          |
+| `published()`    | Proxy to QuerySet.published()                       |
+| `for_pos()`      | Proxy to QuerySet.for_pos()                         |
+| `for_webstore()` | Proxy to QuerySet.for_webstore()                    |
 
 ### Model properties
 
-| Property / Method    | Returns   | Description           |
-| -------------------- | --------- | --------------------- |
-| `profit_margin`      | `Decimal` | Profit margin %       |
-| `is_root` (Category) | `bool`    | Root node check       |
-| `is_leaf` (Category) | `bool`    | Leaf node check       |
-| `get_full_path(sep)` | `str`     | Breadcrumb string     |
+| Property / Method    | Returns   | Description       |
+| -------------------- | --------- | ----------------- |
+| `profit_margin`      | `Decimal` | Profit margin %   |
+| `is_root` (Category) | `bool`    | Root node check   |
+| `is_leaf` (Category) | `bool`    | Leaf node check   |
+| `get_full_path(sep)` | `str`     | Breadcrumb string |
 
 See [docs/overview.md](docs/overview.md) for additional details.
 
@@ -283,13 +283,13 @@ python manage.py import_categories --input=cats.json --clear  # clear first
 
 Comprehensive test suite using real PostgreSQL with tenant schema isolation.
 
-| Suite                   | Location                                          | Description                     |
-| ----------------------- | ------------------------------------------------- | ------------------------------- |
-| Category Models         | `tests/products/test_models.py`                   | 151 tests — MPTT, CRUD, tree   |
-| Category API            | `tests/products/test_api.py`                      | 120 tests — endpoints, serial.  |
-| Product Models          | `tests/products/test_product_models.py`           | 263 tests — fields, manager, QS |
-| Product API (unit)      | `tests/products/test_product_api.py`              | 143 tests — serializer, filter  |
-| Product Integration     | `tests/products/test_product_integration.py`      | 110+ tests — CRUD, API, tenant  |
+| Suite               | Location                                     | Description                     |
+| ------------------- | -------------------------------------------- | ------------------------------- |
+| Category Models     | `tests/products/test_models.py`              | 151 tests — MPTT, CRUD, tree    |
+| Category API        | `tests/products/test_api.py`                 | 120 tests — endpoints, serial.  |
+| Product Models      | `tests/products/test_product_models.py`      | 263 tests — fields, manager, QS |
+| Product API (unit)  | `tests/products/test_product_api.py`         | 143 tests — serializer, filter  |
+| Product Integration | `tests/products/test_product_integration.py` | 110+ tests — CRUD, API, tenant  |
 
 ### Running tests
 

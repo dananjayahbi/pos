@@ -25,7 +25,7 @@ urlpatterns = [
     path("api/v1/", include("apps.attributes.urls", namespace="attributes")),
     # path("api/v1/auth/", include("apps.authentication.urls")),
     # path("api/v1/tenants/", include("apps.tenants.urls")),
-    # path("api/v1/inventory/", include("apps.inventory.urls")),
+    path("api/v1/warehouse/", include("apps.inventory.warehouses.api.urls", namespace="warehouse")),
     # path("api/v1/pos/", include("apps.pos.urls")),
 
     # ──────────────────────────────────────────────

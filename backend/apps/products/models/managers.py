@@ -571,3 +571,67 @@ class ProductManager(models.Manager):
                 | Q(barcode__icontains=query)
                 | Q(description__icontains=query)
             )
+
+
+# ══════════════════════════════════════════════════════════════════════
+# Bundle QuerySet & Manager
+# ══════════════════════════════════════════════════════════════════════
+
+
+class BundleQuerySet(models.QuerySet):
+    """
+    Custom QuerySet for ProductBundle model.
+
+    Provides chainable filter methods for common bundle queries.
+    """
+
+    def active(self):
+        """Return only active bundles."""
+        return self.filter(is_active=True, is_deleted=False)
+
+    def with_items(self):
+        """Prefetch bundle items with related products and variants."""
+        return self.prefetch_related(
+            "items",
+            "items__product",
+            "items__variant",
+        ).select_related("product")
+
+    def by_type(self, bundle_type):
+        """Filter bundles by pricing type (fixed/dynamic)."""
+        return self.filter(bundle_type=bundle_type)
+
+    def available(self):
+        """Return active bundles that have at least one required item with stock."""
+        from apps.products.services import BundleStockService
+
+        active_bundles = self.active()
+        available_ids = []
+        for bundle in active_bundles.prefetch_related("items", "items__product", "items__variant"):
+            service = BundleStockService(bundle)
+            if service.get_available_stock() > 0:
+                available_ids.append(bundle.pk)
+        return self.filter(pk__in=available_ids)
+
+
+class BundleManager(models.Manager):
+    """
+    Custom manager for ProductBundle model.
+
+    Provides convenience methods for common bundle queries.
+    """
+
+    def get_queryset(self):
+        return BundleQuerySet(self.model, using=self._db)
+
+    def active(self):
+        return self.get_queryset().active()
+
+    def with_items(self):
+        return self.get_queryset().with_items()
+
+    def by_type(self, bundle_type):
+        return self.get_queryset().by_type(bundle_type)
+
+    def available(self):
+        return self.get_queryset().available()

@@ -1093,8 +1093,10 @@ class TestProductURLConfiguration:
     def test_router_registry_count(self):
         from apps.products.api.urls import router
 
-        # 4 viewsets registered: categories, brands, tax-classes, products
-        assert len(router.registry) == 4
+        # 8 viewsets registered: categories, brands, tax-classes, products,
+        # variant-option-types, variant-option-values, product-variants,
+        # product-option-configs
+        assert len(router.registry) == 8
 
     def test_brand_list_url_name_exists(self):
         from apps.products.api.urls import urlpatterns

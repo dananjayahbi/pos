@@ -13,7 +13,22 @@ from django.db import transaction
 from django.utils.text import slugify
 from rest_framework import serializers
 
-from apps.products.models import Brand, Category, Product, TaxClass, UnitOfMeasure
+from apps.products.models import (
+    BillOfMaterials,
+    BOMItem,
+    Brand,
+    BundleItem,
+    Category,
+    Product,
+    ProductBundle,
+    ProductOptionConfig,
+    ProductVariant,
+    ProductVariantOption,
+    TaxClass,
+    UnitOfMeasure,
+    VariantOptionType,
+    VariantOptionValue,
+)
 from apps.products.constants import PRODUCT_TYPES, PRODUCT_STATUS
 
 
@@ -544,3 +559,594 @@ class ProductCreateSerializer(serializers.ModelSerializer):
                     validated_data["name"]
                 )
         return super().update(instance, validated_data)
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Variant Option Type Serializer
+# ════════════════════════════════════════════════════════════════════════
+
+
+class VariantOptionTypeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for VariantOptionType model.
+
+    Includes computed ``value_count`` field showing number of values
+    defined for the option type.
+    """
+
+    value_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VariantOptionType
+        fields = [
+            "id",
+            "name",
+            "slug",
+            "display_order",
+            "is_color_swatch",
+            "is_image_swatch",
+            "is_active",
+            "value_count",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "slug", "created_on", "updated_on"]
+
+    def get_value_count(self, obj) -> int:
+        """Return number of option values for this type."""
+        return obj.values.count()
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Variant Option Value Serializer
+# ════════════════════════════════════════════════════════════════════════
+
+
+class VariantOptionValueSerializer(serializers.ModelSerializer):
+    """
+    Serializer for VariantOptionValue with swatch handling.
+
+    Includes the parent option type name and a swatch preview
+    for frontend rendering.
+    """
+
+    option_type_name = serializers.CharField(
+        source="option_type.name", read_only=True
+    )
+    swatch_preview = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VariantOptionValue
+        fields = [
+            "id",
+            "option_type",
+            "option_type_name",
+            "value",
+            "label",
+            "color_code",
+            "image",
+            "display_order",
+            "is_active",
+            "swatch_preview",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+    def get_swatch_preview(self, obj) -> dict | None:
+        """Return swatch representation for frontend rendering."""
+        if obj.image:
+            try:
+                return {"type": "image", "url": obj.image.url}
+            except ValueError:
+                pass
+        if obj.color_code:
+            return {"type": "color", "value": obj.color_code}
+        return None
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Product Variant Option Serializer (through model)
+# ════════════════════════════════════════════════════════════════════════
+
+
+class ProductVariantOptionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductVariantOption through model.
+
+    Read operations include a nested ``VariantOptionValueSerializer``;
+    write operations accept ``option_value_id`` as a primary key.
+    """
+
+    option_value = VariantOptionValueSerializer(read_only=True)
+    option_value_id = serializers.PrimaryKeyRelatedField(
+        queryset=VariantOptionValue.objects.all(),
+        source="option_value",
+        write_only=True,
+    )
+
+    class Meta:
+        model = ProductVariantOption
+        fields = [
+            "id",
+            "option_value",
+            "option_value_id",
+            "display_order",
+        ]
+        read_only_fields = ["id"]
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Product Variant Serializers
+# ════════════════════════════════════════════════════════════════════════
+
+
+class ProductVariantListSerializer(serializers.ModelSerializer):
+    """
+    Lightweight serializer for variant list views.
+
+    Minimal fields optimised for large result sets.
+    """
+
+    product_name = serializers.CharField(
+        source="product.name", read_only=True
+    )
+    option_summary = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductVariant
+        fields = [
+            "id",
+            "product",
+            "product_name",
+            "sku",
+            "name",
+            "option_summary",
+            "sort_order",
+            "is_active",
+            "created_on",
+        ]
+        read_only_fields = ["id", "created_on"]
+
+    def get_option_summary(self, obj) -> dict:
+        """Return option type → value mapping."""
+        return obj.get_option_display()
+
+
+class ProductVariantDetailSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer for single variant retrieval.
+
+    Includes full nested options and override fields.
+    """
+
+    product_name = serializers.CharField(
+        source="product.name", read_only=True
+    )
+    options = ProductVariantOptionSerializer(
+        source="variant_options", many=True, read_only=True
+    )
+    option_summary = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductVariant
+        fields = [
+            "id",
+            "product",
+            "product_name",
+            "sku",
+            "barcode",
+            "name",
+            "options",
+            "option_summary",
+            "weight_override",
+            "length_override",
+            "width_override",
+            "height_override",
+            "sort_order",
+            "is_active",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+    def get_option_summary(self, obj) -> dict:
+        """Return option type → value mapping."""
+        return obj.get_option_display()
+
+
+class ProductVariantCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating and updating product variants.
+
+    Accepts ``option_value_ids`` as a list of VariantOptionValue PKs
+    for linking via the through model on create.  Options cannot be
+    changed on update.
+    """
+
+    option_value_ids = serializers.PrimaryKeyRelatedField(
+        queryset=VariantOptionValue.objects.all(),
+        many=True,
+        write_only=True,
+        required=False,
+    )
+
+    class Meta:
+        model = ProductVariant
+        fields = [
+            "product",
+            "sku",
+            "barcode",
+            "name",
+            "option_value_ids",
+            "weight_override",
+            "length_override",
+            "width_override",
+            "height_override",
+            "sort_order",
+        ]
+
+    # ── Validation ──────────────────────────────────────────────────
+
+    def validate_sku(self, value):
+        """Ensure SKU uniqueness (exclude self on update)."""
+        qs = ProductVariant.objects.filter(sku=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(
+                "A variant with this SKU already exists."
+            )
+        return value
+
+    def validate(self, data):
+        """Validate option combination uniqueness for new variants."""
+        option_values = data.get("option_value_ids", [])
+        product = data.get("product") or (
+            self.instance.product if self.instance else None
+        )
+
+        if option_values and product and not self.instance:
+            option_ids = {ov.pk for ov in option_values}
+            for variant in ProductVariant.objects.for_product(product):
+                existing_ids = set(
+                    variant.option_values.values_list("id", flat=True)
+                )
+                if existing_ids == option_ids:
+                    raise serializers.ValidationError(
+                        "A variant with this option combination already "
+                        "exists for this product."
+                    )
+        return data
+
+    # ── Create / Update ─────────────────────────────────────────────
+
+    @transaction.atomic
+    def create(self, validated_data):
+        """Create variant and link option values via through model."""
+        option_values = validated_data.pop("option_value_ids", [])
+        variant = ProductVariant.objects.create(**validated_data)
+
+        for idx, ov in enumerate(option_values):
+            ProductVariantOption.objects.create(
+                variant=variant,
+                option_value=ov,
+                display_order=idx,
+            )
+
+        if not variant.name and option_values:
+            variant.generate_name_from_options()
+
+        return variant
+
+    def update(self, instance, validated_data):
+        """Update variant — option values cannot be changed."""
+        validated_data.pop("option_value_ids", None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+
+class BulkVariantCreateSerializer(serializers.Serializer):
+    """
+    Serializer for bulk variant generation via VariantGenerator.
+
+    Accepts ``product_id`` and uses the configured option types
+    and their values to generate all combinations.
+    """
+
+    product_id = serializers.UUIDField(
+        help_text="UUID of the product to generate variants for."
+    )
+
+    def validate_product_id(self, value):
+        """Ensure product exists and is of type VARIABLE."""
+        try:
+            product = Product.objects.get(pk=value)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product not found.")
+        if product.product_type != PRODUCT_TYPES.VARIABLE:
+            raise serializers.ValidationError(
+                "Variants can only be generated for VARIABLE products."
+            )
+        return value
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Product Option Config Serializer
+# ════════════════════════════════════════════════════════════════════════
+
+
+class ProductOptionConfigSerializer(serializers.ModelSerializer):
+    """
+    Serializer for ProductOptionConfig.
+
+    Links a product to its applicable option types.
+    """
+
+    option_type_name = serializers.CharField(
+        source="option_type.name", read_only=True
+    )
+
+    class Meta:
+        model = ProductOptionConfig
+        fields = [
+            "id",
+            "product",
+            "option_type",
+            "option_type_name",
+            "display_order",
+            "is_active",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Bundle Serializers (SP05)
+# ════════════════════════════════════════════════════════════════════════
+
+
+class BundleItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for BundleItem model.
+
+    Provides product/variant names for display and validates
+    that variant belongs to the specified product.
+    """
+
+    product_name = serializers.CharField(source="product.name", read_only=True)
+    variant_name = serializers.CharField(
+        source="variant.name", read_only=True, allow_null=True, default=None
+    )
+
+    class Meta:
+        model = BundleItem
+        fields = [
+            "id",
+            "bundle",
+            "product",
+            "product_name",
+            "variant",
+            "variant_name",
+            "quantity",
+            "is_optional",
+            "sort_order",
+            "is_active",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+    def validate(self, attrs):
+        variant = attrs.get("variant")
+        product = attrs.get("product")
+        if variant and product and variant.product_id != product.id:
+            raise serializers.ValidationError(
+                {"variant": "Variant does not belong to the specified product."}
+            )
+        return attrs
+
+
+class ProductBundleSerializer(serializers.ModelSerializer):
+    """
+    Base serializer for ProductBundle model.
+
+    Includes calculated fields for price, stock, and savings.
+    """
+
+    calculated_price = serializers.SerializerMethodField()
+    available_stock = serializers.SerializerMethodField()
+    savings = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductBundle
+        fields = [
+            "id",
+            "product",
+            "bundle_type",
+            "fixed_price",
+            "discount_type",
+            "discount_value",
+            "is_active",
+            "calculated_price",
+            "available_stock",
+            "savings",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+    def get_calculated_price(self, obj):
+        from apps.products.services import BundlePricingService
+
+        try:
+            service = BundlePricingService(obj)
+            return str(service.get_bundle_price())
+        except Exception:
+            return None
+
+    def get_available_stock(self, obj):
+        from apps.products.services import BundleStockService
+
+        try:
+            service = BundleStockService(obj)
+            return service.get_available_stock()
+        except Exception:
+            return None
+
+    def get_savings(self, obj):
+        from apps.products.services import BundlePricingService
+
+        try:
+            service = BundlePricingService(obj)
+            return str(service.get_savings())
+        except Exception:
+            return None
+
+
+class BundleDetailSerializer(ProductBundleSerializer):
+    """
+    Detailed serializer for ProductBundle with nested items.
+
+    Used for retrieve operations with full bundle component details.
+    """
+
+    items = BundleItemSerializer(many=True, read_only=True)
+    component_count = serializers.SerializerMethodField()
+
+    class Meta(ProductBundleSerializer.Meta):
+        fields = ProductBundleSerializer.Meta.fields + [
+            "items",
+            "component_count",
+        ]
+
+    def get_component_count(self, obj):
+        return obj.items.count()
+
+
+# ════════════════════════════════════════════════════════════════════════
+# BOM Serializers (SP05)
+# ════════════════════════════════════════════════════════════════════════
+
+
+class BOMItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for BOMItem (Bill of Materials component).
+
+    Includes raw material name, effective quantity with wastage,
+    unit price, and calculated item cost.
+    """
+
+    raw_material_name = serializers.CharField(
+        source="raw_material.name", read_only=True
+    )
+    effective_quantity = serializers.SerializerMethodField()
+    unit_price = serializers.SerializerMethodField()
+    item_cost = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BOMItem
+        fields = [
+            "id",
+            "bom",
+            "raw_material",
+            "raw_material_name",
+            "quantity",
+            "unit",
+            "wastage_percent",
+            "is_critical",
+            "substitute",
+            "sort_order",
+            "effective_quantity",
+            "unit_price",
+            "item_cost",
+            "is_active",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+    def get_effective_quantity(self, obj):
+        return str(obj.get_effective_quantity())
+
+    def get_unit_price(self, obj):
+        if hasattr(obj.raw_material, "cost_price") and obj.raw_material.cost_price:
+            return str(obj.raw_material.cost_price)
+        return "0.00"
+
+    def get_item_cost(self, obj):
+        from decimal import Decimal
+
+        cost_price = Decimal("0.00")
+        if hasattr(obj.raw_material, "cost_price") and obj.raw_material.cost_price:
+            cost_price = Decimal(str(obj.raw_material.cost_price))
+        return str(obj.get_effective_quantity() * cost_price)
+
+
+class BillOfMaterialsSerializer(serializers.ModelSerializer):
+    """
+    Base serializer for BillOfMaterials.
+
+    Includes computed cost fields for manufacturing decisions.
+    """
+
+    total_cost = serializers.SerializerMethodField()
+    unit_cost = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BillOfMaterials
+        fields = [
+            "id",
+            "product",
+            "version",
+            "is_active",
+            "notes",
+            "yield_quantity",
+            "total_cost",
+            "unit_cost",
+            "created_on",
+            "updated_on",
+        ]
+        read_only_fields = ["id", "created_on", "updated_on"]
+
+    def get_total_cost(self, obj):
+        from apps.products.services import CostCalculationService
+
+        try:
+            service = CostCalculationService(obj)
+            return str(service.calculate_total_cost())
+        except Exception:
+            return None
+
+    def get_unit_cost(self, obj):
+        from apps.products.services import CostCalculationService
+
+        try:
+            service = CostCalculationService(obj)
+            return str(service.calculate_unit_cost())
+        except Exception:
+            return None
+
+
+class BOMDetailSerializer(BillOfMaterialsSerializer):
+    """
+    Detailed BOM serializer with nested items.
+
+    Used for retrieve operations with full BOM component details.
+    """
+
+    items = BOMItemSerializer(many=True, read_only=True)
+    component_count = serializers.SerializerMethodField()
+
+    class Meta(BillOfMaterialsSerializer.Meta):
+        fields = BillOfMaterialsSerializer.Meta.fields + [
+            "items",
+            "component_count",
+        ]
+
+    def get_component_count(self, obj):
+        return obj.items.count()

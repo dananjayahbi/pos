@@ -75,6 +75,42 @@ PRODUCT_STATUS_CHOICES = PRODUCT_STATUS.choices
 
 
 # ════════════════════════════════════════════════════════════════════════
+# Bundle Type Choices
+# ════════════════════════════════════════════════════════════════════════
+
+
+class BUNDLE_TYPE(TextChoices):
+    """
+    Bundle pricing type choices.
+
+    - FIXED: Bundle sold at a fixed price
+    - DYNAMIC: Bundle price calculated from component prices
+    """
+
+    FIXED = "fixed", _("Fixed Price")
+    DYNAMIC = "dynamic", _("Dynamic Price")
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Discount Type Choices
+# ════════════════════════════════════════════════════════════════════════
+
+
+class DISCOUNT_TYPE(TextChoices):
+    """
+    Discount type choices for bundles.
+
+    - PERCENTAGE: Discount as a percentage of total
+    - FIXED: Fixed amount discount
+    - NONE: No discount applied
+    """
+
+    PERCENTAGE = "percentage", _("Percentage")
+    FIXED = "fixed", _("Fixed Amount")
+    NONE = "none", _("No Discount")
+
+
+# ════════════════════════════════════════════════════════════════════════
 # Tax Type Choices (Sri Lankan VAT)
 # ════════════════════════════════════════════════════════════════════════
 

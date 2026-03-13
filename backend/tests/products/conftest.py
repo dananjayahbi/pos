@@ -190,3 +190,140 @@ def authenticated_client(tenant_context):
     client = APIClient(HTTP_HOST=TENANT_DOMAIN)
     client.force_authenticate(user=user)
     return client
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Variant Option Fixtures
+# ═══════════════════════════════════════════════════════════════════════
+
+
+@pytest.fixture
+def variant_option_type_size(tenant_context):
+    """Create a Size variant option type."""
+    from apps.products.models import VariantOptionType
+
+    VariantOptionType.all_with_deleted.filter(slug="size").delete()
+    return VariantOptionType.objects.create(
+        name="Size",
+        display_order=1,
+    )
+
+
+@pytest.fixture
+def variant_option_type_color(tenant_context):
+    """Create a Color variant option type with color swatch."""
+    from apps.products.models import VariantOptionType
+
+    VariantOptionType.all_with_deleted.filter(slug="color").delete()
+    return VariantOptionType.objects.create(
+        name="Color",
+        display_order=2,
+        is_color_swatch=True,
+    )
+
+
+@pytest.fixture
+def variant_option_value_small(variant_option_type_size):
+    """Create a 'Small' option value for Size."""
+    from apps.products.models import VariantOptionValue
+
+    VariantOptionValue.all_with_deleted.filter(
+        option_type=variant_option_type_size, value="s"
+    ).delete()
+    return VariantOptionValue.objects.create(
+        option_type=variant_option_type_size,
+        value="s",
+        display_order=1,
+    )
+
+
+@pytest.fixture
+def variant_option_value_medium(variant_option_type_size):
+    """Create a 'Medium' option value for Size."""
+    from apps.products.models import VariantOptionValue
+
+    VariantOptionValue.all_with_deleted.filter(
+        option_type=variant_option_type_size, value="m"
+    ).delete()
+    return VariantOptionValue.objects.create(
+        option_type=variant_option_type_size,
+        value="m",
+        display_order=2,
+    )
+
+
+@pytest.fixture
+def variant_option_value_red(variant_option_type_color):
+    """Create a 'Red' option value for Color with color code."""
+    from apps.products.models import VariantOptionValue
+
+    VariantOptionValue.all_with_deleted.filter(
+        option_type=variant_option_type_color, value="red"
+    ).delete()
+    return VariantOptionValue.objects.create(
+        option_type=variant_option_type_color,
+        value="red",
+        color_code="#FF0000",
+        display_order=1,
+    )
+
+
+@pytest.fixture
+def variant_option_value_large(variant_option_type_size):
+    """Create a 'Large' option value for Size."""
+    from apps.products.models import VariantOptionValue
+
+    VariantOptionValue.all_with_deleted.filter(
+        option_type=variant_option_type_size, value="l"
+    ).delete()
+    return VariantOptionValue.objects.create(
+        option_type=variant_option_type_size,
+        value="l",
+        display_order=3,
+    )
+
+
+@pytest.fixture
+def variant_option_value_blue(variant_option_type_color):
+    """Create a 'Blue' option value for Color with color code."""
+    from apps.products.models import VariantOptionValue
+
+    VariantOptionValue.all_with_deleted.filter(
+        option_type=variant_option_type_color, value="blue"
+    ).delete()
+    return VariantOptionValue.objects.create(
+        option_type=variant_option_type_color,
+        value="blue",
+        color_code="#0000FF",
+        display_order=2,
+    )
+
+
+@pytest.fixture
+def variable_product(tenant_context, category):
+    """Create and return a VARIABLE-type Product for variant tests."""
+    from apps.products.constants import PRODUCT_TYPES
+    from apps.products.models import Product
+
+    return Product.objects.create(
+        name="Classic T-Shirt",
+        category=category,
+        product_type=PRODUCT_TYPES.VARIABLE,
+        selling_price=Decimal("2500.00"),
+        cost_price=Decimal("1500.00"),
+    )
+
+
+@pytest.fixture
+def variable_product_2(tenant_context, category):
+    """Create and return a second VARIABLE-type Product."""
+    from apps.products.constants import PRODUCT_TYPES
+    from apps.products.models import Product
+
+    return Product.objects.create(
+        name="Polo Shirt",
+        category=category,
+        product_type=PRODUCT_TYPES.VARIABLE,
+        selling_price=Decimal("3500.00"),
+        cost_price=Decimal("2000.00"),
+    )

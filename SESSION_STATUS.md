@@ -1,6 +1,6 @@
 # Session Status - LankaCommerce Cloud POS
 
-> **Last Updated:** Session 8 — Phase-04 SP03 Product Base Model DEEP AUDIT COMPLETE
+> **Last Updated:** Session 12 — Phase-04 SP08 Warehouse & Locations COMPLETE + 220 TESTS (143 unit + 77 integration)
 > **Purpose:** Complete handoff document for the next chat session. This file contains ALL context needed to continue work without the previous chat's memory.
 
 ---
@@ -28,12 +28,17 @@ Phase-03_Core-Backend-Infrastructure/SubPhase-12_Core-Utilities-Helpers (ALL tas
 Phase-04_ERP-Core-Modules-Part1/SubPhase-01_Category-Model-Hierarchy (ALL 92 tasks complete, AUDITED)
 Phase-04_ERP-Core-Modules-Part1/SubPhase-02_Attribute-System (ALL 96 tasks complete, AUDITED)
 Phase-04_ERP-Core-Modules-Part1/SubPhase-03_Product-Base-Model (ALL 98 tasks complete, AUDITED)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-04_Product-Variants (ALL 94 tasks complete, AUDITED)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-05_Bundle-Composite-Products (ALL 90 tasks complete, AUDITED)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-06_Product-Pricing (ALL 88 tasks complete, AUDITED, 53 production DB tests)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-07_Product-Media (ALL 86 tasks complete, AUDITED, 29 production DB tests)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-08_Warehouse-Locations (ALL 84 tasks complete, AUDITED, 220 tests)
 ```
 
 ### Next Document to Implement
 
 ```
-Document-Series/Phase-04_ERP-Core-Modules-Part1/SubPhase-04_*
+Document-Series/Phase-04_ERP-Core-Modules-Part1/SubPhase-09_*
 ```
 
 ---
@@ -97,29 +102,300 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 
 ## Test Results (Docker PostgreSQL)
 
-| Test Scope             | Passed | Failed | Notes                                    |
-| ---------------------- | ------ | ------ | ---------------------------------------- |
-| **Full suite**         | 9866   | 0      | All tests passing (0 errors)             |
-| **Products tests**     | 783    | 0      | SP01 (271) + SP03 (263+143+106=512)      |
-| **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79) |
-| **Users tests**        | 298    | 0      | 71 API + 227 model tests                 |
-| **Core tests (total)** | 5828   | 0      | All core/ tests combined                 |
-| **Tenant tests**       | 2608   | 0      | All 40 previously failing fixed          |
-| **Celery tests**       | 25     | 0      | Task infrastructure tests                |
-| **Exception tests**    | 155    | 0      | Exception/handler/logging tests          |
-| **Cache tests**        | 107    | 0      | Caching layer tests (audited)            |
-| **Storage tests**      | 181    | 0      | File storage tests (SP10, audited)       |
-| **API Docs tests**     | 154    | 0      | SP11 drf-spectacular tests               |
-| **Pagination tests**   | 73     | 0      | SP12 Group A                             |
-| **Filter tests**       | 100    | 0      | SP12 Group B                             |
-| **Validator tests**    | 200    | 0      | SP12 Group C                             |
-| **DateTime tests**     | 122    | 0      | SP12 Group D                             |
-| **Sri Lanka tests**    | 293    | 0      | SP12 Group E                             |
-| **Integration tests**  | 61     | 0      | SP12 Group F cross-module                |
+| Test Scope             | Passed | Failed | Notes                                       |
+| ---------------------- | ------ | ------ | ------------------------------------------- |
+| **Full suite**         | 10089  | 0      | All tests passing (0 errors)                |
+| **Products tests**     | 1175   | 0      | SP01-SP05 (base+variants+bundles+BOM)       |
+| **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79)    |
+| **Users tests**        | 298    | 0      | 71 API + 227 model tests                    |
+| **Core tests (total)** | 5828   | 0      | All core/ tests combined                    |
+| **Tenant tests**       | 2608   | 0      | All 40 previously failing fixed             |
+| **Celery tests**       | 25     | 0      | Task infrastructure tests                   |
+| **Exception tests**    | 155    | 0      | Exception/handler/logging tests             |
+| **Cache tests**        | 107    | 0      | Caching layer tests (audited)               |
+| **Storage tests**      | 181    | 0      | File storage tests (SP10, audited)          |
+| **API Docs tests**     | 154    | 0      | SP11 drf-spectacular tests                  |
+| **Pagination tests**   | 73     | 0      | SP12 Group A                                |
+| **Filter tests**       | 100    | 0      | SP12 Group B                                |
+| **Validator tests**    | 200    | 0      | SP12 Group C                                |
+| **DateTime tests**     | 122    | 0      | SP12 Group D                                |
+| **Sri Lanka tests**    | 293    | 0      | SP12 Group E                                |
+| **Integration tests**  | 61     | 0      | SP12 Group F cross-module                   |
+| **Pricing mock tests** | 141    | 0      | SP06 models+API+integration (6 groups)      |
+| **Pricing prod tests** | 53     | 0      | SP06 real PostgreSQL via django-tenants     |
+| **Media unit tests**   | 183    | 0      | SP07 DB-free unit tests (7 test files)      |
+| **Media prod tests**   | 29     | 0      | SP07 real PostgreSQL integration tests      |
+| **Warehouse tests**    | 220    | 0      | SP08 143 unit + 77 integration (PostgreSQL) |
 
 ---
 
-## What Was Completed This Session (Session 7)
+## What Was Completed This Session (Session 12)
+
+### SP08: Warehouse & Locations (ALL 84 Tasks) — Phase 04
+
+**Phase-04_ERP-Core-Modules-Part1/SubPhase-08_Warehouse-Locations**
+
+**Group A: Warehouse Model (Tasks 01-18)**
+
+- Constants: warehouse statuses/types, 25 Sri Lankan districts, location types/parent rules, barcode constants, zone purposes, capacity thresholds
+- Warehouse(BaseModel = UUIDMixin + AuditMixin + StatusMixin + SoftDeleteMixin): name, code (unique, max 50), warehouse_type, status, address fields, phone (max 20), email, manager_name, is_default, is_24_hours, opens_at, closes_at, breaks_start, breaks_end, latitude, longitude
+- Methods: is_open_at(dt), set_as_default(), clean(), **str** → "{name} ({code})"
+- WarehouseManager (AliveManager): active, by_district, default queries
+- Migration 0002_warehouse; WarehouseAdmin registered
+
+**Group B: Storage Location Hierarchy (Tasks 19-36)**
+
+- StorageLocation(UUIDMixin + TimestampMixin): self-referential tree with parent FK, location_type hierarchy (zone→aisle→rack→shelf→bin), barcode (blank=True, default="")
+- Properties: depth, level_name, location_path; parent-type validation via LOCATION_PARENT_RULES
+- LocationManager: by_warehouse, by_type, root_locations, active queries
+- Migration 0003_storage_location; StorageLocationAdmin registered
+
+**Group C: Barcode Services (Tasks 37-50)**
+
+- BarcodeGenerator: format LOC-{TENANT}-{WH}-{LOC}-{CHECK}, Luhn check digit, generate/validate/parse
+- BarcodeLookup, LabelGenerator services
+- BarcodeScan model: audit log with location FK, user FK, scan_type, success, context_data JSON
+- Migration 0004_barcode_scan; pre_save signal auto-generates barcode
+
+**Group D: Warehouse Operations (Tasks 51-66)**
+
+- WarehouseZone: warehouse FK, purpose choices, code (max 20); zone FK added to StorageLocation
+- TransferRoute: source/dest warehouse FKs, cost fields, calculate_transfer_cost formula
+- WarehouseCapacity: OneToOne to Warehouse, utilization_percentage/alert_level properties
+- DefaultWarehouseConfig & POSWarehouseMapping models
+- Migration 0005_group_d_warehouse_operations; all 8 admin classes registered
+- RouteFinder, DashboardService services
+
+**Group E: API Layer (Tasks 67-78)**
+
+- 10 serializers: WarehouseList, Warehouse, WarehouseCreateUpdate, StorageLocationList, StorageLocation, LocationTree, WarehouseZone, TransferRoute, WarehouseCapacity, BulkLocationCreate
+- 5 viewsets: WarehouseViewSet (CRUD + set_default/dashboard/capacity), StorageLocationViewSet (CRUD + children/ancestors/descendants/siblings/tree/barcode_lookup/bulk_create), WarehouseZoneViewSet, TransferRouteViewSet, WarehouseCapacityViewSet
+- DefaultRouter with 42 URL patterns at /api/v1/warehouse/
+
+**Group F: Testing & Documentation (Tasks 79-84)**
+
+- test_warehouse_models.py: 75+ tests (all 8 models — meta, fields, **str**, properties, methods)
+- test_barcode_services.py: 15+ tests (Luhn, generate/validate/parse, tenant prefix, tamper detection)
+- test_warehouse_api.py: 50+ tests (serializers, viewsets, URL routing)
+- docs/backend/warehouse-module.md, docs/backend/warehouse-setup-guide.md
+- **Total SP08 tests: 143, ALL PASSING**
+- Audit report: P04_SP08_AUDIT_REPORT.md
+
+---
+
+## What Was Completed in Session 11 (Previous)
+
+### SP07: Product Media (ALL 86 Tasks) — Phase 04
+
+**Phase-04_ERP-Core-Modules-Part1/SubPhase-07_Product-Media**
+
+**Group A: Product Image Models (Tasks 01-16)**
+
+- Media app structure: `apps/products/media/` with **init**, apps.py, constants.py, validators.py, utils.py, admin.py, signals.py, urls.py
+- Constants: THUMBNAIL_SIZE(150×150), MEDIUM_SIZE(500×500), LARGE_SIZE(1000×1000), ALLOWED_IMAGE_EXTENSIONS, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE(5MB), JPEG_QUALITY(80), WEBP_QUALITY(80)
+- ProductImage(UUIDMixin, TimestampMixin, models.Model): product FK(CASCADE), image(ImageField), display_order, is_primary, alt_text, title, caption, width, height, file_size, original_filename, processing_status(pending/processing/completed/failed), error_message, thumbnail_path, medium_path, large_path, webp_thumbnail_path, webp_medium_path, webp_large_path
+- UniqueConstraint: `unique_primary_per_product` on ["product", "is_primary"] with condition Q(is_primary=True)
+- ProductImageManager: get_primary(), get_gallery(), get_gallery_excluding_primary(), set_primary_image(), get_by_position(), count_for_product()
+- Validators: validate_image_file_type, validate_image_file_size, validate_image_dimensions, validate_image_corruption, validate_animated_gif, validate_product_image (composite)
+- Signals: populate_image_metadata (pre_save), trigger_variant_generation (post_save), cleanup_image_files (pre_delete)
+- ProductImageAdmin with image preview, list display, filters
+
+**Group B: Image Processing Pipeline (Tasks 17-32)**
+
+- Pillow >= 10.0 in requirements (Pillow 12.1.1 in Docker)
+- ImageProcessor service: resize_to_fit, resize_to_cover, create_thumbnail, create_medium, create_large, fix_orientation (EXIF), strip_exif, LQIP placeholder generation
+- Celery task: process_image_variants with retry logic, processing_status tracking, error_message on failure
+- Image quality settings: JPEG 80%, PNG compression 9, WebP 80%
+- Image cleanup utility: delete_image_files() removes all variants on pre_delete
+
+**Group C: Variant Images & Gallery (Tasks 33-48)**
+
+- VariantImage(UUIDMixin, TimestampMixin, models.Model): variant FK, image, display_order, is_primary, alt_text, title, caption, width, height, file_size, original_filename, processing_status
+- VariantImageManager + VariantImageQuerySet: for_variant, primary, gallery, with_metadata, get_primary, get_gallery, get_or_none, set_primary
+- Variant image upload path: products/{product_id}/variants/{variant_id}/
+- Image inheritance: VariantImage.has_own_images(), get_images() (fallback to product), uses_inherited_images()
+- ProductGallery service: add_image, remove_image, set_primary, reorder, swap, bulk_add_images, count, can_add_images, get_remaining_capacity
+- Standalone functions: copy_product_image_to_variant(), copy_all_to_variant()
+- Gallery limit: DEFAULT_MAX_IMAGES_PER_PRODUCT=20
+- Gallery position validators: validate_unique_display_order(), normalize_gallery_positions()
+
+**Group D: WebP Conversion & Optimization (Tasks 49-64)**
+
+- WebPConverter service: convert_lossless, convert_lossy, get_compression_stats
+- ResponsiveImageService: WebP/original fallback, browser detection, srcset generation, CDN URL generation, lazy loading support
+- Batch optimization task: optimize_images.py
+- Format migration task: migrate_webp.py
+- Cleanup task: cleanup_orphaned_images.py
+- Cache headers utility in utils.py
+
+**Group E: Media Serializers & API Views (Tasks 65-78)**
+
+- ProductImageSerializer with all variant URLs, srcset, sizes fields
+- VariantImageSerializer with inheritance support
+- ImageUploadSerializer, ImageReorderSerializer
+- ProductImageViewSet: CRUD, upload, set_primary, reorder, download, optimize (with format/quality params), cleanup (with types param), optimization_status
+- VariantImageViewSet with CanManageVariantImages default permission
+- 7 permission classes: CanUploadProductImage, CanDeleteProductImage, CanManageGallery, CanOptimizeImages, CanViewImageAnalytics, CanManageVariantImages, IsImageOwner
+- require_media_permission decorator
+
+**Group F: Testing & Documentation (Tasks 79-86)**
+
+- test_models.py, test_processing.py, test_optimization.py, test_variant_image.py, test_serializers.py, test_views.py, test_gallery.py — 183 unit tests (DB-free)
+- test_integration.py — 29 production-level tests (real PostgreSQL): 6 test classes covering ProductImage CRUD/constraints/cascade/ordering, managers, gallery service, variant images, inheritance, cross-copy
+- **Total SP07 tests: 212, ALL PASSING**
+- 18 documentation files in apps/products/media/docs/ (models, services, api, architecture, configuration, permissions, tasks, processing, deployment, best-practices, troubleshooting, CHANGELOG, media_module, media_guide + 3 user guides)
+
+### Deep Audit Results (SP07)
+
+- **86 DONE / 0 PARTIAL / 0 MISSING** out of 86 tasks
+- Critical bug found and fixed:
+  1. **PIL `Image.close()` closes underlying BytesIO** — `validate_image_dimensions()` and both pre_save signals called `img.close()` which closes the BytesIO file handle, causing `ValueError: I/O operation on closed file` during `FileSystemStorage._save()`. Fixed by replacing `img.close()` with `del img` in 3 locations (validators.py, signals.py ×2)
+  2. Optimize endpoint missing format/quality parameters → added
+  3. Cleanup endpoint only handled orphans → added `types` parameter
+  4. Permission classes missing `has_object_permission()` → added to all 7 classes
+  5. VariantImageViewSet missing default permission → added CanManageVariantImages
+- Audit report: SP07_AUDIT_REPORT.md
+
+---
+
+## What Was Completed in Session 10 (Previous)
+
+### SP05: Bundle & Composite Products (ALL 90 Tasks) — Phase 04
+
+**Phase-04_ERP-Core-Modules-Part1/SubPhase-05_Bundle-Composite-Products**
+
+**Group A: Bundle Product Models (Tasks 01-20)**
+
+- ProductBundle(BaseModel): product(OneToOne PROTECT), bundle_type(FIXED/DYNAMIC), fixed_price, discount_type(PERCENTAGE/FIXED/NONE), discount_value
+- BundleItem(BaseModel): bundle(FK CASCADE), product(FK PROTECT), variant(FK PROTECT nullable), quantity, is_optional, sort_order; UniqueConstraint(bundle,product,variant)
+- Migration 0008_sp05_bundle_models, constants BUNDLE_TYPE + DISCOUNT_TYPE in constants.py
+
+**Group B: Bundle Stock & Pricing Logic (Tasks 21-36)**
+
+- BundleStockService: \_get_required_items, get_available_stock, check_availability, get_limiting_item, reserve_stock(@transaction.atomic + select_for_update)
+- BundlePricingService: calculate_fixed_price, calculate_dynamic_price, apply_discount, get_bundle_price, get_individual_total, get_savings
+- BundleQuerySet: active, with_items, by_type, available; BundleManager delegates all
+
+**Group C: Bill of Materials Models (Tasks 37-56)**
+
+- BillOfMaterials(BaseModel): product(FK PROTECT), version("1.0"), is_active, notes, yield_quantity; UniqueConstraint(product,version)
+- BOMItem(BaseModel): bom(FK CASCADE), raw_material(FK PROTECT), quantity(10,3), unit(FK UoM), wastage_percent, is_critical, substitute(FK Product SET_NULL), sort_order; get_effective_quantity()
+- BOMQuerySet: active, for_product, active_for_product, with_items; BOMManager
+- Migration 0009_sp05_bom_models
+
+**Group D: Manufacturing Cost Calculation (Tasks 57-68)**
+
+- CostCalculationService(bom, labor_cost, overhead_cost, overhead_percent): 7 methods — calculate_material_cost, calculate_with_wastage, calculate_labor_cost, calculate_overhead, calculate_total_cost, calculate_unit_cost, suggest_selling_price
+- ManufacturingStockService(bom): check_raw_materials (detailed list[dict]), get_producible_quantity
+
+**Group E: Serializers & Views (Tasks 69-80)**
+
+- 6 serializers: BundleItemSerializer, ProductBundleSerializer(calculated_price, available_stock, savings), BundleDetailSerializer, BOMItemSerializer(raw_material_name, effective_quantity, unit_price, item_cost), BillOfMaterialsSerializer(total_cost, unit_cost), BOMDetailSerializer
+- 4 ViewSets: ProductBundleViewSet(availability+pricing actions), BundleItemViewSet, BillOfMaterialsViewSet(cost_breakdown+stock_check actions), BOMItemViewSet
+- 4 URL registrations: bundles, bundle-items, bom, bom-items
+
+**Group F: Testing & Documentation (Tasks 81-90)**
+
+- test_bundle_models.py: 57 tests (model meta, managers, pricing service)
+- test_bom_models.py: 56 tests (model meta, managers, cost service, stock service)
+- test_sp05_integration.py: 6 integration tests
+- test_sp05_api.py: 40 production-level API tests (real DB + HTTP)
+- Documentation: BUNDLE_COMPOSITE_PRODUCTS.md (299 lines)
+- **Total SP05 tests: 159, ALL PASSING**
+
+### Deep Audit Results (SP05)
+
+- **90 DONE / 0 PARTIAL / 0 MISSING** out of 90 tasks
+- 5 gaps found and fixed during audit:
+  1. `available()` manager method was missing → added to BundleQuerySet + BundleManager
+  2. `select_for_update()` missing in reserve_stock → added for race condition safety
+  3. BOMItemSerializer missing unit_price + item_cost fields → added SerializerMethodFields
+  4. Bundle API tests missing → created 22 production-level tests
+  5. BOM API tests missing → created 18 production-level tests
+- Audit report: SP05_AUDIT_REPORT.md
+
+### SP06: Product Pricing (ALL 88 Tasks) — Phase 04
+
+**Phase-04_ERP-Core-Modules-Part1/SubPhase-06_Product-Pricing**
+
+**Group A: ProductPrice, VariantPrice, PriceHistory Models (Tasks 01-18)**
+
+- ProductPrice(BaseModel): product(OneToOne CASCADE), base_price, cost_price, wholesale_price, sale_price, sale_price_start/end, tax_class(FK SET_NULL), is_taxable, is_tax_inclusive, currency("LKR")
+  - Properties: profit_margin, markup_percentage, is_on_sale, sale_discount_percentage
+  - Methods: get_current_price, get_tax_amount, get_tax_inclusive_price, get_tax_exclusive_price
+  - 3 CHECK constraints: chk_price_positive, chk_cost_lte_base, chk_sale_lt_base
+- VariantPrice(BaseModel): variant(OneToOne CASCADE), use_product_price, base_price, cost_price, wholesale_price, sale_price + dates
+  - Methods: get_effective_price, get_effective_cost_price, get_effective_wholesale_price
+- PriceHistory(BaseModel): product FK, variant FK, field_changed, old_value, new_value, changed_by FK
+- Migration 0001_initial
+
+**Group B: TieredPricing, VariantTieredPricing Models (Tasks 19-34)**
+
+- TieredPricing(BaseModel): product(FK CASCADE), name, min_quantity, max_quantity, tier_price, tier_type(all_units/incremental/volume), is_active, description
+  - 4 CHECK constraints, 3 indexes, overlap validation in clean()
+  - Meta ordering: ["product", "min_quantity"]
+- VariantTieredPricing(BaseModel): variant(FK CASCADE), similar structure to TieredPricing
+- Migration 0002_tiered_pricing
+
+**Group C: ScheduledPrice, FlashSale, PromotionalPrice, PromotionAnalytics Models (Tasks 35-52)**
+
+- ScheduledPrice(BaseModel): product/variant FKs, name, sale_price, original_price, start/end_datetime, priority, status(PENDING/ACTIVE/EXPIRED)
+  - Properties: is_active_now, duration, time_remaining, is_upcoming
+  - Classmethods: get_active_for_product, get_upcoming
+- FlashSale(models.Model): scheduled_price(OneToOne PK), max_quantity, quantity_sold, urgency_message
+  - Properties: quantity_remaining, is_sold_out, sold_percentage
+- PromotionalPrice(BaseModel): name, discount_type(PERCENTAGE_OFF/FIXED_OFF/FIXED_PRICE), discount_value, products M2M, start/end_datetime, max_uses, current_uses
+  - Methods: calculate_discounted_price, is_active_now, is_exhausted
+- PromotionAnalytics(BaseModel): scheduled_price FK, promotional_price FK, total_revenue, units_sold, unique_customers, average_order_value
+- Migration 0003_scheduled_promotional
+
+**Group D: Services (Tasks 53-68)**
+
+- TaxCalculator: 18+ methods (calculate_tax_amount, calculate_price_with/without_tax, convert_inclusive_to_exclusive, convert_exclusive_to_inclusive, batch conversions)
+- BulkPricingService: calculate_tiered_price (all_units/incremental), calculate_cart_line, get_next_tier_savings, get_tier_summary
+- PriceCalculation: get_effective_price, apply_promotions, get_price_breakdown
+- CartCalculator: calculate_line_total, calculate_cart, apply_cart_promotions
+- PriceResolution: resolve_price (product→variant→scheduled→promotional cascade)
+- TaxAudit: audit_tax, generate_report
+- SVATHandler: validate_customer_svat, apply_svat
+- Signals: price history tracking on ProductPrice save, analytics auto-creation for ScheduledPrice
+
+**Group E: Serializers, Views, Permissions, URLs (Tasks 69-80)**
+
+- 4 serializers: ProductPriceSerializer, TieredPricingSerializer, ScheduledPriceSerializer, PriceBreakdownSerializer
+- 7 ViewSets: ProductPriceViewSet, VariantPriceViewSet, TieredPricingViewSet, VariantTieredPricingViewSet, ScheduledPriceViewSet, FlashSaleViewSet
+- 3 special views: PriceLookupView (AllowAny), BulkPriceUpdateView, BulkScheduleOperationsView, PromotionalCalendarView
+- Permissions: HasPricingPermission, CanViewCostPrice, CanCreatePromotions
+- URL routes: /pricing/ with router (6 ViewSets) + 5 manual paths
+- Migration 0004 (TieredPricing Meta index + constraint changes)
+
+**Group F: Testing & Documentation (Tasks 81-88)**
+
+- test_models.py: 70 mock tests (model meta, properties, methods)
+- test_api.py: 37 mock tests (serializers, views)
+- test_integration.py: 13 mock integration tests
+- test_tax_calculation.py: 152 lines mock tax tests
+- test_tiered_pricing.py: 193 lines mock tier tests
+- test_scheduled_pricing.py: 259 lines mock schedule tests
+- **Total SP06 mock tests: 141, ALL PASSING**
+- **Total SP06 production DB tests: 53, ALL PASSING** (real PostgreSQL + tenant schema)
+- Documentation: pricing_module.md (201 lines), pricing_guide.md (333 lines)
+
+### Deep Audit Results (SP06)
+
+- **88 DONE / 0 PARTIAL / 0 MISSING** out of 88 tasks
+- Bugs found and fixed during audit:
+  1. `created_at` referenced instead of `created_on` (BaseModel uses TimestampMixin with `created_on`) — fixed in admin.py, views, test assertions, factories
+  2. Permissions not wired into ViewSets — wired HasPricingPermission, CanViewCostPrice, CanCreatePromotions
+  3. Migration 0004 needed for TieredPricing Meta changes — generated and applied
+  4. Tenant migration inconsistency — fixed by inserting fake platform migration records
+- Production DB tests use django-tenants tenant lifecycle fixtures (conftest.py with `setup_test_tenant` + `tenant_context`)
+- Test coverage: 15 test classes covering CRUD, constraints, signals, services, serializers, indexes, URLs
+- Audit report: SP06_AUDIT_REPORT.md
+
+---
+
+## What Was Completed in Session 7
 
 ### SP03: Product Base Model (ALL 98 Tasks) — Phase 04
 
@@ -177,6 +453,72 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 - Products conftest uses unique domain ("products.testserver") to avoid collision with attributes conftest ("testserver")
 - `.testserver` wildcard added to test ALLOWED_HOSTS for subdomain pattern support
 - tenant_context fixture is NOT autouse — only integration tests that explicitly request it get tenant schema
+
+---
+
+## What Was Completed in Session 9
+
+### SP04: Product Variants (ALL 94 Tasks) — Phase 04
+
+**Phase-04_ERP-Core-Modules-Part1/SubPhase-04_Product-Variants**
+
+**Group A: VariantOptionType & VariantOptionValue Models (Tasks 01-18)**
+
+- VariantOptionType(BaseModel): name(100, db_index), slug(100, auto-gen, unique), display_order, is_color_swatch, is_image_swatch
+  - Meta: db_table="products_variantoptiontype", ordering=["display_order","name"], UniqueConstraint on name
+  - Methods: **str**, save(auto-slug), clean(swatch mutual exclusivity)
+- VariantOptionValue(BaseModel): option_type(FK CASCADE), value(100), label(150, auto-gen), color_code(7), image(ImageField), display_order
+  - Meta: unique_together=["option_type","value"], ordering=["option_type","display_order","value"]
+  - Properties: is_color_swatch, is_image_swatch, get_display_html
+- Migration 0006_sp04_variant_options, admin classes (VariantOptionTypeAdmin, VariantOptionValueAdmin, inline)
+- 44 tests in test_variant_option.py (including 9 edge-case tests)
+
+**Group B: ProductVariant & Through Models (Tasks 19-38)**
+
+- ProductVariant(BaseModel): product(FK CASCADE), sku(100, unique), barcode, name(255), option_values(M2M through), weight/length/width/height overrides, sort_order
+  - objects = VariantManager() (custom, NOT AliveManager)
+  - Methods: **str**, save(auto-name), clean(validates VARIABLE type), generate_name_from_options(), get_option_display(), get_full_name, get_weight(), get_dimensions()
+- ProductVariantOption(models.Model): variant(FK CASCADE), option_value(FK PROTECT), display_order; unique_together
+- ProductOptionConfig(BaseModel): product(FK CASCADE), option_type(FK CASCADE), display_order; UniqueConstraint on product+option_type
+- Migration 0007_sp04_product_variant, admin classes (ProductVariantAdmin, ProductVariantTabInline in ProductAdmin)
+
+**Group C: Variant Services + Signals (Tasks 39-54)**
+
+- services/config.py: DEFAULT_SKU_PATTERN, SKU_SEPARATOR, SKU_MAX_RETRY, validate_sku_pattern, format_option_value_for_sku
+- services/variant_generator.py: VariantGenerator class — validate_combinations, get_combinations (itertools.product), generate_sku (uses DEFAULT_SKU_PATTERN), check_sku_unique, get_unique_sku, generate_variants, bulk_create_variants (atomic, bulk_create batch=500)
+- signals.py: auto_generate_variant_name (pre_save → delegates to get_variant_name utility), variant_post_save_handler (post_save logging)
+- apps.py: ready() imports signals
+
+**Group D: Variant Managers & QuerySets (Tasks 55-66)**
+
+- VariantQuerySet: active(), inactive(), in_stock(), for_product(), by_option(), with_prices(), with_stock(), with_options()
+- VariantManager: proxies all QuerySet methods + get_by_options(product, options) — two-step annotation approach
+- 37 tests in test_variant_managers.py
+
+**Group E: Serializers, Views & Admin (Tasks 67-82)**
+
+- 8 serializers: VariantOptionTypeSerializer, VariantOptionValueSerializer, ProductVariantOptionSerializer, ProductVariantListSerializer, ProductVariantDetailSerializer, ProductVariantCreateSerializer, BulkVariantCreateSerializer, ProductOptionConfigSerializer
+- 4 ViewSets: VariantOptionTypeViewSet, VariantOptionValueViewSet (by_type action), ProductVariantViewSet (by_options + generate_variants actions), ProductOptionConfigViewSet
+- 4 URL registrations: variant-option-types, variant-option-values, product-variants, product-option-configs
+- Admin: ProductVariantTabInline in ProductAdmin, standalone admin classes for all models
+
+**Group F: Testing & Documentation (Tasks 83-94)**
+
+- 233 new SP04 tests total:
+  - test_variant_option.py: 44 tests (models + edge cases)
+  - test_variant_models.py: 39 tests (ProductVariant + relationships)
+  - test_variant_generator.py: 34 tests (service + 3-option types + signals)
+  - test_variant_managers.py: 37 tests (QuerySet/Manager)
+  - test_variant_api.py: 60 tests (API CRUD + custom actions)
+  - test_variant_integration.py: 19 tests (production-level e2e lifecycle)
+- Documentation: VARIANTS.md comprehensive documentation
+
+### Deep Audit Results (SP04)
+
+- **84 PASS / 10 PARTIAL / 0 FAIL** out of 94 tasks
+- 5 fixes applied during audit (signals, SKU pattern, edge-case tests, 3-option tests, integration tests)
+- 10 PARTIAL items are all acceptable architectural deviations (ImageField vs CloudinaryField, schema-level tenant isolation, future-phase computed fields)
+- Audit report: SP04_AUDIT_REPORT.md
 - \_make_product() helper uses `Product.__new__()` + `ModelState()` initialization for mock-based tests
 
 ---
@@ -692,6 +1034,24 @@ backend/tests/products/test_product_integration.py # EXPANDED: +29 tests → 106
 SP03_AUDIT_REPORT.md                              # NEW: Comprehensive audit report with certification
 ```
 
+### Session 12 Files (SP08: Warehouse & Locations — Deep Audit + Integration Tests)
+
+```
+backend/apps/inventory/warehouses/models/warehouse.py            # MODIFIED: address_line_2/postal_code/email/manager_name → null=True; custom permissions
+backend/apps/inventory/warehouses/models/storage_location.py     # MODIFIED: barcode/description → null=True; max_volume decimal 4→3; max_pallets; capacity_notes; barcode UniqueConstraint; permissions
+backend/apps/inventory/warehouses/models/transfer_route.py       # MODIFIED: Added active-warehouse validation in clean()
+backend/apps/inventory/warehouses/models/__init__.py             # FIXED: Removed duplicate __all__ declaration
+backend/apps/inventory/warehouses/managers/location_manager.py   # MODIFIED: Added inactive(), by_parent(), get_by_code() methods
+backend/apps/inventory/warehouses/services/route_finder.py       # MODIFIED: find_multi_hop_route cost_per_kg/m3 field names fixed
+backend/apps/inventory/warehouses/api/views.py                   # FIXED: Count("locations") → Count("storage_locations")
+backend/apps/inventory/warehouses/api/serializers.py             # FIXED: phone_number→phone, locations→storage_locations, removed invalid description field
+backend/apps/inventory/warehouses/validators.py                  # MODIFIED: Added Sri Lankan phone validator
+backend/apps/inventory/warehouses/migrations/0006_warehouse_fields_storage_location_updates.py  # NEW: Audit gap fixes
+backend/tests/inventory/conftest.py                              # NEW: Tenant-aware fixtures (warehouse, zones, locations, routes, capacity)
+backend/tests/inventory/test_warehouse_integration.py            # NEW: 77 production integration tests (Docker PostgreSQL)
+P04_SP08_AUDIT_REPORT.md                                         # UPDATED: Comprehensive audit report with certification (220 tests)
+```
+
 ---
 
 ## Config Functions (Pre-existing, KEPT Untouched)
@@ -721,12 +1081,11 @@ These ~620 config functions and their ~4956 tests still exist and pass. They are
 
 ## What To Do Next
 
-| Priority | Task                            | Details                                                  |
-| -------- | ------------------------------- | -------------------------------------------------------- |
-| 1        | **Phase-04 SP04+: ERP Core**    | SP01+SP02+SP03 COMPLETE — Continue Phase-04 SubPhase-04+ |
-| 2        | **SP03 Audit**                  | Deep audit of SP03 (98 tasks) like SP01/SP02             |
-| 3        | **Phase-05+ ERP Modules Part2** | Continue to Phase-05 after Phase-04 complete             |
-| 4        | **Phase-06+ Advanced Modules**  | Continue through remaining phases                        |
+| Priority | Task                            | Details                                             |
+| -------- | ------------------------------- | --------------------------------------------------- |
+| 1        | **Phase-04 SP09+: ERP Core**    | SP01–SP08 COMPLETE — Continue Phase-04 SubPhase-09+ |
+| 2        | **Phase-05+ ERP Modules Part2** | Continue to Phase-05 after Phase-04 complete        |
+| 3        | **Phase-06+ Advanced Modules**  | Continue through remaining phases                   |
 
 ---
 
@@ -783,6 +1142,12 @@ cd /e/work_git_repos/pos && docker compose run --rm -e DJANGO_SETTINGS_MODULE=co
 
 # Import verification
 cd /e/work_git_repos/pos && docker compose run --rm --no-deps -e DJANGO_SETTINGS_MODULE=config.settings.test_pg --entrypoint "" backend python -c "import django; django.setup(); from apps.core.cache import TenantCache, get_tenant_cache, CacheInvalidator, cache_response, cache_method, cache_queryset; print('ALL CACHE IMPORTS OK')"
+
+# Warehouse tests (220 tests — 143 unit + 77 integration)
+docker exec -e DATABASE_URL=postgres://lankacommerce:lankacommerce@lcc-postgres:5432/lankacommerce_test -e DJANGO_SETTINGS_MODULE=config.settings.test_pg lcc-backend bash -c "pip install -q pytest pytest-django drf-spectacular drf-spectacular-sidecar django-mptt django-filter django-redis 2>/dev/null && cd /app && python -m pytest tests/inventory/ --tb=short -q"
+
+# Warehouse integration tests only (77 tests — real PostgreSQL)
+docker exec -e DATABASE_URL=postgres://lankacommerce:lankacommerce@lcc-postgres:5432/lankacommerce_test -e DJANGO_SETTINGS_MODULE=config.settings.test_pg lcc-backend bash -c "pip install -q pytest pytest-django drf-spectacular drf-spectacular-sidecar django-mptt django-filter django-redis 2>/dev/null && cd /app && python -m pytest tests/inventory/test_warehouse_integration.py --tb=short -q"
 ```
 
 ---
@@ -820,6 +1185,16 @@ cd /e/work_git_repos/pos && docker compose run --rm --no-deps -e DJANGO_SETTINGS
 29. Product model extends BaseModel (UUID, timestamps, audit, status, soft-delete); Category uses UUIDMixin+TimestampMixin
 30. Products integration tests must explicitly request `tenant_context` fixture (NOT autouse)
 31. Mock-based tests use `Product.__new__(Product)` + `obj._state = ModelState()` to avoid FK descriptor errors32. SP03 deep audit COMPLETE — 12 gaps found and fixed, 18 acceptable deviations documented
-33. SP03_AUDIT_REPORT.md documents all 98 tasks, migration 0005, full certification
-34. Tenant isolation tests use `connection.set_schema_to_public()` before creating second tenant
-35. Full test suite: 9,866 passed, 0 errors (after SP03 audit)
+32. SP03_AUDIT_REPORT.md documents all 98 tasks, migration 0005, full certification
+33. Tenant isolation tests use `connection.set_schema_to_public()` before creating second tenant
+34. Full test suite: 9,866 passed, 0 errors (after SP03 audit)
+35. Phase-04 SP04 Product Variants is now COMPLETE (94 tasks, AUDITED)
+36. Phase-04 SP05 Bundle & Composite Products is now COMPLETE (90 tasks, AUDITED)
+37. Phase-04 SP06 Product Pricing is now COMPLETE (88 tasks, 141 unit + 53 integration tests, AUDITED)
+38. Phase-04 SP07 Product Media is now COMPLETE (86 tasks, 183 unit + 29 integration tests, AUDITED)
+39. Phase-04 SP08 Warehouse & Locations is now COMPLETE (84 tasks, 143 unit + 77 integration tests, AUDITED, 8 bugs fixed)
+40. SP08 integration tests use `pytestmark = pytest.mark.django_db` (module-level, NO `transaction=True`) — `transaction=True` causes FK truncation errors
+41. SP08 IntegrityError tests must wrap the failing operation in `with transaction.atomic():` inside `with pytest.raises(IntegrityError):`
+42. Warehouse model field is `phone` (NOT `phone_number`); StorageLocation related_name from Warehouse is `storage_locations` (NOT `locations`)
+43. SoftDeleteMixin (core/mixins.py) is fields-only (`is_deleted`, `deleted_on`) — no `delete()` override; calling `.delete()` is a hard delete
+44. drf-spectacular-sidecar is required in Docker pip installs for warehouse tests

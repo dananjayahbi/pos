@@ -10,3 +10,7 @@ class InventoryConfig(AppConfig):
     name = "apps.inventory"
     label = "inventory"
     verbose_name = "Inventory Management"
+
+    def ready(self):
+        """Import signals when app is ready."""
+        from apps.inventory.warehouses import signals  # noqa: F401

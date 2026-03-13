@@ -294,6 +294,7 @@ TENANT_APPS: list[str] = [
     "django.contrib.auth",               # Per-tenant users, groups, permissions
     # ── LankaCommerce Business Modules (per-tenant data) ────────────
     "apps.products",                     # Product catalog — tenant-specific SKUs & pricing
+    "apps.products.pricing",             # Product pricing — price types, history & tax config
     "apps.attributes",                   # Product attributes — tenant-specific attribute definitions
     "apps.inventory",                    # Stock & warehouse — tenant-specific stock levels
     "apps.vendors",                      # Supplier management — tenant-specific vendors
