@@ -296,6 +296,7 @@ CELERY_TASK_ROUTES = {
     "apps.core.tasks.notification_tasks.*": {"queue": "default"},
     "apps.core.tasks.report_tasks.*": {"queue": "low_priority"},
     "apps.core.tasks.scheduled_tasks.*": {"queue": "low_priority"},
+    "apps.inventory.alerts.tasks.*": {"queue": "default"},
 }
 
 # ── Beat Schedule (periodic tasks) ─────────────────────────────────
@@ -317,6 +318,23 @@ CELERY_BEAT_SCHEDULE = {
     "cleanup-tokens": {
         "task": "apps.core.tasks.scheduled_tasks.cleanup_expired_tokens_task",
         "schedule": crontab(hour=2, minute=0),
+    },
+    # ── SP10 Stock Alert Tasks (Task 43) ────────────────────────
+    "run-stock-monitoring": {
+        "task": "apps.inventory.alerts.tasks.stock_monitor.run_stock_monitoring",
+        "schedule": crontab(minute=0),  # Every hour
+    },
+    "auto-resolve-alerts": {
+        "task": "apps.inventory.alerts.tasks.alert_resolution.auto_resolve_alerts_task",
+        "schedule": crontab(minute="*/30"),  # Every 30 minutes
+    },
+    "check-expired-snoozes": {
+        "task": "apps.inventory.alerts.tasks.alert_resolution.check_expired_snoozes",
+        "schedule": crontab(minute="*/5"),  # Every 5 minutes
+    },
+    "cleanup-monitoring-logs": {
+        "task": "apps.inventory.alerts.tasks.alert_resolution.cleanup_old_monitoring_logs",
+        "schedule": crontab(hour=3, minute=0),  # Daily at 3 AM
     },
 }
 

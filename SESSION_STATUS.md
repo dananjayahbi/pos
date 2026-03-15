@@ -1,6 +1,6 @@
 # Session Status - LankaCommerce Cloud POS
 
-> **Last Updated:** Session 12 — Phase-04 SP08 Warehouse & Locations COMPLETE + 220 TESTS (143 unit + 77 integration)
+> **Last Updated:** Session 14 — Phase-04 SP10 Stock Alerts & Reordering AUDITED + 135 TESTS (all passing on Docker/PostgreSQL)
 > **Purpose:** Complete handoff document for the next chat session. This file contains ALL context needed to continue work without the previous chat's memory.
 
 ---
@@ -33,12 +33,14 @@ Phase-04_ERP-Core-Modules-Part1/SubPhase-05_Bundle-Composite-Products (ALL 90 ta
 Phase-04_ERP-Core-Modules-Part1/SubPhase-06_Product-Pricing (ALL 88 tasks complete, AUDITED, 53 production DB tests)
 Phase-04_ERP-Core-Modules-Part1/SubPhase-07_Product-Media (ALL 86 tasks complete, AUDITED, 29 production DB tests)
 Phase-04_ERP-Core-Modules-Part1/SubPhase-08_Warehouse-Locations (ALL 84 tasks complete, AUDITED, 220 tests)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-09_Inventory-Management (ALL 92 tasks complete, AUDITED, 375 tests)
+Phase-04_ERP-Core-Modules-Part1/SubPhase-10_Stock-Alerts-Reordering (ALL 86 tasks complete, AUDITED, 135 tests)
 ```
 
 ### Next Document to Implement
 
 ```
-Document-Series/Phase-04_ERP-Core-Modules-Part1/SubPhase-09_*
+Document-Series/Phase-04_ERP-Core-Modules-Part1/SubPhase-11_*
 ```
 
 ---
@@ -129,7 +131,88 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 
 ---
 
-## What Was Completed This Session (Session 12)
+## What Was Completed This Session (Session 14)
+
+### SP10: Stock Alerts & Reordering (ALL 86 Tasks) — Phase 04
+
+**Phase-04_ERP-Core-Modules-Part1/SubPhase-10_Stock-Alerts-Reordering**
+
+**Group A: Stock Configuration Models (Tasks 01-16)**
+
+- Alerts submodule at `apps/inventory/alerts/` with models, views, serializers, tasks, services, templates, tests
+- Constants: alert types (LOW_STOCK, CRITICAL_STOCK, OUT_OF_STOCK, OVERSTOCK, BACK_IN_STOCK), priorities (LOW–URGENT), statuses, urgency levels
+- GlobalStockSettings singleton: thresholds, monitoring window (start/end time), escalation (enabled/hours/recipients), dashboard_cache_ttl, excluded_dates JSONField, get_monitoring_schedule()
+- CategoryStockConfig: FK to Category, override thresholds, auto_reorder, lead_time_days
+- ProductStockConfig: FK to Product (+ nullable warehouse), all override fields, monitoring_enabled, unique_together
+- ConfigResolver: product → category → global fallback inheritance chain
+- Migration 0013 (base), 0014 (audit fixes)
+
+**Group B: Stock Alert System (Tasks 17-34)**
+
+- StockAlert model: all FKs (product, variant, warehouse), severity (0.0–1.0), lifecycle methods (acknowledge/resolve/snooze/escalate)
+- Create_or_update() with cooldown-based deduplication
+- Severity gradient calculation: 1 − (stock/threshold), fixed Decimal/float mixing bug
+- NotificationService with escalation and throttling
+- Webhook integration with retry logic
+- Admin with bulk acknowledge/resolve actions
+
+**Group C: Scheduled Monitoring Tasks (Tasks 35-50)**
+
+- run_stock_monitoring Celery task: TenantAwareTask, concurrency lock, batch processing
+- check_low_stock, check_critical_stock, check_out_of_stock monitor functions
+- auto_resolve_alerts_task: resolves when stock recovers
+- check_expired_snoozes: reactivates expired snoozed alerts
+- cleanup_old_monitoring_logs: retention-based cleanup
+- MonitoringLog model: tracks each run (started_at, completed_at, products/alerts counts)
+- Celery Beat: 4 periodic entries in config/settings/base.py
+- Fixed: removed non-existent `track_inventory` field from product filters
+
+**Group D: Reorder Suggestions & Automation (Tasks 51-68)**
+
+- ReorderSuggestion model: product, variant, warehouse, supplier FKs; quantities, costs, urgency, status lifecycle
+- SalesVelocityCalculator: daily/weekly/monthly velocity, trend detection, seasonality, w-o-w growth
+- ReorderCalculator: EOQ (Wilson formula), safety stock, reorder point
+- ForecastingService: demand forecasting
+- SupplierLeadTimeLog model (migration 0015)
+- Celery tasks: generate_reorder_suggestions, mark_expired, process_auto_reorders, send_weekly_reorder_report
+- Calendar action on ViewSet for delivery date tracking
+
+**Group E: Serializers & API Views (Tasks 69-80)**
+
+- Config serializers: GlobalSettings, CategoryConfig, ProductConfig, Bulk, BulkExclude
+- Alert serializers: StockAlert, Snooze, Acknowledge
+- Reorder serializers: ReorderSuggestion, SupplierSummary (with code/is_active)
+- ViewSets: ProductStockConfig (CRUD + bulk_update + reset_to_defaults), GlobalSettings, StockAlert (list + actions), ReorderSuggestion (list + convert_to_po + calendar + report)
+- AlertDashboardView, StockHealthView (warehouse filter + caching), ProductAlertsView
+- 7 URL patterns via router + manual paths
+
+**Group F: Testing & Documentation (Tasks 81-86)**
+
+- test_models.py: 40 tests (379 lines) — all model CRUD, constraints, properties
+- test_services.py: 28 tests (307 lines) — velocity, calculator, config resolver
+- test_tasks.py: 29 tests (661 lines) — monitoring logic, alerts, back-in-stock, auto-resolve, snooze, cleanup
+- test_views.py: 38 tests (337 lines) — all endpoints, filters, permissions
+- factories.py: factory-boy factories for all models
+- conftest.py: tenant-aware tests with setup_test_tenant + tenant_context
+- 6 documentation pages: index, configuration, alerts, monitoring, reordering, api
+- **Total SP10 tests: 135, ALL PASSING**
+- **Bugs fixed: 4** (Decimal/float severity, track_inventory field, is_snoozed property, critical threshold logic)
+- Audit report: SP10_AUDIT_REPORT.md
+
+---
+
+## What Was Completed in Session 13 (Previous)
+
+### SP09: Inventory Management (ALL 92 Tasks) — Phase 04
+
+- 6 groups (A–F): Stock Level Models, Stock Movement Tracking, Stock Operations Services, Stock Take & Adjustments, Serializers & API Views, Testing & Documentation
+- 375 tests ALL PASSING on Docker/PostgreSQL
+- Deferred features all implemented: in-transit tracking, movement-ID reservations, FIFO/LIFO costing, per-item approval, PDF/Excel/CSV reports, cycle count scheduling
+- Audit report: SP09_AUDIT_REPORT.md
+
+---
+
+## What Was Completed in Session 12 (Previous)
 
 ### SP08: Warehouse & Locations (ALL 84 Tasks) — Phase 04
 
@@ -1083,7 +1166,7 @@ These ~620 config functions and their ~4956 tests still exist and pass. They are
 
 | Priority | Task                            | Details                                             |
 | -------- | ------------------------------- | --------------------------------------------------- |
-| 1        | **Phase-04 SP09+: ERP Core**    | SP01–SP08 COMPLETE — Continue Phase-04 SubPhase-09+ |
+| 1        | **Phase-04 SP11+: ERP Core**    | SP01–SP10 COMPLETE — Continue Phase-04 SubPhase-11+ |
 | 2        | **Phase-05+ ERP Modules Part2** | Continue to Phase-05 after Phase-04 complete        |
 | 3        | **Phase-06+ Advanced Modules**  | Continue through remaining phases                   |
 
@@ -1148,6 +1231,9 @@ docker exec -e DATABASE_URL=postgres://lankacommerce:lankacommerce@lcc-postgres:
 
 # Warehouse integration tests only (77 tests — real PostgreSQL)
 docker exec -e DATABASE_URL=postgres://lankacommerce:lankacommerce@lcc-postgres:5432/lankacommerce_test -e DJANGO_SETTINGS_MODULE=config.settings.test_pg lcc-backend bash -c "pip install -q pytest pytest-django drf-spectacular drf-spectacular-sidecar django-mptt django-filter django-redis 2>/dev/null && cd /app && python -m pytest tests/inventory/test_warehouse_integration.py --tb=short -q"
+
+# SP10 Stock Alerts tests (135 tests — real PostgreSQL)
+docker compose exec -T -e DJANGO_SETTINGS_MODULE=config.settings.test_pg backend python -m pytest apps/inventory/alerts/tests/ -v --tb=short
 ```
 
 ---
@@ -1198,3 +1284,12 @@ docker exec -e DATABASE_URL=postgres://lankacommerce:lankacommerce@lcc-postgres:
 42. Warehouse model field is `phone` (NOT `phone_number`); StorageLocation related_name from Warehouse is `storage_locations` (NOT `locations`)
 43. SoftDeleteMixin (core/mixins.py) is fields-only (`is_deleted`, `deleted_on`) — no `delete()` override; calling `.delete()` is a hard delete
 44. drf-spectacular-sidecar is required in Docker pip installs for warehouse tests
+45. Phase-04 SP09 Inventory Management is now COMPLETE (92 tasks, 375 tests, AUDITED)
+46. Phase-04 SP10 Stock Alerts & Reordering is now COMPLETE (86 tasks, 135 tests, AUDITED)
+47. SP10 alerts app is at `apps/inventory/alerts/` (submodule under inventory) with models, views, serializers, tasks, services, tests
+48. SP10 uses tenant-aware test pattern: `setup_test_tenant` (session-scoped), `tenant_context` (per-test), APIClient(HTTP_HOST="alerts.testserver")
+49. Product model does NOT have `track_inventory` field — use `is_active` and `status` instead
+50. StockLevel.available_quantity is a @property returning Decimal — always cast to float for arithmetic with floats
+51. StockAlert.is_snoozed is a read-only @property — set `snoozed_until` field directly, never assign to `is_snoozed`
+52. SP10 has 3 migrations: 0013 (base), 0014 (Group A audit fixes), 0015 (SupplierLeadTimeLog)
+53. SP10 Celery Beat: 4 scheduled tasks in config/settings/base.py (monitoring hourly, resolve 30min, snooze 5min, cleanup daily 3AM)

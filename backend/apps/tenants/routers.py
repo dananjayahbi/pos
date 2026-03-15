@@ -579,6 +579,11 @@ class TenantRouter:
         """
         Prevent foreign key relations between shared-only and tenant-only apps.
 
+        Exceptions:
+        - Dual apps (contenttypes, auth) are always allowed.
+        - AUTH_USER_MODEL is always allowed — tenant models commonly
+          reference the shared user model via FK (e.g. created_by).
+
         Parameters
         ----------
         obj1 : Model instance
@@ -604,6 +609,15 @@ class TenantRouter:
 
         # If both models are in the same classification, allow.
         if classification1 == classification2:
+            return True
+
+        # Allow relations involving AUTH_USER_MODEL — tenant models
+        # commonly have FKs to the shared user model (created_by,
+        # assigned_to, etc.). This is safe because django-tenants
+        # uses a single database with schema-level isolation, so
+        # the FK references are valid across schemas.
+        auth_user_app = settings.AUTH_USER_MODEL.split(".")[0]
+        if obj1._meta.app_label == auth_user_app or obj2._meta.app_label == auth_user_app:
             return True
 
         # Cross-schema relation: shared_only ↔ tenant_only — block it.
@@ -897,6 +911,15 @@ class LCCDatabaseRouter(TenantSyncRouter):
 
         # Same classification -- always allow.
         if classification1 == classification2:
+            return True
+
+        # Allow relations involving AUTH_USER_MODEL — tenant models
+        # commonly have FKs to the shared user model (created_by,
+        # assigned_to, etc.). This is safe because django-tenants
+        # uses a single database with schema-level isolation, so
+        # the FK references are valid across schemas.
+        auth_user_app = settings.AUTH_USER_MODEL.split(".")[0]
+        if obj1._meta.app_label == auth_user_app or obj2._meta.app_label == auth_user_app:
             return True
 
         # Cross-schema relation -- block it.
