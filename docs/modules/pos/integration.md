@@ -15,13 +15,13 @@ The POS terminal is linked to a warehouse via `POSTerminal.warehouse`.
 
 ## Products Module
 
-| Integration Point | Detail |
-|--------------------|--------|
-| `Product` model | Referenced by `POSCartItem.product` and search service |
-| `ProductVariant` | Optional variant reference with separate barcode/SKU |
-| `TaxClass` | Tax rate pulled into cart items via `set_tax_from_product()` |
-| `Category` (MPTT) | Used for category-filtered search |
-| `is_pos_visible` | Boolean flag on Product controlling POS visibility |
+| Integration Point | Detail                                                       |
+| ----------------- | ------------------------------------------------------------ |
+| `Product` model   | Referenced by `POSCartItem.product` and search service       |
+| `ProductVariant`  | Optional variant reference with separate barcode/SKU         |
+| `TaxClass`        | Tax rate pulled into cart items via `set_tax_from_product()` |
+| `Category` (MPTT) | Used for category-filtered search                            |
+| `is_pos_visible`  | Boolean flag on Product controlling POS visibility           |
 
 ## Customers Module
 
@@ -53,11 +53,11 @@ Currently, payments are recorded locally. External gateway integration:
 
 Planned integrations:
 
-| Gateway | Method Constant | Status |
-|---------|----------------|--------|
-| Visa/Mastercard | `card` | Local recording only |
-| FriMi | `mobile_frimi` | Local recording only |
-| Genie | `mobile_genie` | Local recording only |
+| Gateway         | Method Constant | Status               |
+| --------------- | --------------- | -------------------- |
+| Visa/Mastercard | `card`          | Local recording only |
+| FriMi           | `mobile_frimi`  | Local recording only |
+| Genie           | `mobile_genie`  | Local recording only |
 
 Gateway adapters should be implemented as strategy classes injected
 into `PaymentService`.

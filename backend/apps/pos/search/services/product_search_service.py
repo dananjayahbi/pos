@@ -84,6 +84,129 @@ class ProductSearchService:
                 deduped.append(item)
         return deduped
 
+    @classmethod
+    def _check_stock_availability(
+        cls, product, location=None
+    ) -> dict[str, Any]:
+        """
+        Check stock availability for a product at an optional location.
+
+        Returns dict with quantity, available, reserved, status, etc.
+        """
+        result: dict[str, Any] = {
+            "quantity": Decimal("0"),
+            "available": Decimal("0"),
+            "reserved": Decimal("0"),
+            "status": "out_of_stock",
+            "low_stock_threshold": None,
+            "reorder_level": None,
+            "below_reorder": False,
+        }
+
+        try:
+            from apps.inventory.models import StockRecord
+
+            filters = {"product": product}
+            if location is not None:
+                filters["location"] = location
+
+            stock = (
+                StockRecord.objects.filter(**filters)
+                .order_by("-updated_on")
+                .first()
+            )
+            if stock:
+                qty = getattr(stock, "quantity", Decimal("0")) or Decimal("0")
+                reserved = getattr(stock, "reserved_quantity", Decimal("0")) or Decimal("0")
+                available = qty - reserved
+                result["quantity"] = qty
+                result["reserved"] = reserved
+                result["available"] = max(available, Decimal("0"))
+
+                low_threshold = getattr(stock, "low_stock_threshold", None)
+                reorder = getattr(stock, "reorder_level", None)
+                result["low_stock_threshold"] = low_threshold
+                result["reorder_level"] = reorder
+                result["below_reorder"] = (
+                    reorder is not None and qty <= reorder
+                )
+
+                if available <= 0:
+                    result["status"] = "out_of_stock"
+                elif low_threshold and available <= low_threshold:
+                    result["status"] = "low_stock"
+                else:
+                    result["status"] = "in_stock"
+        except (ImportError, Exception):
+            # Inventory module may not be available
+            pass
+
+        return result
+
+    @classmethod
+    def _get_effective_price(
+        cls, product, customer=None, quantity: int = 1
+    ) -> dict[str, Any]:
+        """
+        Determine the effective selling price for a product,
+        considering customer group pricing and active promotions.
+        """
+        base_price = product.selling_price or Decimal("0")
+        unit_price = base_price
+        discount_amount = Decimal("0")
+        discount_percent = Decimal("0")
+        discount_reason = ""
+        promotion = None
+
+        # Customer group pricing
+        if customer and hasattr(customer, "customer_group") and customer.customer_group:
+            try:
+                from apps.products.models import CustomerGroupPrice
+
+                group_price = (
+                    CustomerGroupPrice.objects.filter(
+                        product=product,
+                        customer_group=customer.customer_group,
+                        is_active=True,
+                    )
+                    .first()
+                )
+                if group_price and group_price.price:
+                    unit_price = group_price.price
+                    discount_amount = base_price - unit_price
+                    if base_price > 0:
+                        discount_percent = (discount_amount / base_price) * 100
+                    discount_reason = f"Customer group: {customer.customer_group}"
+            except (ImportError, Exception):
+                pass
+
+        # Tax calculation
+        tax_rate = Decimal("0")
+        if hasattr(product, "tax_class") and product.tax_class:
+            tax_rate = getattr(product.tax_class, "rate", Decimal("0")) or Decimal("0")
+        price_with_tax = unit_price * (1 + tax_rate / 100)
+
+        # Currency
+        currency = "LKR"
+        try:
+            from django.conf import settings
+
+            currency = getattr(settings, "DEFAULT_CURRENCY", "LKR")
+        except Exception:
+            pass
+
+        return {
+            "base_price": str(base_price),
+            "unit_price": str(unit_price),
+            "discount_amount": str(discount_amount),
+            "discount_percent": str(discount_percent.quantize(Decimal("0.01"))),
+            "discount_reason": discount_reason,
+            "tax_rate": str(tax_rate),
+            "price_with_tax": str(price_with_tax.quantize(Decimal("0.01"))),
+            "currency": currency,
+            "promotion": promotion,
+        }
+
     # ── core search methods ─────────────────────────────────────────
 
     @classmethod
@@ -324,3 +447,81 @@ class ProductSearchService:
             .annotate(freq=Count("id"))
             .order_by("-freq")[:limit]
         )
+
+    # ── category helpers ────────────────────────────────────────────
+
+    @classmethod
+    def get_active_categories(cls) -> list[dict[str, Any]]:
+        """Return active categories that contain POS-visible products."""
+        from apps.products.models import Product
+
+        category_ids = (
+            Product.objects.filter(
+                is_active=True,
+                is_deleted=False,
+                is_pos_visible=True,
+                status=PRODUCT_STATUS.ACTIVE,
+                category__isnull=False,
+            )
+            .values_list("category_id", flat=True)
+            .distinct()
+        )
+
+        from apps.products.models import Category
+
+        categories = Category.objects.filter(
+            id__in=category_ids, is_active=True
+        ).order_by("name")
+
+        return [
+            {
+                "id": str(cat.id),
+                "name": cat.name,
+                "parent_id": str(cat.parent_id) if cat.parent_id else None,
+                "level": getattr(cat, "level", 0),
+                "product_count": (
+                    Product.objects.filter(
+                        category=cat,
+                        is_active=True,
+                        is_deleted=False,
+                        is_pos_visible=True,
+                    ).count()
+                ),
+            }
+            for cat in categories
+        ]
+
+    @classmethod
+    def get_category_quick_filters(cls, limit: int = 10) -> list[dict[str, Any]]:
+        """Return top-level categories with product counts for quick filter UI."""
+        from django.db.models import Count
+
+        from apps.products.models import Category
+
+        top_categories = (
+            Category.objects.filter(
+                is_active=True,
+                parent__isnull=True,
+            )
+            .annotate(
+                pos_product_count=Count(
+                    "product",
+                    filter=Q(
+                        product__is_active=True,
+                        product__is_deleted=False,
+                        product__is_pos_visible=True,
+                    ),
+                )
+            )
+            .filter(pos_product_count__gt=0)
+            .order_by("-pos_product_count")[:limit]
+        )
+        return [
+            {
+                "id": str(cat.id),
+                "name": cat.name,
+                "product_count": cat.pos_product_count,
+                "icon": getattr(cat, "icon", ""),
+            }
+            for cat in top_categories
+        ]

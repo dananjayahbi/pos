@@ -9,6 +9,7 @@ import logging
 from decimal import Decimal
 
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,6 +22,7 @@ from apps.pos.constants import (
     PAYMENT_METHOD_CASH,
     PAYMENT_STATUS_COMPLETED,
     PAYMENT_STATUS_PENDING,
+    PAYMENT_STATUS_REFUNDED,
     SESSION_STATUS_OPEN,
 )
 from apps.pos.payment.models import POSPayment
@@ -306,11 +308,12 @@ class PaymentRefundView(APIView):
 
         try:
             with transaction.atomic():
-                payment.status = "refunded"
+                payment.status = PAYMENT_STATUS_REFUNDED
+                payment.refunded_at = timezone.now()
                 payment.notes = (
                     f"{payment.notes}\nRefund: {refund_amount} — {reason}"
                 ).strip()
-                payment.save(update_fields=["status", "notes", "updated_on"])
+                payment.save(update_fields=["status", "refunded_at", "notes", "updated_on"])
             logger.info("Payment %s refunded: %s", pk, refund_amount)
             return Response(
                 {

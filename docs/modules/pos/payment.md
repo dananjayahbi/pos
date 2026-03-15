@@ -12,14 +12,14 @@ svc = PaymentService(cart=cart, user=request.user)
 
 ## Supported Payment Methods
 
-| Method | Constant | Service Method |
-|--------|----------|----------------|
-| Cash | `PAYMENT_METHOD_CASH` | `process_cash_payment(amount_tendered)` |
-| Card | `PAYMENT_METHOD_CARD` | `process_card_payment(amount, authorization_code, reference_number=None)` |
-| Bank Transfer | `PAYMENT_METHOD_BANK_TRANSFER` | `process_mobile_payment(amount, reference_number, method)` |
-| Mobile — FriMi | `PAYMENT_METHOD_MOBILE_FRIMI` | `process_mobile_payment(...)` |
-| Mobile — Genie | `PAYMENT_METHOD_MOBILE_GENIE` | `process_mobile_payment(...)` |
-| Store Credit | `PAYMENT_METHOD_STORE_CREDIT` | `process_store_credit(amount)` |
+| Method         | Constant                       | Service Method                                                            |
+| -------------- | ------------------------------ | ------------------------------------------------------------------------- |
+| Cash           | `PAYMENT_METHOD_CASH`          | `process_cash_payment(amount_tendered)`                                   |
+| Card           | `PAYMENT_METHOD_CARD`          | `process_card_payment(amount, authorization_code, reference_number=None)` |
+| Bank Transfer  | `PAYMENT_METHOD_BANK_TRANSFER` | `process_mobile_payment(amount, reference_number, method)`                |
+| Mobile — FriMi | `PAYMENT_METHOD_MOBILE_FRIMI`  | `process_mobile_payment(...)`                                             |
+| Mobile — Genie | `PAYMENT_METHOD_MOBILE_GENIE`  | `process_mobile_payment(...)`                                             |
+| Store Credit   | `PAYMENT_METHOD_STORE_CREDIT`  | `process_store_credit(amount)`                                            |
 
 ## Cash Payment
 
@@ -133,11 +133,11 @@ stateDiagram-v2
 
 ```json
 {
-  "terminal": {"code": "POS-001", "name": "Main Register"},
-  "session": {"session_number": "SESS-POS001-20250101-0001"},
-  "cart": {"reference_number": "...", "subtotal": "...", "grand_total": "..."},
-  "items": [{"name": "...", "qty": "...", "line_total": "..."}],
-  "payments": [{"method": "cash", "amount": "...", "change_due": "..."}],
-  "totals": {"subtotal": "...", "discount": "...", "tax": "...", "grand_total": "..."}
+  "terminal": { "code": "POS-001", "name": "Main Register" },
+  "session": { "session_number": "SESS-POS001-20250101-0001" },
+  "cart": { "reference_number": "...", "subtotal": "...", "grand_total": "..." },
+  "items": [{ "name": "...", "qty": "...", "line_total": "..." }],
+  "payments": [{ "method": "cash", "amount": "...", "change_due": "..." }],
+  "totals": { "subtotal": "...", "discount": "...", "tax": "...", "grand_total": "..." }
 }
 ```

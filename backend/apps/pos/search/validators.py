@@ -114,3 +114,81 @@ def parse_weight_barcode(barcode: str) -> Optional[dict]:
         "product_code": product_code,
         "weight_kg": weight_kg,
     }
+
+
+def validate_barcode(barcode: str, barcode_format: Optional[str] = None) -> dict:
+    """
+    Unified barcode validation.
+
+    If barcode_format is provided, validates against that specific format.
+    Otherwise, detects the format automatically and validates.
+
+    Returns dict with keys: valid (bool), format (str|None), message (str).
+    """
+    if not barcode or not barcode.strip():
+        return {"valid": False, "format": None, "message": "Barcode is empty"}
+
+    barcode = barcode.strip()
+
+    format_validators = {
+        BARCODE_FORMAT_EAN13: (validate_ean13, "EAN-13"),
+        BARCODE_FORMAT_EAN8: (validate_ean8, "EAN-8"),
+        BARCODE_FORMAT_UPC_A: (validate_upc_a, "UPC-A"),
+        BARCODE_FORMAT_CODE128: (validate_code128, "Code-128"),
+    }
+
+    if barcode_format:
+        if barcode_format not in format_validators:
+            return {
+                "valid": False,
+                "format": barcode_format,
+                "message": f"Unknown barcode format: {barcode_format}",
+            }
+        validator_fn, label = format_validators[barcode_format]
+        is_valid = validator_fn(barcode)
+        return {
+            "valid": is_valid,
+            "format": barcode_format if is_valid else None,
+            "message": f"Valid {label} barcode" if is_valid else f"Invalid {label} barcode",
+        }
+
+    # Auto-detect
+    detected = detect_barcode_format(barcode)
+    if detected:
+        return {
+            "valid": True,
+            "format": detected,
+            "message": f"Valid barcode (detected: {detected})",
+        }
+
+    return {"valid": False, "format": None, "message": "Unrecognized barcode format"}
+
+
+def is_weight_barcode(barcode: str) -> bool:
+    """Check if a barcode is a weight-embedded barcode."""
+    if not barcode or len(barcode) != 13 or not barcode.isdigit():
+        return False
+    return barcode.startswith(WEIGHT_BARCODE_PREFIX) and validate_ean13(barcode)
+
+
+def generate_weight_barcode(product_code: str, weight_grams: int) -> Optional[str]:
+    """
+    Generate a weight-embedded EAN-13 barcode.
+
+    Args:
+        product_code: 5-digit product code
+        weight_grams: Weight in grams (0-99999)
+
+    Returns:
+        13-digit barcode string or None if inputs are invalid.
+    """
+    if not product_code or len(product_code) != WEIGHT_BARCODE_PRODUCT_DIGITS:
+        return None
+    if not product_code.isdigit():
+        return None
+    if weight_grams < 0 or weight_grams > 99999:
+        return None
+
+    body = f"{WEIGHT_BARCODE_PREFIX}{product_code}{weight_grams:05d}"
+    check_digit = _calculate_ean_check_digit(body)
+    return f"{body}{check_digit}"

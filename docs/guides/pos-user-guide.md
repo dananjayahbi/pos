@@ -32,9 +32,9 @@ cash and print a summary.
 
 **Roles:**
 
-| Role | What you can do |
-|------|----------------|
-| **Cashier** | Open shift, scan products, process payments, hold/recall carts |
+| Role        | What you can do                                                                                                       |
+| ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Cashier** | Open shift, scan products, process payments, hold/recall carts                                                        |
 | **Manager** | Everything a cashier can do, plus: approve large discounts, void transactions, close other users' shifts, run reports |
 
 ---
@@ -93,11 +93,11 @@ again or tap the **+** button.
 
 Check the bottom of the screen:
 
-| Label | Meaning |
-|-------|---------|
-| Subtotal | Sum of all item prices |
-| Discount | Any discounts applied |
-| Tax | Calculated tax |
+| Label           | Meaning                |
+| --------------- | ---------------------- |
+| Subtotal        | Sum of all item prices |
+| Discount        | Any discounts applied  |
+| Tax             | Calculated tax         |
 | **Grand Total** | What the customer pays |
 
 ### Step 5 — Accept payment

@@ -180,6 +180,31 @@ class POSCartItem(BaseModel):
     def line_total_with_tax(self):
         return self.line_total + self.tax_amount
 
+    @property
+    def formatted_unit_price(self):
+        return f"\u20A8 {self.unit_price:,.2f}"
+
+    @property
+    def formatted_line_total(self):
+        return f"\u20A8 {self.line_total:,.2f}"
+
+    @property
+    def formatted_discount(self):
+        """Format discount for display."""
+        if not self.has_discount:
+            return ""
+        if self.discount_type == DISCOUNT_TYPE_PERCENT:
+            return f"{self.discount_value}% (\u20A8 {self.discount_amount:,.2f})"
+        return f"\u20A8 {self.discount_amount:,.2f}"
+
+    @property
+    def formatted_tax_rate(self):
+        return f"{self.tax_rate}%"
+
+    @property
+    def formatted_tax_amount(self):
+        return f"\u20A8 {self.tax_amount:,.2f}"
+
     # ── Pricing Methods ───────────────────────────────────────────────────
     def set_prices_from_product(self):
         """Copy price from the product or variant."""
@@ -216,6 +241,30 @@ class POSCartItem(BaseModel):
             )
         else:
             self.tax_rate = Decimal("0.00")
+
+    def calculate_discount_amount(self):
+        """Calculate and return the discount amount without saving."""
+        if not self.has_discount:
+            return Decimal("0.00")
+        if self.discount_type == DISCOUNT_TYPE_PERCENT:
+            return (
+                self.original_price * self.discount_value / 100
+            ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        elif self.discount_type == DISCOUNT_TYPE_FIXED:
+            return min(self.discount_value, self.original_price)
+        return Decimal("0.00")
+
+    def validate_stock_availability(self, quantity=None):
+        """Check if requested quantity is available in stock."""
+        qty = quantity if quantity is not None else self.quantity
+        target = self.variant if self.variant else self.product
+        if hasattr(target, "stock_quantity"):
+            if target.stock_quantity < qty:
+                raise ValidationError(
+                    f"Insufficient stock. Available: {target.stock_quantity}, "
+                    f"Requested: {qty}"
+                )
+        return True
 
     # ── Discount Methods ──────────────────────────────────────────────────
     def apply_discount(self, discount_type, discount_value, reason=None):

@@ -39,18 +39,18 @@ reconciliation — all within a multi-tenant Django architecture.
 
 ## Quick Links
 
-| Topic | Document |
-|-------|----------|
-| Architecture & design patterns | [architecture.md](architecture.md) |
-| Terminals & sessions | [terminal.md](terminal.md) |
-| Cart & items | [cart.md](cart.md) |
-| Product search | [search.md](search.md) |
-| Payment processing | [payment.md](payment.md) |
-| Transaction lifecycle | [transaction.md](transaction.md) |
-| REST API reference | [api.md](api.md) |
-| Configuration & settings | [configuration.md](configuration.md) |
-| Module integrations | [integration.md](integration.md) |
-| Troubleshooting | [troubleshooting.md](troubleshooting.md) |
+| Topic                          | Document                                 |
+| ------------------------------ | ---------------------------------------- |
+| Architecture & design patterns | [architecture.md](architecture.md)       |
+| Terminals & sessions           | [terminal.md](terminal.md)               |
+| Cart & items                   | [cart.md](cart.md)                       |
+| Product search                 | [search.md](search.md)                   |
+| Payment processing             | [payment.md](payment.md)                 |
+| Transaction lifecycle          | [transaction.md](transaction.md)         |
+| REST API reference             | [api.md](api.md)                         |
+| Configuration & settings       | [configuration.md](configuration.md)     |
+| Module integrations            | [integration.md](integration.md)         |
+| Troubleshooting                | [troubleshooting.md](troubleshooting.md) |
 
 ## Module Location
 

@@ -1,8 +1,10 @@
 from decimal import ROUND_HALF_UP, Decimal
 
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
 from apps.pos.constants import (
@@ -72,6 +74,29 @@ class POSCart(BaseModel):
     held_at = models.DateTimeField(null=True, blank=True)
     abandoned_at = models.DateTimeField(null=True, blank=True)
 
+    # ── Held Cart Fields ──────────────────────────────────────────────────
+    held_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="held_carts",
+        verbose_name=_("Held By"),
+    )
+    held_reason = models.TextField(
+        blank=True,
+        default="",
+        verbose_name=_("Held Reason"),
+    )
+    held_identifier = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        db_index=True,
+        verbose_name=_("Held Identifier"),
+        help_text=_("Unique identifier for retrieving held carts"),
+    )
+
     # ── Totals ────────────────────────────────────────────────────────────
     subtotal = models.DecimalField(
         max_digits=12,
@@ -80,15 +105,22 @@ class POSCart(BaseModel):
         validators=[MinValueValidator(Decimal("0.00"))],
     )
     discount_total = models.DecimalField(
-        max_digits=12, decimal_places=2, default=Decimal("0.00")
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(Decimal("0.00"))],
     )
     tax_total = models.DecimalField(
-        max_digits=12, decimal_places=2, default=Decimal("0.00")
+        max_digits=12,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(Decimal("0.00"))],
     )
     grand_total = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00"),
+        validators=[MinValueValidator(Decimal("0.00"))],
         db_index=True,
     )
 
@@ -202,13 +234,44 @@ class POSCart(BaseModel):
 
     @property
     def has_notes(self):
-        return bool(self.notes)
+        return bool(self.notes and self.notes.strip())
 
     @property
     def notes_preview(self):
         if len(self.notes) > 50:
             return self.notes[:50] + "..."
         return self.notes
+
+    @property
+    def duration_to_complete(self):
+        """Time from cart creation to completion."""
+        if self.completed_at and self.created_on:
+            return self.completed_at - self.created_on
+        return None
+
+    @property
+    def duration_active(self):
+        """Time since cart was created (for active carts)."""
+        if self.created_on:
+            return timezone.now() - self.created_on
+        return None
+
+    @property
+    def formatted_subtotal(self):
+        return f"\u20A8 {self.subtotal:,.2f}"
+
+    @property
+    def formatted_grand_total(self):
+        return f"\u20A8 {self.grand_total:,.2f}"
+
+    @property
+    def formatted_cart_discount(self):
+        """Format cart discount for display."""
+        if not self.has_cart_discount:
+            return ""
+        if self.cart_discount_type == DISCOUNT_TYPE_PERCENT:
+            return f"{self.cart_discount_value}% (\u20A8 {self.cart_discount_amount:,.2f})"
+        return f"\u20A8 {self.cart_discount_amount:,.2f}"
 
     @property
     def has_cart_discount(self):

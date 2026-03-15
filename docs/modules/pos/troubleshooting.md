@@ -71,6 +71,7 @@ customer.
 (`opening + sales − refunds`).
 
 **Investigation:**
+
 1. Check `session.total_sales` and `session.total_refunds` against the
    payment records.
 2. Verify that all card/mobile payments were recorded correctly (they
@@ -82,12 +83,12 @@ customer.
 
 ## Error Codes
 
-| HTTP Status | When |
-|-------------|------|
-| 400 | Validation failure, bad request body, business rule violation |
-| 401 | Missing or invalid JWT / session authentication |
-| 404 | Resource not found (terminal, session, cart, payment, product) |
-| 409 | Conflict (deactivate with open session, maintenance with open session) |
+| HTTP Status | When                                                                   |
+| ----------- | ---------------------------------------------------------------------- |
+| 400         | Validation failure, bad request body, business rule violation          |
+| 401         | Missing or invalid JWT / session authentication                        |
+| 404         | Resource not found (terminal, session, cart, payment, product)         |
+| 409         | Conflict (deactivate with open session, maintenance with open session) |
 
 ---
 

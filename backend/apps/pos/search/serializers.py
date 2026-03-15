@@ -30,10 +30,26 @@ class ProductSearchResultSerializer(serializers.Serializer):
     selling_price = serializers.DecimalField(
         max_digits=10, decimal_places=2, read_only=True
     )
-    category_name = serializers.CharField(
+    cost_price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, read_only=True, allow_null=True
+    )
+    category = serializers.CharField(
         read_only=True, allow_null=True, default=None
     )
+    brand = serializers.CharField(
+        read_only=True, allow_null=True, default=None
+    )
+    tax_class = serializers.CharField(
+        read_only=True, allow_null=True, default=None
+    )
+    product_type = serializers.CharField(read_only=True, default="")
     variant_id = serializers.UUIDField(
+        read_only=True, allow_null=True, default=None
+    )
+    variant_sku = serializers.CharField(
+        read_only=True, allow_null=True, default=None
+    )
+    variant_barcode = serializers.CharField(
         read_only=True, allow_null=True, default=None
     )
     variant_name = serializers.CharField(
@@ -41,6 +57,14 @@ class ProductSearchResultSerializer(serializers.Serializer):
     )
     search_method = serializers.CharField(read_only=True)
     is_pos_visible = serializers.BooleanField(read_only=True, default=True)
+
+    # Stock availability
+    stock_quantity = serializers.DecimalField(
+        max_digits=12, decimal_places=3, read_only=True, default=None, allow_null=True
+    )
+    is_in_stock = serializers.BooleanField(read_only=True, default=None, allow_null=True)
+    low_stock_warning = serializers.BooleanField(read_only=True, default=None, allow_null=True)
+    can_sell = serializers.BooleanField(read_only=True, default=None, allow_null=True)
 
 
 class BarcodeScanRequestSerializer(serializers.Serializer):

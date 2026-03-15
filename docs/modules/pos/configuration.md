@@ -51,11 +51,11 @@ urlpatterns = [
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `POS_SESSION_TIMEOUT_HOURS` | `24` | Auto-close sessions after N hours |
-| `POS_MAX_CART_ITEMS` | `100` | Maximum items per cart |
-| `POS_RECEIPT_LANGUAGE` | `en` | Default receipt language |
+| Variable                    | Default | Description                       |
+| --------------------------- | ------- | --------------------------------- |
+| `POS_SESSION_TIMEOUT_HOURS` | `24`    | Auto-close sessions after N hours |
+| `POS_MAX_CART_ITEMS`        | `100`   | Maximum items per cart            |
+| `POS_RECEIPT_LANGUAGE`      | `en`    | Default receipt language          |
 
 ## Terminal-Level Configuration
 

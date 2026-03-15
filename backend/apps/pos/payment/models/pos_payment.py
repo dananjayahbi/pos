@@ -8,6 +8,7 @@ with split-payment capability (multiple payments per cart).
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -58,7 +59,9 @@ class POSPayment(BaseModel):
     amount = models.DecimalField(
         max_digits=AMOUNT_MAX_DIGITS,
         decimal_places=AMOUNT_DECIMAL_PLACES,
+        validators=[MinValueValidator(Decimal("0.01"))],
         verbose_name=_("Amount (LKR)"),
+        help_text=_("Payment amount in LKR"),
     )
     status = models.CharField(
         max_length=20,
@@ -105,8 +108,9 @@ class POSPayment(BaseModel):
     transaction_id = models.CharField(
         max_length=100,
         blank=True,
-        default="",
-        db_index=True,
+        null=True,
+        default=None,
+        unique=True,
         verbose_name=_("Transaction ID"),
         help_text=_("Gateway transaction identifier"),
     )
@@ -129,6 +133,16 @@ class POSPayment(BaseModel):
         blank=True,
         verbose_name=_("Voided At"),
     )
+    failed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Failed At"),
+    )
+    refunded_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Refunded At"),
+    )
 
     # ── Notes ───────────────────────────────────────────────────────
 
@@ -148,6 +162,7 @@ class POSPayment(BaseModel):
             models.Index(fields=["method"], name="pos_pay_method"),
             models.Index(fields=["-created_on"], name="pos_pay_created"),
             models.Index(fields=["reference_number"], name="pos_pay_ref"),
+            models.Index(fields=["paid_at"], name="pos_pay_paid_at"),
         ]
 
     def __str__(self):
@@ -163,8 +178,21 @@ class POSPayment(BaseModel):
             return None
         return self.amount_tendered == self.amount
 
+    @property
+    def processing_duration(self):
+        """Time between creation and payment completion."""
+        if self.paid_at and self.created_on:
+            return self.paid_at - self.created_on
+        return None
+
     def calculate_change(self):
         """Calculate and return change due (does not save)."""
         if self.amount_tendered is None or self.amount is None:
             return Decimal("0.00")
         return max(self.amount_tendered - self.amount, Decimal("0.00"))
+
+    def save(self, *args, **kwargs):
+        """Auto-calculate change_due for cash payments."""
+        if self.method == PAYMENT_METHOD_CASH and self.amount_tendered is not None:
+            self.change_due = self.calculate_change()
+        super().save(*args, **kwargs)

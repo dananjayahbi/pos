@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from rest_framework import serializers
 
-from apps.pos.constants import PAYMENT_METHOD_CHOICES
+from apps.pos.constants import PAYMENT_METHOD_CHOICES, PAYMENT_STATUS_COMPLETED
 from apps.pos.payment.models import POSPayment
 
 
@@ -19,6 +19,12 @@ class POSPaymentSerializer(serializers.ModelSerializer):
     processed_by_email = serializers.EmailField(
         source="processed_by.email", read_only=True, default=None
     )
+    is_successful = serializers.SerializerMethodField()
+    can_refund = serializers.SerializerMethodField()
+    payment_method_display = serializers.CharField(
+        source="get_method_display", read_only=True
+    )
+    processing_duration = serializers.SerializerMethodField()
 
     class Meta:
         model = POSPayment
@@ -28,6 +34,7 @@ class POSPaymentSerializer(serializers.ModelSerializer):
             "processed_by",
             "processed_by_email",
             "method",
+            "payment_method_display",
             "amount",
             "status",
             "amount_tendered",
@@ -37,7 +44,12 @@ class POSPaymentSerializer(serializers.ModelSerializer):
             "transaction_id",
             "paid_at",
             "voided_at",
+            "failed_at",
+            "refunded_at",
             "notes",
+            "is_successful",
+            "can_refund",
+            "processing_duration",
             "created_on",
             "updated_on",
         ]
@@ -47,9 +59,23 @@ class POSPaymentSerializer(serializers.ModelSerializer):
             "change_due",
             "paid_at",
             "voided_at",
+            "failed_at",
+            "refunded_at",
             "created_on",
             "updated_on",
         ]
+
+    def get_is_successful(self, obj):
+        return obj.status == PAYMENT_STATUS_COMPLETED
+
+    def get_can_refund(self, obj):
+        return obj.status == PAYMENT_STATUS_COMPLETED
+
+    def get_processing_duration(self, obj):
+        duration = obj.processing_duration
+        if duration:
+            return duration.total_seconds()
+        return None
 
 
 class PaymentRequestSerializer(serializers.Serializer):

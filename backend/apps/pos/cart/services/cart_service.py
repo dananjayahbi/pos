@@ -44,11 +44,24 @@ class CartService:
 
     @staticmethod
     @transaction.atomic
-    def hold_cart(cart):
-        """Put a cart on hold."""
+    def hold_cart(cart, user=None, reason=""):
+        """Put a cart on hold with tracking info."""
         if cart.status != CART_STATUS_ACTIVE:
             raise ValidationError("Only active carts can be held.")
         cart.update_status(CART_STATUS_HELD)
+        if user:
+            cart.held_by = user
+        if reason:
+            cart.held_reason = reason
+        # Generate held identifier
+        session_num = getattr(cart.session, "session_number", "0")
+        seq = cart.__class__.objects.filter(
+            session=cart.session, status=CART_STATUS_HELD
+        ).count()
+        cart.held_identifier = f"HELD-{session_num}-{seq:03d}"
+        cart.save(update_fields=[
+            "held_by", "held_reason", "held_identifier", "updated_on"
+        ])
         return True
 
     @staticmethod
@@ -58,7 +71,23 @@ class CartService:
         if cart.status != CART_STATUS_HELD:
             raise ValidationError("Only held carts can be resumed.")
         cart.update_status(CART_STATUS_ACTIVE)
+        cart.held_by = None
+        cart.held_reason = ""
+        cart.held_identifier = ""
+        cart.save(update_fields=[
+            "held_by", "held_reason", "held_identifier", "updated_on"
+        ])
         return True
+
+    @staticmethod
+    def list_held_carts(session=None, user=None):
+        """List held carts for a session or user."""
+        qs = POSCart.objects.filter(status=CART_STATUS_HELD)
+        if session:
+            qs = qs.filter(session=session)
+        if user:
+            qs = qs.filter(held_by=user)
+        return qs.order_by("-held_at")
 
     @staticmethod
     @transaction.atomic
@@ -107,8 +136,16 @@ class CartService:
                 f"Quantity cannot exceed {MAX_CART_ITEM_QUANTITY}."
             )
 
+        # Validate product is active
+        if hasattr(product, "is_active") and not product.is_active:
+            raise ValidationError("Product is not active.")
+
         if variant and variant.product_id != product.pk:
             raise ValidationError("Variant does not belong to this product.")
+
+        # Validate variant is active
+        if variant and hasattr(variant, "is_active") and not variant.is_active:
+            raise ValidationError("Product variant is not active.")
 
         # Check for existing item
         existing = POSCartItem.objects.filter(
@@ -153,6 +190,9 @@ class CartService:
     @transaction.atomic
     def update_quantity(cart_item, quantity):
         """Update item quantity. If 0, removes the item."""
+        if not cart_item.cart.is_modifiable:
+            raise ValidationError("Cart is not modifiable.")
+
         quantity = Decimal(str(quantity))
 
         if quantity <= 0:
@@ -185,6 +225,9 @@ class CartService:
     @transaction.atomic
     def apply_line_discount(cart_item, discount_type, discount_value, reason=None):
         """Apply discount to a specific line item."""
+        if not cart_item.cart.is_modifiable:
+            raise ValidationError("Cart is not modifiable.")
+
         if discount_type not in (DISCOUNT_TYPE_PERCENT, DISCOUNT_TYPE_FIXED):
             raise ValidationError("Invalid discount type.")
 

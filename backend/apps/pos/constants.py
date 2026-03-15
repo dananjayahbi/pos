@@ -54,10 +54,14 @@ SCANNER_INTERFACE_CHOICES = (
 )
 
 # ── Receipt Language Constants ────────────────────────────────────────────
+RECEIPT_LANGUAGE_ENGLISH = "en"
+RECEIPT_LANGUAGE_SINHALA = "si"
+RECEIPT_LANGUAGE_TAMIL = "ta"
+
 RECEIPT_LANGUAGE_CHOICES = (
-    ("en", "English"),
-    ("si", "Sinhala"),
-    ("ta", "Tamil"),
+    (RECEIPT_LANGUAGE_ENGLISH, "English"),
+    (RECEIPT_LANGUAGE_SINHALA, "Sinhala"),
+    (RECEIPT_LANGUAGE_TAMIL, "Tamil"),
 )
 
 # ── Cart Status Constants ─────────────────────────────────────────────────
@@ -66,7 +70,7 @@ CART_STATUS_HELD = "held"
 CART_STATUS_COMPLETED = "completed"
 CART_STATUS_VOIDED = "voided"
 CART_STATUS_ABANDONED = "abandoned"
-
+DEFAULT_CART_STATUS = CART_STATUS_ACTIVE
 CART_STATUS_CHOICES = (
     (CART_STATUS_ACTIVE, "Active"),
     (CART_STATUS_HELD, "Held"),
@@ -93,6 +97,7 @@ PAYMENT_METHOD_BANK_TRANSFER = "bank_transfer"
 PAYMENT_METHOD_MOBILE_FRIMI = "mobile_frimi"
 PAYMENT_METHOD_MOBILE_GENIE = "mobile_genie"
 PAYMENT_METHOD_STORE_CREDIT = "store_credit"
+PAYMENT_METHOD_PAYHERE = "payhere"
 
 PAYMENT_METHOD_CHOICES = (
     (PAYMENT_METHOD_CASH, "Cash"),
@@ -101,6 +106,7 @@ PAYMENT_METHOD_CHOICES = (
     (PAYMENT_METHOD_MOBILE_FRIMI, "FriMi"),
     (PAYMENT_METHOD_MOBILE_GENIE, "Dialog Genie"),
     (PAYMENT_METHOD_STORE_CREDIT, "Store Credit"),
+    (PAYMENT_METHOD_PAYHERE, "PayHere"),
 )
 
 # ── Payment Status Constants ──────────────────────────────────────────────
@@ -141,3 +147,22 @@ BARCODE_FORMAT_WEIGHT = "weight"
 WEIGHT_BARCODE_PREFIX = "2"
 WEIGHT_BARCODE_PRODUCT_DIGITS = 5
 WEIGHT_BARCODE_WEIGHT_DIGITS = 5
+
+# ── Payment Audit Event Constants ─────────────────────────────────────────
+PAYMENT_EVENT_INITIATED = "payment_initiated"
+PAYMENT_EVENT_COMPLETED = "payment_completed"
+PAYMENT_EVENT_FAILED = "payment_failed"
+PAYMENT_EVENT_VOIDED = "payment_voided"
+PAYMENT_EVENT_REFUNDED = "payment_refunded"
+PAYMENT_EVENT_CART_COMPLETED = "cart_completed"
+PAYMENT_EVENT_CART_VOIDED = "cart_voided"
+
+PAYMENT_EVENT_CHOICES = (
+    (PAYMENT_EVENT_INITIATED, "Payment Initiated"),
+    (PAYMENT_EVENT_COMPLETED, "Payment Completed"),
+    (PAYMENT_EVENT_FAILED, "Payment Failed"),
+    (PAYMENT_EVENT_VOIDED, "Payment Voided"),
+    (PAYMENT_EVENT_REFUNDED, "Payment Refunded"),
+    (PAYMENT_EVENT_CART_COMPLETED, "Cart Completed"),
+    (PAYMENT_EVENT_CART_VOIDED, "Cart Voided"),
+)

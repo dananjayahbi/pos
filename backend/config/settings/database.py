@@ -306,6 +306,7 @@ TENANT_APPS: list[str] = [
     "apps.reports",                      # Reports & analytics — tenant-specific report data
     "apps.webstore",                     # E-commerce storefront — tenant-specific store content
     "apps.integrations",                 # Third-party integrations — tenant-specific API keys
+    "apps.pos",                          # Point of Sale — tenant-specific POS terminals & sessions
 ]
 
 

@@ -142,7 +142,7 @@ class POSSessionAdmin(admin.ModelAdmin):
         "cash_variance_display",
         "transaction_count",
     ]
-    list_filter = ["status", "terminal", "opened_at"]
+    list_filter = ["status", "terminal", "user", "opened_at"]
     search_fields = [
         "session_number",
         "terminal__name",
@@ -156,7 +156,13 @@ class POSSessionAdmin(admin.ModelAdmin):
         "cash_variance",
         "total_sales",
         "total_refunds",
+        "net_sales_amount",
         "transaction_count",
+        "refund_count",
+        "cash_sales_amount",
+        "card_sales_amount",
+        "other_payment_amount",
+        "items_sold_count",
         "session_duration_display",
     ]
     date_hierarchy = "opened_at"
@@ -189,6 +195,9 @@ class POSSessionAdmin(admin.ModelAdmin):
                     "actual_cash_amount",
                     "cash_variance",
                     "closing_cash_counted_by",
+                    "closing_cash_counted_at",
+                    "closing_notes",
+                    "variance_reason",
                 ),
             },
         ),
@@ -198,7 +207,13 @@ class POSSessionAdmin(admin.ModelAdmin):
                 "fields": (
                     "total_sales",
                     "total_refunds",
+                    "net_sales_amount",
                     "transaction_count",
+                    "refund_count",
+                    "cash_sales_amount",
+                    "card_sales_amount",
+                    "other_payment_amount",
+                    "items_sold_count",
                 ),
             },
         ),

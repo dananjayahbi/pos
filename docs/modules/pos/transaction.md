@@ -79,6 +79,7 @@ result = svc.complete_transaction()
 ```
 
 Atomically:
+
 - Marks pending payments as `completed`.
 - Sets `cart.status = COMPLETED`, `cart.completed_at = now()`.
 - Increments `session.transaction_count` by 1.

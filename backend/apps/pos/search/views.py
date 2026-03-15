@@ -78,24 +78,24 @@ class BarcodeScanView(APIView):
         ser.is_valid(raise_exception=True)
         barcode = ser.validated_data["barcode"]
 
-        results = ProductSearchService.barcode_search(barcode)
+        result = ProductSearchService.barcode_search(barcode)
 
         terminal = getattr(request, "_pos_terminal", None)
         ProductSearchService.record_search(
             user=request.user,
             terminal=terminal,
             query=barcode,
-            result_count=len(results),
+            result_count=1 if result else 0,
             search_method="barcode",
         )
 
-        if not results:
+        if not result:
             return Response(
                 {"detail": "No product found for this barcode."},
                 status=status.HTTP_404_NOT_FOUND,
             )
         return Response(
-            ProductSearchResultSerializer(results, many=True).data
+            ProductSearchResultSerializer(result).data
         )
 
 

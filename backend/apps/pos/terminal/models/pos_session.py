@@ -95,7 +95,11 @@ class POSSession(BaseModel):
         max_digits=15, decimal_places=2, null=True, blank=True
     )
     actual_cash_amount = models.DecimalField(
-        max_digits=15, decimal_places=2, null=True, blank=True
+        max_digits=15,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0)],
     )
     cash_variance = models.DecimalField(
         max_digits=15, decimal_places=2, null=True, blank=True
@@ -107,15 +111,47 @@ class POSSession(BaseModel):
         blank=True,
         related_name="sessions_cash_closed",
     )
+    closing_cash_counted_at = models.DateTimeField(null=True, blank=True)
+    closing_notes = models.TextField(blank=True, default="")
+    variance_reason = models.TextField(blank=True, default="")
 
     # ── Session Totals ────────────────────────────────────────────────────
     total_sales = models.DecimalField(
-        max_digits=15, decimal_places=2, default=Decimal("0.00")
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(0)],
     )
     total_refunds = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(0)],
+    )
+    net_sales_amount = models.DecimalField(
         max_digits=15, decimal_places=2, default=Decimal("0.00")
     )
     transaction_count = models.PositiveIntegerField(default=0)
+    refund_count = models.PositiveIntegerField(default=0)
+    cash_sales_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(0)],
+    )
+    card_sales_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(0)],
+    )
+    other_payment_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        validators=[MinValueValidator(0)],
+    )
+    items_sold_count = models.PositiveIntegerField(default=0)
 
     # ── Managers ──────────────────────────────────────────────────────────
     objects = POSSessionManager()
@@ -159,6 +195,39 @@ class POSSession(BaseModel):
             return self.closed_at > self.expected_close_time
         return False
 
+    @property
+    def variance_percentage(self):
+        """Calculate cash variance as a percentage of expected cash."""
+        if self.expected_cash and self.expected_cash > 0 and self.cash_variance is not None:
+            return (self.cash_variance / self.expected_cash) * Decimal("100")
+        return Decimal("0.00")
+
+    @property
+    def is_variance_acceptable(self):
+        """Check if cash variance is within acceptable threshold (0.1%)."""
+        return abs(self.variance_percentage) <= Decimal("0.1")
+
+    @property
+    def average_transaction_value(self):
+        """Calculate average sale value per transaction."""
+        if self.transaction_count > 0:
+            return self.total_sales / self.transaction_count
+        return Decimal("0.00")
+
+    @property
+    def items_per_transaction(self):
+        """Calculate average items sold per transaction."""
+        if self.transaction_count > 0:
+            return self.items_sold_count / self.transaction_count
+        return 0
+
+    @property
+    def refund_rate(self):
+        """Calculate refund rate as a percentage of transactions."""
+        if self.transaction_count > 0:
+            return (Decimal(str(self.refund_count)) / Decimal(str(self.transaction_count))) * Decimal("100")
+        return Decimal("0.00")
+
     # ── Methods ───────────────────────────────────────────────────────────
     def open_session(self):
         """
@@ -182,13 +251,17 @@ class POSSession(BaseModel):
 
         existing_open = (
             POSSession.objects.filter(
-                terminal=self.terminal, status=SESSION_STATUS_OPEN
+                terminal=self.terminal,
+                status__in=[SESSION_STATUS_OPEN, SESSION_STATUS_SUSPENDED],
             )
             .exclude(pk=self.pk)
             .exists()
         )
         if existing_open:
             raise ValidationError("Terminal already has an open session.")
+
+        if self.opening_cash_amount is None:
+            raise ValidationError("Opening cash amount is required.")
 
         if self.opening_cash_amount < 0:
             raise ValidationError("Opening cash cannot be negative.")
@@ -237,9 +310,7 @@ class POSSession(BaseModel):
         self.status = SESSION_STATUS_CLOSED
 
         if notes:
-            self.opening_cash_notes = (
-                f"{self.opening_cash_notes}\nClose notes: {notes}".strip()
-            )
+            self.closing_notes = notes
 
         self.save()
         return self

@@ -84,6 +84,18 @@ class QuickButtonGroup(BaseModel):
     def max_buttons(self):
         return self.rows * self.columns
 
+    def get_button_count(self):
+        """Return the number of buttons in this group."""
+        return self.buttons.count()
+
+    def get_grid_capacity(self):
+        """Return total grid capacity (rows * columns)."""
+        return self.rows * self.columns
+
+    def is_grid_full(self):
+        """Check if all grid positions are occupied."""
+        return self.get_button_count() >= self.get_grid_capacity()
+
 
 class QuickButton(BaseModel):
     """A single quick-select button mapped to a product on the POS grid."""
@@ -157,6 +169,38 @@ class QuickButton(BaseModel):
     @property
     def display_label(self):
         return self.label or self.product.name
+
+    @property
+    def position_tuple(self):
+        """Return (row, column) tuple."""
+        return (self.row, self.column)
+
+    @property
+    def is_valid_position(self):
+        """Check if button position is within group grid bounds."""
+        return (
+            1 <= self.row <= self.group.rows
+            and 1 <= self.column <= self.group.columns
+        )
+
+    def get_display_label(self):
+        """Return the display label for this button."""
+        return self.label or self.product.name
+
+    def get_position_string(self):
+        """Return human-readable position string."""
+        return f"Row {self.row}, Col {self.column}"
+
+    def get_effective_color(self):
+        """Return button color, falling back to group color."""
+        return self.color or self.group.color or ""
+
+    @classmethod
+    def get_occupied_positions(cls, group):
+        """Return set of occupied (row, column) tuples for a group."""
+        return set(
+            cls.objects.filter(group=group).values_list("row", "column")
+        )
 
     def find_next_available_position(self):
         """Find the next open (row, col) in this button's group."""

@@ -9,6 +9,7 @@ from apps.pos.constants import (
     PRINTER_TYPE_CHOICES,
     PRINTER_TYPE_THERMAL,
     RECEIPT_LANGUAGE_CHOICES,
+    RECEIPT_LANGUAGE_ENGLISH,
     SCANNER_INTERFACE_CHOICES,
     SCANNER_INTERFACE_USB,
     TERMINAL_STATUS_ACTIVE,
@@ -114,7 +115,7 @@ class POSTerminal(BaseModel):
     receipt_language = models.CharField(
         max_length=10,
         choices=RECEIPT_LANGUAGE_CHOICES,
-        default="en",
+        default=RECEIPT_LANGUAGE_ENGLISH,
     )
 
     # ── Managers ──────────────────────────────────────────────────────────
@@ -122,14 +123,22 @@ class POSTerminal(BaseModel):
     all_with_deleted = models.Manager()
 
     class Meta:
-        db_table = "pos_terminal"
+        db_table = "pos_terminals"
         verbose_name = "POS Terminal"
         verbose_name_plural = "POS Terminals"
-        ordering = ["name"]
+        ordering = ["warehouse", "code"]
         indexes = [
             models.Index(fields=["code"], name="idx_pos_terminal_code"),
             models.Index(fields=["status"], name="idx_pos_terminal_status"),
             models.Index(fields=["warehouse"], name="idx_pos_terminal_warehouse"),
+            models.Index(
+                fields=["warehouse", "status"],
+                name="idx_pos_terminal_wh_status",
+            ),
+            models.Index(
+                fields=["warehouse", "is_mobile"],
+                name="idx_pos_terminal_wh_mobile",
+            ),
         ]
 
     def __str__(self):

@@ -28,7 +28,7 @@ urlpatterns = [
     path("api/v1/warehouse/", include("apps.inventory.warehouses.api.urls", namespace="warehouse")),
     path("api/v1/stock/", include("apps.inventory.stock.api.urls", namespace="stock")),
     path("api/v1/alerts/", include("apps.inventory.alerts.urls", namespace="alerts")),
-    # path("api/v1/pos/", include("apps.pos.urls")),
+    path("api/v1/pos/", include("apps.pos.urls", namespace="pos")),
 
     # ──────────────────────────────────────────────
     # API Documentation — drf-spectacular (SP11)

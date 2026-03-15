@@ -88,6 +88,11 @@ class PaymentService:
         return qs.order_by("created_on")
 
     def can_complete_cart(self) -> bool:
+        has_pending = self.cart.payments.filter(
+            status=PAYMENT_STATUS_PENDING
+        ).exists()
+        if has_pending:
+            return False
         return self.get_remaining_amount() == Decimal("0.00")
 
     # ── payment processors ──────────────────────────────────────────
@@ -178,12 +183,31 @@ class PaymentService:
         if amount > remaining:
             raise ValueError(f"Amount exceeds remaining: LKR {remaining}")
 
-        return self._create_payment(
+        # Validate sufficient credit balance
+        customer = self.cart.customer
+        credit_balance = getattr(customer, "store_credit_balance", None)
+        if credit_balance is not None and credit_balance < amount:
+            raise ValueError(
+                f"Insufficient store credit. Available: LKR {credit_balance}"
+            )
+
+        payment = self._create_payment(
             method=PAYMENT_METHOD_STORE_CREDIT,
             amount=amount,
             status=PAYMENT_STATUS_COMPLETED,
             paid_at=timezone.now(),
+            notes=f"Store credit: balance {credit_balance} -> {credit_balance - amount}" if credit_balance is not None else "",
         )
+
+        # Deduct balance atomically
+        if credit_balance is not None:
+            from django.db.models import F
+
+            customer.__class__.objects.filter(pk=customer.pk).update(
+                store_credit_balance=F("store_credit_balance") - amount
+            )
+
+        return payment
 
     @transaction.atomic
     def split_payment(self, payments: list[dict]) -> list[POSPayment]:
@@ -200,7 +224,7 @@ class PaymentService:
             amount = Decimal(str(pay_spec["amount"]))
 
             if method == PAYMENT_METHOD_CASH:
-                amt_tendered = Decimal(str(pay_spec.get("amount_tendered", amount)))
+                amt_tendered = Decimal(str(pay_spec.get("tendered_amount", pay_spec.get("amount_tendered", amount))))
                 results.append(self.process_cash_payment(amt_tendered))
             elif method == PAYMENT_METHOD_CARD:
                 results.append(
@@ -259,6 +283,61 @@ class PaymentService:
             "receipt_data": receipt_data,
         }
 
+    def validate_payment_amount(self, amount: Decimal) -> None:
+        """Validate that a payment amount is positive and within remaining."""
+        if not amount or amount <= 0:
+            raise ValueError("Payment amount must be positive")
+        remaining = self.get_remaining_amount()
+        if amount > remaining:
+            raise ValueError(
+                f"Amount LKR {amount} exceeds remaining LKR {remaining}"
+            )
+
+    def get_payment_summary(self) -> dict:
+        """Return a comprehensive summary of all payments for this cart."""
+        payments = self.cart.payments.all()
+        summary = {
+            "total_completed": Decimal("0.00"),
+            "total_pending": Decimal("0.00"),
+            "total_failed": Decimal("0.00"),
+            "total_voided": Decimal("0.00"),
+            "total_refunded": Decimal("0.00"),
+            "by_method": {},
+            "by_status": {},
+            "payment_count": payments.count(),
+            "remaining": self.get_remaining_amount(),
+            "can_complete": self.can_complete_cart(),
+        }
+        for payment in payments:
+            amount = payment.amount or Decimal("0.00")
+            # By status
+            if payment.status == PAYMENT_STATUS_COMPLETED:
+                summary["total_completed"] += amount
+            elif payment.status == PAYMENT_STATUS_PENDING:
+                summary["total_pending"] += amount
+            elif payment.status == PAYMENT_STATUS_FAILED:
+                summary["total_failed"] += amount
+            elif payment.status == PAYMENT_STATUS_VOIDED:
+                summary["total_voided"] += amount
+            # By method
+            method_key = payment.method
+            if method_key not in summary["by_method"]:
+                summary["by_method"][method_key] = Decimal("0.00")
+            if payment.status == PAYMENT_STATUS_COMPLETED:
+                summary["by_method"][method_key] += amount
+            # By status counts
+            if payment.status not in summary["by_status"]:
+                summary["by_status"][payment.status] = 0
+            summary["by_status"][payment.status] += 1
+
+        return summary
+
+    def get_failed_payments(self):
+        """Return failed payments for potential retry."""
+        return self.cart.payments.filter(
+            status=PAYMENT_STATUS_FAILED
+        ).order_by("-created_on")
+
     @transaction.atomic
     def void_transaction(self, reason: str = "") -> "POSPayment":
         """Void all payments and mark the cart as VOIDED."""
@@ -269,10 +348,28 @@ class PaymentService:
 
         void_reason = reason or "Transaction voided"
 
-        # Void payments
-        self.cart.payments.filter(
+        # Reverse store credit for completed store_credit payments
+        from django.db.models import F
+
+        for payment in self.cart.payments.filter(
+            method=PAYMENT_METHOD_STORE_CREDIT,
+            status=PAYMENT_STATUS_COMPLETED,
+        ):
+            if self.cart.customer:
+                self.cart.customer.__class__.objects.filter(
+                    pk=self.cart.customer.pk
+                ).update(
+                    store_credit_balance=F("store_credit_balance") + payment.amount
+                )
+
+        # Void payments individually to retain notes
+        for payment in self.cart.payments.filter(
             status__in=[PAYMENT_STATUS_COMPLETED, PAYMENT_STATUS_PENDING]
-        ).update(status=PAYMENT_STATUS_VOIDED, voided_at=timezone.now())
+        ):
+            payment.status = PAYMENT_STATUS_VOIDED
+            payment.voided_at = timezone.now()
+            payment.notes = f"{payment.notes}\nVoided: {void_reason}".strip()
+            payment.save(update_fields=["status", "voided_at", "notes", "updated_on"])
 
         # Void cart
         self.cart.status = CART_STATUS_VOIDED
@@ -301,7 +398,35 @@ class PaymentService:
                 "tax_amount",
             )
         )
+
+        # Store information
+        store_info = {}
+        currency = "LKR"
+        try:
+            from django.conf import settings as django_settings
+
+            store_info = {
+                "store_name": getattr(django_settings, "STORE_NAME", ""),
+                "store_address": getattr(django_settings, "STORE_ADDRESS", ""),
+                "store_phone": getattr(django_settings, "STORE_PHONE", ""),
+                "business_reg": getattr(django_settings, "BUSINESS_REG_NUMBER", ""),
+                "tax_id": getattr(django_settings, "TAX_IDENTIFICATION_NUMBER", ""),
+            }
+            currency = getattr(django_settings, "DEFAULT_CURRENCY", "LKR")
+        except Exception:
+            pass
+
+        # Customer information
+        customer_info = None
+        if self.cart.customer:
+            customer_info = {
+                "name": str(self.cart.customer),
+                "phone": getattr(self.cart.customer, "phone", ""),
+                "email": getattr(self.cart.customer, "email", ""),
+            }
+
         return {
+            "store": store_info,
             "terminal_name": terminal.name,
             "terminal_code": terminal.code,
             "receipt_header": terminal.receipt_header,
@@ -309,7 +434,7 @@ class PaymentService:
             "session_number": self.cart.session.session_number,
             "reference_number": self.cart.reference_number,
             "cashier": str(self.user),
-            "customer": str(self.cart.customer) if self.cart.customer else None,
+            "customer": customer_info,
             "items": items,
             "subtotal": str(self.cart.subtotal),
             "discount_total": str(self.cart.discount_total),
@@ -319,4 +444,6 @@ class PaymentService:
             "completed_at": (
                 self.cart.completed_at.isoformat() if self.cart.completed_at else None
             ),
+            "currency": currency,
+            "print_time": timezone.now().isoformat(),
         }

@@ -84,13 +84,13 @@ stateDiagram-v2
 
 ## Design Patterns Used
 
-| Pattern | Where | Purpose |
-|---------|-------|---------|
-| Service Layer | `CartService`, `PaymentService`, `ProductSearchService` | Encapsulate business logic away from views |
-| Strategy | Payment processing (`process_cash`, `process_card`, etc.) | Polymorphic payment handling |
-| Template Method | `PaymentService.complete_transaction()` | Standardised completion flow |
-| Repository | `AliveManager` / custom managers | Encapsulated query logic |
-| Observer (signals) | Session open/close | Side-effects like audit logging |
+| Pattern            | Where                                                     | Purpose                                    |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------ |
+| Service Layer      | `CartService`, `PaymentService`, `ProductSearchService`   | Encapsulate business logic away from views |
+| Strategy           | Payment processing (`process_cash`, `process_card`, etc.) | Polymorphic payment handling               |
+| Template Method    | `PaymentService.complete_transaction()`                   | Standardised completion flow               |
+| Repository         | `AliveManager` / custom managers                          | Encapsulated query logic                   |
+| Observer (signals) | Session open/close                                        | Side-effects like audit logging            |
 
 ## Key Decisions
 

@@ -218,7 +218,7 @@ class POSCartViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="hold")
     def hold(self, request, pk=None):
         cart = self.get_object()
-        CartService.hold_cart(cart)
+        CartService.hold_cart(cart, user=request.user, reason=request.data.get("reason", ""))
         return self._cart_response(cart)
 
     @action(detail=True, methods=["post"], url_path="recall")
@@ -232,6 +232,73 @@ class POSCartViewSet(viewsets.ModelViewSet):
         cart = self.get_object()
         reason = request.data.get("reason", "")
         CartService.void_cart(cart, reason=reason)
+        return self._cart_response(cart)
+
+    # ── customer management ─────────────────────────────────────────
+
+    @action(detail=True, methods=["post"], url_path="customer")
+    def add_customer(self, request, pk=None):
+        """Assign a customer to the cart."""
+        cart = self.get_object()
+        customer_id = request.data.get("customer")
+        if not customer_id:
+            return Response(
+                {"detail": "Customer ID is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        from apps.customers.models import Customer
+
+        try:
+            customer = Customer.objects.get(pk=customer_id, is_active=True)
+        except Customer.DoesNotExist:
+            return Response(
+                {"detail": "Customer not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        cart.customer = customer
+        cart.save(update_fields=["customer", "updated_on"])
+        return self._cart_response(cart)
+
+    @add_customer.mapping.delete
+    def remove_customer(self, request, pk=None):
+        """Remove a customer from the cart."""
+        cart = self.get_object()
+        cart.customer = None
+        cart.save(update_fields=["customer", "updated_on"])
+        return self._cart_response(cart)
+
+    # ── cart summary / discount ─────────────────────────────────────
+
+    @action(detail=True, methods=["get"], url_path="summary")
+    def cart_summary(self, request, pk=None):
+        """Return a detailed breakdown of the cart."""
+        cart = self.get_object()
+        items = cart.items.select_related("product", "variant")
+        return Response({
+            "id": str(cart.pk),
+            "status": cart.status,
+            "item_count": items.count(),
+            "subtotal": str(cart.subtotal),
+            "discount_total": str(cart.discount_total),
+            "tax_total": str(cart.tax_total),
+            "grand_total": str(cart.grand_total),
+            "customer": str(cart.customer) if cart.customer else None,
+            "reference_number": cart.reference_number,
+        })
+
+    @action(detail=True, methods=["delete"], url_path="discount")
+    def remove_discount(self, request, pk=None):
+        """Clear the cart-level discount."""
+        cart = self.get_object()
+        if not cart.is_modifiable:
+            return Response(
+                {"detail": "Cart is not modifiable."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        cart.cart_discount_type = "none"
+        cart.cart_discount_value = 0
+        cart.save(update_fields=["cart_discount_type", "cart_discount_value", "updated_on"])
+        cart.recalculate_totals()
         return self._cart_response(cart)
 
     # ── convenience list actions ────────────────────────────────────
