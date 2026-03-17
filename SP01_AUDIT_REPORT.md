@@ -14,15 +14,15 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Overall Compliance
 
-| Group                               | Tasks   | Fully Implemented | Partially Implemented | Deferred (Future) | Score    |
-| ----------------------------------- | ------- | ----------------- | --------------------- | ----------------- | -------- |
-| **A** — Terminal & Session Models   | 1–18    | 18                | 0                     | 0                 | 100%     |
-| **B** — Cart & Line Item Management | 19–38   | 20                | 0                     | 0                 | 100%     |
-| **C** — Product Search & Barcode    | 39–54   | 16                | 0                     | 0                 | 100%     |
-| **D** — Payment Processing          | 55–74   | 18                | 0                     | 2*                | 100%     |
-| **E** — POS API & Frontend          | 75–86   | 12                | 0                     | 0                 | 100%     |
-| **F** — Testing & Documentation     | 87–94   | 8                 | 0                     | 0                 | 100%     |
-| **TOTAL**                           | **94**  | **92**            | **0**                 | **2***            | **100%** |
+| Group                               | Tasks  | Fully Implemented | Partially Implemented | Deferred (Future) | Score    |
+| ----------------------------------- | ------ | ----------------- | --------------------- | ----------------- | -------- |
+| **A** — Terminal & Session Models   | 1–18   | 18                | 0                     | 0                 | 100%     |
+| **B** — Cart & Line Item Management | 19–38  | 20                | 0                     | 0                 | 100%     |
+| **C** — Product Search & Barcode    | 39–54  | 16                | 0                     | 0                 | 100%     |
+| **D** — Payment Processing          | 55–74  | 18                | 0                     | 2\*               | 100%     |
+| **E** — POS API & Frontend          | 75–86  | 12                | 0                     | 0                 | 100%     |
+| **F** — Testing & Documentation     | 87–94  | 8                 | 0                     | 0                 | 100%     |
+| **TOTAL**                           | **94** | **92**            | **0**                 | **2\***           | **100%** |
 
 > \* Deferred: Full payment gateway integration (PayHere/external) and ESC/POS hardware commands — stubs created, full integration requires SubPhase-03 infrastructure.
 
@@ -46,26 +46,26 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Task-by-Task Status
 
-| Task | Description                      | Status  | Notes                                              |
-| ---- | -------------------------------- | ------- | -------------------------------------------------- |
-| 1    | POSTerminal model structure      | ✅ FULL | UUIDMixin + BaseModel, all FK fields               |
-| 2    | Terminal hardware config fields  | ✅ FULL | printer_type, scanner_type, receipt_printer_ip      |
-| 3    | Terminal location fields         | ✅ FULL | warehouse FK, location, is_mobile                  |
-| 4    | Terminal settings JSONField      | ✅ FULL | settings, receipt_header/footer, currency           |
-| 5    | Terminal manager methods         | ✅ FULL | active_terminals(), by_warehouse()                 |
-| 6    | Terminal Meta & indexes          | ✅ FULL | db_table, ordering, compound indexes               |
-| 7    | POSSession model structure       | ✅ FULL | terminal FK, user FK, status, opening/closing      |
-| 8    | Session financial fields         | ✅ FULL | totals, cash amounts, card/mobile/credit amounts   |
-| 9    | Session receipt config           | ✅ FULL | receipt_language, RECEIPT_LANGUAGE_ENGLISH constant |
-| 10   | Session number generation        | ✅ FULL | generate_session_number() classmethod               |
-| 11   | open_session() method            | ✅ FULL | Validates terminal active, no existing OPEN/SUSPENDED |
-| 12   | close_session() method           | ✅ FULL | Calculates expected cash, variance, saves notes    |
-| 13   | suspend_session() method         | ✅ FULL | Sets status SUSPENDED                              |
-| 14   | resume_session() method          | ✅ FULL | Validates SUSPENDED, sets back to OPEN             |
-| 15   | force_close_session() method     | ✅ FULL | Handles OPEN or SUSPENDED sessions                 |
-| 16   | Session properties               | ✅ FULL | is_balanced, duration, variance_percentage, etc.   |
-| 17   | Session Meta & indexes           | ✅ FULL | Ordering, indexes on terminal+status               |
-| 18   | Admin & serializer               | ✅ FULL | Full admin config, serializer with all fields      |
+| Task | Description                     | Status  | Notes                                                 |
+| ---- | ------------------------------- | ------- | ----------------------------------------------------- |
+| 1    | POSTerminal model structure     | ✅ FULL | UUIDMixin + BaseModel, all FK fields                  |
+| 2    | Terminal hardware config fields | ✅ FULL | printer_type, scanner_type, receipt_printer_ip        |
+| 3    | Terminal location fields        | ✅ FULL | warehouse FK, location, is_mobile                     |
+| 4    | Terminal settings JSONField     | ✅ FULL | settings, receipt_header/footer, currency             |
+| 5    | Terminal manager methods        | ✅ FULL | active_terminals(), by_warehouse()                    |
+| 6    | Terminal Meta & indexes         | ✅ FULL | db_table, ordering, compound indexes                  |
+| 7    | POSSession model structure      | ✅ FULL | terminal FK, user FK, status, opening/closing         |
+| 8    | Session financial fields        | ✅ FULL | totals, cash amounts, card/mobile/credit amounts      |
+| 9    | Session receipt config          | ✅ FULL | receipt_language, RECEIPT_LANGUAGE_ENGLISH constant   |
+| 10   | Session number generation       | ✅ FULL | generate_session_number() classmethod                 |
+| 11   | open_session() method           | ✅ FULL | Validates terminal active, no existing OPEN/SUSPENDED |
+| 12   | close_session() method          | ✅ FULL | Calculates expected cash, variance, saves notes       |
+| 13   | suspend_session() method        | ✅ FULL | Sets status SUSPENDED                                 |
+| 14   | resume_session() method         | ✅ FULL | Validates SUSPENDED, sets back to OPEN                |
+| 15   | force_close_session() method    | ✅ FULL | Handles OPEN or SUSPENDED sessions                    |
+| 16   | Session properties              | ✅ FULL | is_balanced, duration, variance_percentage, etc.      |
+| 17   | Session Meta & indexes          | ✅ FULL | Ordering, indexes on terminal+status                  |
+| 18   | Admin & serializer              | ✅ FULL | Full admin config, serializer with all fields         |
 
 ---
 
@@ -87,28 +87,28 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Task-by-Task Status
 
-| Task | Description                      | Status  | Notes                                              |
-| ---- | -------------------------------- | ------- | -------------------------------------------------- |
-| 19   | POSCart model structure          | ✅ FULL | session FK, customer FK, status, reference          |
-| 20   | Cart financial fields            | ✅ FULL | subtotal, discount_total, tax_total, grand_total   |
-| 21   | Cart discount fields             | ✅ FULL | discount_type, discount_value, coupon_code          |
-| 22   | Cart reference generation        | ✅ FULL | generate_reference() with date+sequence             |
-| 23   | Cart properties                  | ✅ FULL | item_count, is_empty, has_discount, duration, etc. |
-| 24   | Cart Meta & validation           | ✅ FULL | Validators on totals, ordering, indexes             |
-| 25   | CartItem model structure         | ✅ FULL | cart FK, product FK, variant FK, quantity            |
-| 26   | CartItem financial fields        | ✅ FULL | unit_price, line_total, discount fields             |
-| 27   | CartItem properties              | ✅ FULL | formatted prices, calculate_discount_amount()       |
-| 28   | CartItem stock validation        | ✅ FULL | validate_stock_availability() method                |
-| 29   | CartService.get_or_create_cart() | ✅ FULL | Returns existing ACTIVE or creates new              |
-| 30   | CartService.add_to_cart()        | ✅ FULL | Creates/updates item, recalculates totals           |
-| 31   | CartService.update_quantity()    | ✅ FULL | Updates quantity, validates, recalculates            |
-| 32   | CartService.remove_from_cart()   | ✅ FULL | Removes item, recalculates totals                  |
-| 33   | CartService.apply_line_discount()| ✅ FULL | Percentage or fixed discount on item               |
-| 34   | CartService.apply_cart_discount()| ✅ FULL | Cart-level discount with coupon support             |
-| 35   | CartService.calculate_totals()   | ✅ FULL | Aggregates from items, applies cart discount        |
-| 36   | CartService.hold_cart()          | ✅ FULL | Sets HELD status with user, reason, identifier      |
-| 37   | CartService.recall_cart()        | ✅ FULL | Validates HELD, clears held fields, sets ACTIVE     |
-| 38   | CartService.void_cart()          | ✅ FULL | Sets VOIDED with reason, validates modifiability    |
+| Task | Description                       | Status  | Notes                                              |
+| ---- | --------------------------------- | ------- | -------------------------------------------------- |
+| 19   | POSCart model structure           | ✅ FULL | session FK, customer FK, status, reference         |
+| 20   | Cart financial fields             | ✅ FULL | subtotal, discount_total, tax_total, grand_total   |
+| 21   | Cart discount fields              | ✅ FULL | discount_type, discount_value, coupon_code         |
+| 22   | Cart reference generation         | ✅ FULL | generate_reference() with date+sequence            |
+| 23   | Cart properties                   | ✅ FULL | item_count, is_empty, has_discount, duration, etc. |
+| 24   | Cart Meta & validation            | ✅ FULL | Validators on totals, ordering, indexes            |
+| 25   | CartItem model structure          | ✅ FULL | cart FK, product FK, variant FK, quantity          |
+| 26   | CartItem financial fields         | ✅ FULL | unit_price, line_total, discount fields            |
+| 27   | CartItem properties               | ✅ FULL | formatted prices, calculate_discount_amount()      |
+| 28   | CartItem stock validation         | ✅ FULL | validate_stock_availability() method               |
+| 29   | CartService.get_or_create_cart()  | ✅ FULL | Returns existing ACTIVE or creates new             |
+| 30   | CartService.add_to_cart()         | ✅ FULL | Creates/updates item, recalculates totals          |
+| 31   | CartService.update_quantity()     | ✅ FULL | Updates quantity, validates, recalculates          |
+| 32   | CartService.remove_from_cart()    | ✅ FULL | Removes item, recalculates totals                  |
+| 33   | CartService.apply_line_discount() | ✅ FULL | Percentage or fixed discount on item               |
+| 34   | CartService.apply_cart_discount() | ✅ FULL | Cart-level discount with coupon support            |
+| 35   | CartService.calculate_totals()    | ✅ FULL | Aggregates from items, applies cart discount       |
+| 36   | CartService.hold_cart()           | ✅ FULL | Sets HELD status with user, reason, identifier     |
+| 37   | CartService.recall_cart()         | ✅ FULL | Validates HELD, clears held fields, sets ACTIVE    |
+| 38   | CartService.void_cart()           | ✅ FULL | Sets VOIDED with reason, validates modifiability   |
 
 ---
 
@@ -131,24 +131,24 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Task-by-Task Status
 
-| Task | Description                      | Status  | Notes                                              |
-| ---- | -------------------------------- | ------- | -------------------------------------------------- |
-| 39   | SearchHistory model              | ✅ FULL | user, query, method, timestamp, result_count       |
-| 40   | QuickButtonGroup model           | ✅ FULL | terminal FK, name, grid_rows/cols, sort_order      |
-| 41   | QuickButton model                | ✅ FULL | group FK, product FK, row/col, label, color        |
-| 42   | QuickButton methods              | ✅ FULL | Position management, display, grid utilities        |
-| 43   | Barcode validators               | ✅ FULL | validate_barcode(), is_weight_barcode(), generate   |
-| 44   | ProductSearchService.barcode_search() | ✅ FULL | Exact match, weight-embedded, variant fallback |
-| 45   | ProductSearchService.sku_search()     | ✅ FULL | Exact and partial SKU matching                |
-| 46   | ProductSearchService.name_search()    | ✅ FULL | Case-insensitive, min length, limit           |
-| 47   | ProductSearchService.combined_search()| ✅ FULL | Priority cascade: barcode → SKU → name        |
-| 48   | Stock availability check         | ✅ FULL | _check_stock_availability() with thresholds        |
-| 49   | Effective price calculation      | ✅ FULL | _get_effective_price() with discount/tax            |
-| 50   | Category quick filters           | ✅ FULL | get_active_categories(), get_category_quick_filters()|
-| 51   | Search result formatting         | ✅ FULL | _format_result() with all product details           |
-| 52   | record_search() history          | ✅ FULL | Logs search queries and results                    |
-| 53   | get_recent_searches()            | ✅ FULL | Returns recent search history with limit            |
-| 54   | Search views & serializers       | ✅ FULL | ProductSearchView, BarcodeScanView (bug fixed)      |
+| Task | Description                            | Status  | Notes                                                 |
+| ---- | -------------------------------------- | ------- | ----------------------------------------------------- |
+| 39   | SearchHistory model                    | ✅ FULL | user, query, method, timestamp, result_count          |
+| 40   | QuickButtonGroup model                 | ✅ FULL | terminal FK, name, grid_rows/cols, sort_order         |
+| 41   | QuickButton model                      | ✅ FULL | group FK, product FK, row/col, label, color           |
+| 42   | QuickButton methods                    | ✅ FULL | Position management, display, grid utilities          |
+| 43   | Barcode validators                     | ✅ FULL | validate_barcode(), is_weight_barcode(), generate     |
+| 44   | ProductSearchService.barcode_search()  | ✅ FULL | Exact match, weight-embedded, variant fallback        |
+| 45   | ProductSearchService.sku_search()      | ✅ FULL | Exact and partial SKU matching                        |
+| 46   | ProductSearchService.name_search()     | ✅ FULL | Case-insensitive, min length, limit                   |
+| 47   | ProductSearchService.combined_search() | ✅ FULL | Priority cascade: barcode → SKU → name                |
+| 48   | Stock availability check               | ✅ FULL | \_check_stock_availability() with thresholds          |
+| 49   | Effective price calculation            | ✅ FULL | \_get_effective_price() with discount/tax             |
+| 50   | Category quick filters                 | ✅ FULL | get_active_categories(), get_category_quick_filters() |
+| 51   | Search result formatting               | ✅ FULL | \_format_result() with all product details            |
+| 52   | record_search() history                | ✅ FULL | Logs search queries and results                       |
+| 53   | get_recent_searches()                  | ✅ FULL | Returns recent search history with limit              |
+| 54   | Search views & serializers             | ✅ FULL | ProductSearchView, BarcodeScanView (bug fixed)        |
 
 ---
 
@@ -177,28 +177,28 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Task-by-Task Status
 
-| Task | Description                      | Status  | Notes                                              |
-| ---- | -------------------------------- | ------- | -------------------------------------------------- |
-| 55   | POSPayment model structure       | ✅ FULL | cart FK, method, amount, status, timestamps         |
-| 56   | Payment financial fields         | ✅ FULL | tendered, change_due, auth_code, reference          |
-| 57   | Payment validators               | ✅ FULL | MinValueValidator(0.01), unique transaction_id      |
-| 58   | Payment status tracking          | ✅ FULL | failed_at, refunded_at, processing_duration         |
-| 59   | PaymentService initialization    | ✅ FULL | Instance-based with cart, calculates remaining      |
-| 60   | process_cash_payment()           | ✅ FULL | Validates amount, calculates change, auto save()    |
-| 61   | process_card_payment()           | ✅ FULL | Auth code, reference, amount validation             |
-| 62   | process_mobile_payment()         | ✅ FULL | FriMi/Genie/PayHere support, reference required     |
-| 63   | process_store_credit()           | ✅ FULL | Balance validation + atomic F() deduction           |
-| 64   | split_payment()                  | ✅ FULL | Multiple methods, key compatibility fixed           |
-| 65   | can_complete_cart()              | ✅ FULL | Checks remaining ≤ 0 AND no PENDING payments        |
-| 66   | complete_transaction()           | ✅ FULL | Updates cart + session totals                       |
-| 67   | void_transaction()               | ✅ FULL | Reverses store credit, voids individual payments    |
-| 68   | validate_payment_amount()        | ✅ FULL | Validates positive, not exceeding remaining         |
-| 69   | get_payment_summary()            | ✅ FULL | Totals by status and method, remaining amount       |
-| 70   | generate_receipt_data()          | ✅ FULL | Store info, customer info, items, payments, totals  |
-| 71   | CashDrawerService                | ✅ FULL | Stub with open_drawer, should_auto_open, etc.       |
-| 72   | PaymentAuditLog model            | ✅ FULL | Immutable audit trail with indexed queries          |
-| 73   | Hold cart enhancements           | ✅ FULL | held_by, held_reason, held_identifier fields        |
-| 74   | Payment constants                | ✅ FULL | PAYHERE, audit event types and choices              |
+| Task | Description                   | Status  | Notes                                              |
+| ---- | ----------------------------- | ------- | -------------------------------------------------- |
+| 55   | POSPayment model structure    | ✅ FULL | cart FK, method, amount, status, timestamps        |
+| 56   | Payment financial fields      | ✅ FULL | tendered, change_due, auth_code, reference         |
+| 57   | Payment validators            | ✅ FULL | MinValueValidator(0.01), unique transaction_id     |
+| 58   | Payment status tracking       | ✅ FULL | failed_at, refunded_at, processing_duration        |
+| 59   | PaymentService initialization | ✅ FULL | Instance-based with cart, calculates remaining     |
+| 60   | process_cash_payment()        | ✅ FULL | Validates amount, calculates change, auto save()   |
+| 61   | process_card_payment()        | ✅ FULL | Auth code, reference, amount validation            |
+| 62   | process_mobile_payment()      | ✅ FULL | FriMi/Genie/PayHere support, reference required    |
+| 63   | process_store_credit()        | ✅ FULL | Balance validation + atomic F() deduction          |
+| 64   | split_payment()               | ✅ FULL | Multiple methods, key compatibility fixed          |
+| 65   | can_complete_cart()           | ✅ FULL | Checks remaining ≤ 0 AND no PENDING payments       |
+| 66   | complete_transaction()        | ✅ FULL | Updates cart + session totals                      |
+| 67   | void_transaction()            | ✅ FULL | Reverses store credit, voids individual payments   |
+| 68   | validate_payment_amount()     | ✅ FULL | Validates positive, not exceeding remaining        |
+| 69   | get_payment_summary()         | ✅ FULL | Totals by status and method, remaining amount      |
+| 70   | generate_receipt_data()       | ✅ FULL | Store info, customer info, items, payments, totals |
+| 71   | CashDrawerService             | ✅ FULL | Stub with open_drawer, should_auto_open, etc.      |
+| 72   | PaymentAuditLog model         | ✅ FULL | Immutable audit trail with indexed queries         |
+| 73   | Hold cart enhancements        | ✅ FULL | held_by, held_reason, held_identifier fields       |
+| 74   | Payment constants             | ✅ FULL | PAYHERE, audit event types and choices             |
 
 ---
 
@@ -216,20 +216,20 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Task-by-Task Status
 
-| Task | Description                      | Status  | Notes                                              |
-| ---- | -------------------------------- | ------- | -------------------------------------------------- |
-| 75   | Terminal ViewSet                 | ✅ FULL | CRUD + activate/deactivate/maintenance actions      |
-| 76   | Session ViewSet                  | ✅ FULL | open_session, close_session, current, summary       |
-| 77   | Cart ViewSet                     | ✅ FULL | CRUD + add/update/remove item, discount, hold/recall/void + customer/summary |
-| 78   | Search ViewSet                   | ✅ FULL | ProductSearchView, BarcodeScanView, QuickButtonView |
-| 79   | Payment ViewSet                  | ✅ FULL | Process, split, refund, history endpoints           |
-| 80   | Terminal service layer           | ✅ FULL | Service methods on viewset                         |
-| 81   | Session service layer            | ✅ FULL | Service methods on viewset                         |
-| 82   | Session summary endpoint         | ✅ FULL | Returns session totals, duration, transaction count |
-| 83   | Cart recall action               | ✅ FULL | Recalls held cart with held field cleanup           |
-| 84   | Product search endpoint          | ✅ FULL | POST-based search with stock/price enrichment       |
-| 85   | Payment processing endpoint      | ✅ FULL | Collapsed initiate+process into single endpoint     |
-| 86   | WebSocket infrastructure         | ✅ FULL | Consumers + routing for real-time updates           |
+| Task | Description                 | Status  | Notes                                                                        |
+| ---- | --------------------------- | ------- | ---------------------------------------------------------------------------- |
+| 75   | Terminal ViewSet            | ✅ FULL | CRUD + activate/deactivate/maintenance actions                               |
+| 76   | Session ViewSet             | ✅ FULL | open_session, close_session, current, summary                                |
+| 77   | Cart ViewSet                | ✅ FULL | CRUD + add/update/remove item, discount, hold/recall/void + customer/summary |
+| 78   | Search ViewSet              | ✅ FULL | ProductSearchView, BarcodeScanView, QuickButtonView                          |
+| 79   | Payment ViewSet             | ✅ FULL | Process, split, refund, history endpoints                                    |
+| 80   | Terminal service layer      | ✅ FULL | Service methods on viewset                                                   |
+| 81   | Session service layer       | ✅ FULL | Service methods on viewset                                                   |
+| 82   | Session summary endpoint    | ✅ FULL | Returns session totals, duration, transaction count                          |
+| 83   | Cart recall action          | ✅ FULL | Recalls held cart with held field cleanup                                    |
+| 84   | Product search endpoint     | ✅ FULL | POST-based search with stock/price enrichment                                |
+| 85   | Payment processing endpoint | ✅ FULL | Collapsed initiate+process into single endpoint                              |
+| 86   | WebSocket infrastructure    | ✅ FULL | Consumers + routing for real-time updates                                    |
 
 ---
 
@@ -243,16 +243,16 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ### Task-by-Task Status
 
-| Task | Description                      | Status  | Notes                                              |
-| ---- | -------------------------------- | ------- | -------------------------------------------------- |
-| 87   | Terminal/Session tests           | ✅ FULL | 42 tests (12 terminal + 30 session) + factories    |
-| 88   | Cart operation tests             | ✅ FULL | 42 tests across 7 test classes                     |
-| 89   | Product search tests             | ✅ FULL | 31 tests across 6 test classes                     |
-| 90   | Payment processing tests         | ✅ FULL | 31 tests across 8 test classes                     |
-| 91   | Transaction flow tests           | ✅ FULL | 13 tests, end-to-end with session integration      |
-| 92   | API endpoint tests               | ✅ FULL | 46 tests across 5 ViewSet test classes             |
-| 93   | POS module documentation         | ✅ FULL | 11 files: index, architecture, terminal, cart, search, payment, transaction, api, config, integration, troubleshooting |
-| 94   | POS user guide                   | ✅ FULL | Non-technical guide: shifts, sales, payments, hold/recall, closing |
+| Task | Description              | Status  | Notes                                                                                                                  |
+| ---- | ------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 87   | Terminal/Session tests   | ✅ FULL | 42 tests (12 terminal + 30 session) + factories                                                                        |
+| 88   | Cart operation tests     | ✅ FULL | 42 tests across 7 test classes                                                                                         |
+| 89   | Product search tests     | ✅ FULL | 31 tests across 6 test classes                                                                                         |
+| 90   | Payment processing tests | ✅ FULL | 31 tests across 8 test classes                                                                                         |
+| 91   | Transaction flow tests   | ✅ FULL | 13 tests, end-to-end with session integration                                                                          |
+| 92   | API endpoint tests       | ✅ FULL | 46 tests across 5 ViewSet test classes                                                                                 |
+| 93   | POS module documentation | ✅ FULL | 11 files: index, architecture, terminal, cart, search, payment, transaction, api, config, integration, troubleshooting |
+| 94   | POS user guide           | ✅ FULL | Non-technical guide: shifts, sales, payments, hold/recall, closing                                                     |
 
 ---
 
@@ -261,6 +261,7 @@ All 94 tasks across 6 groups have been audited against the source task documents
 **File:** `apps/pos/migrations/0005_sp01_audit_fixes.py`
 
 **Changes:**
+
 - Created PaymentAuditLog model
 - Changed POSTerminal Meta (db_table → pos_terminals)
 - Added POSCart fields: held_by, held_identifier, held_reason
@@ -277,6 +278,7 @@ All 94 tasks across 6 groups have been audited against the source task documents
 ## Files Modified/Created
 
 ### Modified Files (16)
+
 1. `apps/pos/constants.py` — PAYHERE payment method, audit event constants
 2. `apps/pos/terminal/models/pos_terminal.py` — db_table, ordering, indexes
 3. `apps/pos/terminal/models/pos_session.py` — 9 fields, validators, properties, methods
@@ -298,6 +300,7 @@ All 94 tasks across 6 groups have been audited against the source task documents
 19. `apps/pos/payment/models/__init__.py` — PaymentAuditLog export
 
 ### New Files (5)
+
 1. `apps/pos/payment/models/payment_audit_log.py` — Immutable audit trail model
 2. `apps/pos/terminal/services/__init__.py` — Service package init
 3. `apps/pos/terminal/services/cash_drawer_service.py` — ESC/POS cash drawer stub
@@ -310,24 +313,24 @@ All 94 tasks across 6 groups have been audited against the source task documents
 
 ## Test Statistics
 
-| Test File          | Tests | Coverage Area                           |
-| ------------------ | ----- | --------------------------------------- |
-| test_terminal.py   | 12    | POSTerminal model, manager, status      |
-| test_session.py    | 30    | POSSession lifecycle, reconciliation    |
-| test_cart.py       | 42    | Cart CRUD, discounts, totals, states    |
-| test_search.py     | 31    | Barcode, SKU, name, combined search     |
-| test_payment.py    | 31    | Cash, card, mobile, credit, split, void |
-| test_transaction.py| 13    | End-to-end flows, session integration   |
-| test_views.py      | 46    | API endpoints across all ViewSets       |
-| **TOTAL**          | **205**| **Full POS module coverage**            |
+| Test File           | Tests   | Coverage Area                           |
+| ------------------- | ------- | --------------------------------------- |
+| test_terminal.py    | 12      | POSTerminal model, manager, status      |
+| test_session.py     | 30      | POSSession lifecycle, reconciliation    |
+| test_cart.py        | 42      | Cart CRUD, discounts, totals, states    |
+| test_search.py      | 31      | Barcode, SKU, name, combined search     |
+| test_payment.py     | 31      | Cash, card, mobile, credit, split, void |
+| test_transaction.py | 13      | End-to-end flows, session integration   |
+| test_views.py       | 46      | API endpoints across all ViewSets       |
+| **TOTAL**           | **205** | **Full POS module coverage**            |
 
 ---
 
 ## Deferred Items (Future SubPhases)
 
-| Item | Reason | Target |
-| ---- | ------ | ------ |
-| Receipt template FK on POSTerminal | ReceiptTemplate model not yet created | SubPhase-03 |
-| Full PayHere gateway integration | External service dependency | SubPhase-03 |
-| ESC/POS hardware commands | Hardware abstraction layer needed | SubPhase-03 |
-| unique_together with tenant | BaseModel has no tenant FK (schema isolation) | N/A — handled by django-tenants |
+| Item                               | Reason                                        | Target                          |
+| ---------------------------------- | --------------------------------------------- | ------------------------------- |
+| Receipt template FK on POSTerminal | ReceiptTemplate model not yet created         | SubPhase-03                     |
+| Full PayHere gateway integration   | External service dependency                   | SubPhase-03                     |
+| ESC/POS hardware commands          | Hardware abstraction layer needed             | SubPhase-03                     |
+| unique_together with tenant        | BaseModel has no tenant FK (schema isolation) | N/A — handled by django-tenants |

@@ -25,4 +25,12 @@
 // export { useIsClient } from './useIsClient'
 // export { useIsMounted } from './useIsMounted'
 
-export {};
+// Offline hooks
+export { useCacheWarmup } from './useCacheWarmup';
+export { useTransactionQueue } from './useTransactionQueue';
+export { useOfflineStatus } from './useOfflineStatus';
+export { useFeatureRestriction } from './useFeatureRestriction';
+export { useSyncHistory } from './useSyncHistory';
+export { useManualSync } from './useManualSync';
+export { useSyncToasts } from './useSyncToasts';
+export { useCacheRefresh } from './useCacheRefresh';

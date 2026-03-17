@@ -10,3 +10,8 @@ class OrdersConfig(AppConfig):
     name = "apps.orders"
     label = "orders"
     verbose_name = "Order Management"
+
+    def ready(self):
+        from apps.orders.signals.recalculation import connect_signals
+
+        connect_signals()

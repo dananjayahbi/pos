@@ -16,6 +16,9 @@ import pytest
 from django.db import connection
 from django_tenants.utils import get_tenant_model, get_tenant_domain_model
 
+# Import receipt fixtures so pytest discovers them
+from tests.pos.conftest_receipts import *  # noqa: F401,F403
+
 TenantModel = get_tenant_model()
 DomainModel = get_tenant_domain_model()
 

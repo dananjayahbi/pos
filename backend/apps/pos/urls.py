@@ -76,4 +76,6 @@ urlpatterns = [
         PaymentStatusView.as_view(),
         name="payment-status",
     ),
+    # Receipts
+    path("", include("apps.pos.receipts.urls")),
 ]
