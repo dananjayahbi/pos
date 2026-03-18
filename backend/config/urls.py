@@ -31,6 +31,9 @@ urlpatterns = [
     path("api/v1/pos/", include("apps.pos.urls", namespace="pos")),
     path("api/v1/quotes/", include("apps.quotes.urls", namespace="quotes")),
     path("api/v1/", include("apps.orders.urls", namespace="orders")),
+    path("api/v1/", include("apps.invoices.urls", namespace="invoices")),
+    path("api/v1/", include("apps.payments.urls", namespace="payments")),
+    path("api/v1/", include("apps.customers.urls", namespace="customers")),
 
     # ──────────────────────────────────────────────
     # API Documentation — drf-spectacular (SP11)

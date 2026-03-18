@@ -308,6 +308,8 @@ TENANT_APPS: list[str] = [
     "apps.integrations",                 # Third-party integrations — tenant-specific API keys
     "apps.pos",                          # Point of Sale — tenant-specific POS terminals & sessions
     "apps.quotes",                       # Quote management — tenant-specific quotations
+    "apps.invoices",                     # Invoice system — tenant-specific invoices & credit/debit notes
+    "apps.payments",                     # Payment recording — tenant-specific payment transactions
 ]
 
 

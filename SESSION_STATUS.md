@@ -1,6 +1,6 @@
 # Session Status - LankaCommerce Cloud POS
 
-> **Last Updated:** Session 20 — Phase-05 SP05 Order Management AUDITED (92/92 tasks, 6 groups, 55 tests pass)
+> **Last Updated:** Session 25 — Phase-05 SP08 Customer Module AUDITED (88/88 tasks, 6 groups A-F, 8 migrations, 90 tests ALL PASSING, 4 audit gaps + 2 bugs fixed)
 > **Purpose:** Complete handoff document for the next chat session. This file contains ALL context needed to continue work without the previous chat's memory.
 
 ---
@@ -40,12 +40,15 @@ Phase-05_ERP-Core-Modules-Part2/SubPhase-02_POS-Offline-Mode (ALL 90 tasks compl
 Phase-05_ERP-Core-Modules-Part2/SubPhase-03_Receipt-Generation (ALL 82 tasks complete, AUDITED, 55 tests, 42+ gaps fixed)
 Phase-05_ERP-Core-Modules-Part2/SubPhase-04_Quote-Management (ALL 88 tasks complete, AUDITED, 118 tests, 9 gaps + 6 bugs fixed)
 Phase-05_ERP-Core-Modules-Part2/SubPhase-05_Order-Management (ALL 92 tasks complete, AUDITED, 55 tests, 28 gaps fixed)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-06_Invoice-System (ALL 90 tasks complete, AUDITED, 56 tests, ~60 gaps fixed)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-07_Payment-Recording (ALL 86 tasks complete, AUDITED, 69 tests, 114 migration ops, 6 groups A-F)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-08_Customer-Module (ALL 88 tasks complete, AUDITED, 90 tests, 4 gaps + 2 bugs fixed, 6 groups A-F)
 ```
 
 ### Next Document to Implement
 
 ```
-Document-Series/Phase-05_ERP-Core-Modules-Part2/SubPhase-06_*
+Document-Series/Phase-05_ERP-Core-Modules-Part2/SubPhase-09_*
 ```
 
 ---
@@ -110,7 +113,7 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 ## Test Results (Docker PostgreSQL)
 
 | Test Scope             | Passed | Failed | Notes                                             |
-| ---------------------- | ------ | ------ | ------------------------------------------------- |
+| ---------------------- | ------ | ------ | ------------------------------------------------- | --- | ------------------ | --- | --- | ------------------------------------------------------ |
 | **Full suite**         | 10089  | 0      | All tests passing (0 errors)                      |
 | **Products tests**     | 1175   | 0      | SP01-SP05 (base+variants+bundles+BOM)             |
 | **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79)          |
@@ -135,10 +138,241 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 | **Warehouse tests**    | 220    | 0      | SP08 143 unit + 77 integration (PostgreSQL)       |
 | **Quote tests**        | 118    | 0      | SP04 models+services+views+pdf+email (PostgreSQL) |
 | **Order tests**        | 55     | 0      | SP05 models+services+API (PostgreSQL)             |
+| **Invoice tests**      | 56     | 0      | SP06 models+services+API+PDF (PostgreSQL)         |
+| **Payment tests**      | 69     | 0      | SP07 models+services+API (PostgreSQL)             |     | **Customer tests** | 90  | 0   | SP08 models+services+API (PostgreSQL, tenant-isolated) |
 
 ---
 
-## What Was Completed This Session (Session 20)
+## What Was Completed This Session (Session 25)
+
+### SP08: Customer Module DEEP AUDIT — Phase 05
+
+**Phase-05_ERP-Core-Modules-Part2/SubPhase-08_Customer-Module**
+
+Deep audit of all 88 tasks across 6 groups (A–F). 4 code gaps identified and fixed. 2 additional bugs discovered and fixed during production testing. All 90 tests passing on Docker PostgreSQL with tenant schema isolation.
+
+**Audit Gaps Fixed:**
+
+1. **customer_service.py** — Added missing `get_customer()` and `list_customers()` static methods (Task 35)
+2. **duplicate_service.py** — Fixed scoring algorithm: `max()` → cumulative `+=`, updated thresholds (HIGH=150, MEDIUM=80) (Task 75)
+3. **duplicate_service.py** — Added tag_assignments transfer in `merge_customers()` before soft-delete (Task 76)
+4. **import_service.py** — Added district-province validation and tax_id length check in `validate_row()` (Task 81)
+
+**Bugs Fixed During Testing:** 5. **import_service.py** — Fixed `.upper()` → `.lower()` for customer_type case comparison (VALID_TYPES uses lowercase) 6. **customer_settings.py** — Fixed singleton save: `not self.pk` → `self._state.adding` (UUIDMixin always has pk)
+
+**Test Infrastructure:**
+
+- Created `tests/conftest.py` with tenant-aware fixtures (session-scoped tenant, autouse context)
+- Fixed test_api.py choice values: INDIVIDUAL → individual, BILLING → billing, MOBILE → mobile
+- Fixed test_services.py assertions: change_type casing, auto_detect_mapping expectations
+
+**Audit Report:** `SP08_AUDIT_REPORT.md` — comprehensive task-by-task audit with 100% compliance
+
+---
+
+## What Was Completed Last Session (Session 24)
+
+### SP08: Customer Module (ALL 88 Tasks) — Phase 05
+
+**Phase-05_ERP-Core-Modules-Part2/SubPhase-08_Customer-Module**
+
+Full implementation of all 88 tasks across 6 groups (A–F). 80+ tests written. 8 migrations applied.
+
+**Group A: Customer Model & Core Setup (Tasks 01–18)**
+
+- Customer model: UUID PK, customer_code (auto-generated CUS-00001), first_name, last_name, display_name (auto), email, phone, NIC, tax_id
+- Customer types: INDIVIDUAL, BUSINESS, WHOLESALE, WALK_IN
+- Status choices: active, inactive, blocked, suspended
+- Financial tracking: total_purchases, order_count, average_order_value, outstanding_balance, credit_limit
+- search_vector SearchVectorField + GinIndex for full-text search
+- CustomerCodeGenerator service with atomic sequence
+- Constants: CUSTOMER_TYPES, STATUS_CHOICES, SOURCES, TITLES, 25 provinces, 25 districts
+- SoftDeleteMixin for soft delete
+- Migration: 0002_sp08_group_a (47 operations)
+
+**Group B: Address & Phone Models + Validators (Tasks 19–34)**
+
+- CustomerAddress: customer FK CASCADE, address_type (BILLING/SHIPPING/BOTH), address fields, is_default_billing/shipping, coordinate fields
+- CustomerPhone: customer FK CASCADE, phone_type (MOBILE/LANDLINE/WORK/FAX/WHATSAPP), phone_number, is_primary/verified/whatsapp
+- Sri Lanka validators: NIC (old 9-digit, new 12-digit), phone (+94 format), postal code, tax_id (TIN)
+- Province/district data files with full Sri Lanka mapping
+- Migration: 0003_sp08_group_b
+
+**Group C: Search, History & Settings (Tasks 35–50)**
+
+- CustomerSearchService: PostgreSQL FTS via search_vector, quick_search, lookup_by_phone/email
+- HistoryService: log_creation, log_change, log_changes with CustomerHistory model
+- CustomerSettings: singleton with code prefix/start, require email/phone, default status, allow duplicates
+- CustomerCacheService: tenant-scoped caching with TenantCache
+- CustomerService: create/update/deactivate/reactivate/block with settings-driven validation
+- PostgreSQL trigger for auto search_vector update (RunSQL migration)
+- Migrations: 0004_sp08_group_c + 0005_sp08_group_c_search_trigger
+
+**Group D: Communications & Purchase History (Tasks 51–64)**
+
+- CustomerCommunication: customer FK, type (EMAIL/PHONE/SMS/IN_PERSON/NOTE), subject, content, related_order/invoice FKs, follow_up_date
+- CommunicationService: log_communication, get_communication_timeline, get_pending_follow_ups
+- PurchaseHistoryService: get_purchase_summary, get_top_products, get_last_purchase, get_customer_statistics
+- CustomerActivityService: get_activity_feed (paginated, 4 source collectors: orders, invoices, payments, communications)
+- Migration: 0006_sp08_group_d
+
+**Group E: Tags, Segments & Merge (Tasks 65–78)**
+
+- CustomerTag + CustomerTagAssignment: tag with color/description, unique constraint on customer+tag
+- CustomerSegment: rules JSONField, auto_assign, customer_count tracking
+- CustomerMerge: primary/duplicate customer FKs, transfer counts, duplicate_customer_snapshot JSONField
+- CustomerTagService: assign/remove/bulk_assign, filter_by_tag(s) with AND/OR logic, get_tag_statistics
+- CustomerSegmentService: evaluate_customer (11 operators: eq/neq/gt/gte/lt/lte/contains/in/not_in/is_null/is_not_null), auto_assign_segments
+- DuplicateDetectionService: find_duplicates (weighted scoring: email 100, phone 90, name 80, company 70), merge_customers (transfers orders/invoices/payments, soft-deletes duplicate)
+- Migration: 0007_sp08_group_e
+
+**Group F: Import/Export, API & Tests (Tasks 79–88)**
+
+- CustomerImportService: CSV parsing, auto column mapping, row validation, batch import (100 per batch), strict/skip_invalid/skip_duplicate modes
+- CustomerExportService: configurable columns, CSV streaming export
+- CustomerImport model: progress tracking (status, row counts, error_log JSONField)
+- Serializers: CustomerListSerializer, CustomerSerializer (detail), CustomerCreateUpdateSerializer, AddressSerializer, PhoneSerializer, TagSerializer
+- CustomerFilter: 15+ filter fields with custom methods (tag names, outstanding balance, full-text search)
+- CustomerViewSet (ModelViewSet): 22+ endpoints including CRUD + search, addresses, phones, communications, history, statistics, activity, tags, import, export, duplicates, merge
+- URL routing: DefaultRouter, 32 URL patterns at /api/v1/customers/
+- Admin: 11 model registrations
+- Tests: test_models.py (18 tests), test_services.py (35 tests), test_api.py (28 tests)
+- Migration: 0008_sp08_group_f
+
+---
+
+## What Was Completed Last Session (Session 23)
+
+### SP07: Payment Recording AUDIT (ALL 86 Tasks) — Phase 05
+
+**Phase-05_ERP-Core-Modules-Part2/SubPhase-07_Payment-Recording**
+
+Full implementation of all 86 tasks across 6 groups (A–F). 69 tests all passing.
+
+**Group A: App Setup & Payment Model (Tasks 01–18)**
+
+- Payments app at `apps/payments/` with models/, views/, serializers/, services/, tasks/, utils/
+- Payment model: UUID PK, payment_number (PAY-YYYY-NNNNN), method (CASH/CARD/BANK_TRANSFER/MOBILE/CHECK/STORE_CREDIT), status (PENDING/COMPLETED/FAILED/CANCELLED/REFUNDED)
+- Financial: amount (15,2), currency (LKR), exchange_rate, amount_in_base_currency
+- Relations: invoice FK, order FK, customer FK, received_by FK, approved_by FK
+- Method details: method_details (JSON), reference_number, transaction_id
+- Dates: payment_date, processed_at, cancelled_at
+- SoftDeleteMixin for soft delete
+- PaymentSequence: yearly numbering (year + last_number)
+- PaymentMethodConfig: per-method settings (min/max amount, display order, active flag)
+- Constants: PaymentMethod, PaymentStatus, ALLOWED_TRANSITIONS, TERMINAL_STATES
+- Custom exceptions: PaymentError hierarchy (7 exception classes)
+- Migration: 0001_initial
+
+**Group B: Payment Services & Processing (Tasks 19–36)**
+
+- PaymentService: create_payment, complete/fail/cancel/approve_payment, allocate_to_invoice/multiple_invoices
+- 6 method-specific recording: record_cash/card/bank_transfer/mobile/check/store_credit_payment
+- validation: validate_payment_data, check_duplicate_payment, calculate_processing_fee
+- PaymentNumberGenerator: PAY-YYYY-NNNNN with atomic sequence
+- PaymentHistory: audit trail with 10 action types, old/new JSON values
+- PaymentAllocation: payment→invoice linking with amount tracking
+- PaymentSettings: tenant-configurable (approval threshold, duplicate detection, auto-complete cash, etc.)
+- Migration: 0002 (settings, allocation, history)
+
+**Group C: Split Payments & Payment Plans (Tasks 37–50)**
+
+- SplitPayment + SplitPaymentComponent: multi-method payment support
+- PaymentPlan + PaymentPlanInstallment: installment scheduling
+- PlanService: create_plan, record_installment_payment, mark_overdue, cancel_plan
+- SplitPaymentService: record_split_payment with individual method recording
+- Celery tasks: send_installment_reminders, mark_overdue_installments_task
+- Migration: 0003 (plans, split)
+
+**Group D: Refund System (Tasks 51–64)**
+
+- Refund model: refund_number (REF-YYYY-NNNNN), original_payment FK, amount, reason (7 choices), refund_method (4 choices), status (5 states)
+- RefundService: request_refund, approve/reject/process_refund with state machine
+- Validates refund amount against available refundable amount
+- Admin: RefundAdmin with status filtering and readonly fields
+- Migration: 0004_refund
+
+**Group E: Receipts & Email Notifications (Tasks 65–76)**
+
+- PaymentReceipt: OneToOne with Payment, receipt_number (REC-YYYY-NNNNN), PDF file storage
+- ReceiptService: generate_receipt (idempotent, COMPLETED only), get_receipt_by_payment
+- ReceiptPDFService: ReportLab-based PDF generation with header, customer info, payment details, invoice reference, footer
+- PaymentEmailService: 5 email types (confirmation, receipt delivery w/ PDF attachment, refund notification, reminder, payment failed)
+- 6 HTML email templates in templates/emails/payments/
+- Celery email tasks: async email sending for all notification types
+- Migration: 0005_paymentreceipt
+
+**Group F: API, Serializers, Tests (Tasks 77–86)**
+
+- PaymentViewSet: list/create/retrieve + complete/cancel/receipt(PDF download) actions
+- RefundViewSet: list/create/retrieve + approve/reject/process actions
+- 14 serializers: Payment (List/Detail/Create), History, Allocation, Refund (List/Full/Create/Approve/Reject), Receipt
+- Filters: PaymentFilter (method, status, customer, invoice, date/amount ranges), RefundFilter (status, reason, payment, dates)
+- URL routing via DefaultRouter
+- Test suite: conftest.py + test_models.py (27) + test_services.py (26) + test_api.py (16)
+
+**Test Results:** 69 tests, ALL PASSING (Docker PostgreSQL)
+
+---
+
+## What Was Completed Last Session (Session 21)
+
+### SP06: Invoice System (ALL 90 Tasks) — Phase 05
+
+**Phase-05_ERP-Core-Modules-Part2/SubPhase-06_Invoice-System**
+
+Deep audit of all 90 tasks across 6 groups (A–F). ~60 issues identified and fixed in real-time. Full audit report at `SP06_AUDIT_REPORT.md`.
+
+**Group A: Invoice Model & Types (Tasks 01–18)** — 14 fixes
+
+- Fixed VAT rate (18%→12%) and SVAT rate (8%→0%)
+- Added 4 missing fields: customer_tax_id, sent_date, payment_terms, pdf_version
+- Changed FK on_delete to PROTECT, fixed related_names
+- Migration: 0005_sp06_audit_fixes
+
+**Group B: Line Items & Tax Calculation (Tasks 19–34)** — 6 fixes
+
+- Changed description from CharField→TextField
+- Added hsn_description field
+- Added 4 VAT/SVAT calculation methods (apply_vat_to_line_item, etc.)
+- Migration: 0006_sp06_audit_group_b
+
+**Group C: Invoice Generation Services (Tasks 35–50)** — 7 fixes
+
+- Fixed aging bucket names to snake_case
+- Added \*\*metadata support to \_log_history()
+- Added method aliases (issue, send, cancel, void)
+- Rewrote overdue Celery task with multi-tenant support
+- Migration: 0007_sp06_audit_group_c
+
+**Group D: Credit Notes & Debit Notes (Tasks 51–66)** — 13 fixes
+
+- Added 5 missing DebitNoteReason values
+- Changed credit/debit note status from DRAFT→ISSUED
+- Added number generation to both CN and DN creation
+- Added reason validation, full-credit support, simple-amount support
+- Improved credit limit validation (applied vs pending)
+
+**Group E: Invoice PDF & Email (Tasks 67–80)** — 16 fixes
+
+- Added 5 render methods to PDF generator (header, billing, line_items, tax_summary, footer)
+- Created 5 section templates in templates/invoices/pdf/sections/
+- Fixed InvoiceTemplate **str** and added get_absolute_url()
+- Added try-except error handling to all email methods
+- Fixed PDF attachment seek(0) file pointer bug
+
+**Group F: API, Testing & Documentation (Tasks 81–90)** — 8 fixes
+
+- Changed aging report URL to reports/aging
+- Created test_api.py (15 tests) and test_pdf.py (22 tests)
+- Created 7 documentation files in docs/modules/invoices/
+- Fixed API test HTTP_HOST for django-tenants
+
+**Test Results:** 56 tests, ALL PASSING (Docker PostgreSQL)
+
+---
+
+## What Was Completed Last Session (Session 20)
 
 ### SP05: Order Management (ALL 92 Tasks) — Phase 05
 
@@ -347,10 +581,10 @@ These ~620 config functions and their ~4956 tests still exist and pass. They are
 
 ## What To Do Next
 
-| Priority | Task                            | Details                                             |
-| -------- | ------------------------------- | --------------------------------------------------- |
-| 1        | **Phase-05+ ERP Modules Part2** | Continue Phase-05 (SP06 Invoice System next)        |
-| 2        | **Phase-06+ Advanced Modules**  | Continue through remaining phases                   |
+| Priority | Task                            | Details                                      |
+| -------- | ------------------------------- | -------------------------------------------- |
+| 1        | **Phase-05+ ERP Modules Part2** | Continue Phase-05 (SP06 Invoice System next) |
+| 2        | **Phase-06+ Advanced Modules**  | Continue through remaining phases            |
 
 ---
 

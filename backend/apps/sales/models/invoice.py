@@ -73,7 +73,7 @@ class Invoice(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="invoices",
+        related_name="sales_invoices",
         verbose_name="Order",
         help_text="Optional link to the order being invoiced.",
     )
@@ -82,7 +82,7 @@ class Invoice(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
     customer = models.ForeignKey(
         "customers.Customer",
         on_delete=models.PROTECT,
-        related_name="invoices",
+        related_name="sales_invoices",
         verbose_name="Customer",
         help_text="The customer being billed.",
     )

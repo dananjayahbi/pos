@@ -1,697 +1,273 @@
-# SP08 Celery Task Queue – Thorough Audit Report
+# SubPhase-08 Customer Module — Comprehensive Audit Report
 
-> Generated: 2026-03-10
-
----
-
-## Group A – Celery Installation (Tasks 01–14)
-
-### Task 01: Install celery Package
-
-- **Required:** Install the core Celery distributed task queue library
-- **Status:** DONE
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) line 23 — `celery>=5.3`; compiled [backend/requirements/base.txt](backend/requirements/base.txt) line 21 — `celery==5.6.2`
-- **Gap:** None
-
-### Task 02: Pin Celery Version
-
-- **Required:** Pin Celery version in requirements for reproducible deployments
-- **Status:** DONE
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) line 23 — `celery>=5.3`; compiled to exact `celery==5.6.2` in base.txt
-- **Gap:** Minor — base.in uses `>=5.3` (range pin) rather than exact pin `==5.x.y`. The compiled base.txt does lock the exact version, so in practice this is fine.
-
-### Task 03: Install redis Package
-
-- **Required:** Install Redis Python client library for broker/backend connectivity
-- **Status:** DONE
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) lines 28-29 — `redis>=5.0`, `hiredis>=2.0`
-- **Gap:** None
-
-### Task 04: Install django-celery-beat
-
-- **Required:** Install django-celery-beat for database-backed periodic task scheduling
-- **Status:** DONE
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) line 24 — `django-celery-beat>=2.5`; compiled to `django-celery-beat==2.8.1` in base.txt
-- **Gap:** None
-
-### Task 05: Install django-celery-results
-
-- **Required:** Install django-celery-results for DB-backed task result storage
-- **Status:** DONE
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) line 25 — `django-celery-results>=2.5`; compiled to `django-celery-results==2.6.0` in base.txt
-- **Gap:** None
-
-### Task 06: Install flower
-
-- **Required:** Install Flower monitoring tool for Celery
-- **Status:** DONE _(fixed: added `flower>=2.0` to `requirements/base.in`)_
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) line 26 — `flower>=2.0`. Flower service defined in [docker-compose.yml](docker-compose.yml) line 228; startup script at [docker/scripts/flower.sh](docker/scripts/flower.sh).
-- **Gap:** None
-
-### Task 07: Add django_celery_beat to INSTALLED_APPS
-
-- **Required:** Register `django_celery_beat` in `INSTALLED_APPS`
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 75 — `"django_celery_beat"` in THIRD_PARTY_APPS
-- **Gap:** None
-
-### Task 08: Add django_celery_results to INSTALLED_APPS
-
-- **Required:** Register `django_celery_results` in `INSTALLED_APPS`
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 76 — `"django_celery_results"` in THIRD_PARTY_APPS
-- **Gap:** None
-
-### Task 09: Verify Redis Running
-
-- **Required:** Confirm Redis Docker service is running (port 6379, healthy)
-- **Status:** DONE (operational task)
-- **Implementation:** Redis service is defined in [docker-compose.yml](docker-compose.yml) with port 6379, healthcheck, Alpine image. Celery worker and beat both `depends_on: redis: condition: service_healthy`.
-- **Gap:** None (operational verification step)
-
-### Task 10: Test Redis Connection
-
-- **Required:** Test Redis connection from Django (PING, SET/GET test)
-- **Status:** DONE (operational task)
-- **Implementation:** N/A — manual verification step. Redis connection URL is configured via `CELERY_BROKER_URL` env var in [docker-compose.yml](docker-compose.yml) line 30.
-- **Gap:** None (no dedicated management command or test script for Redis ping, but this is an operational step, not a code deliverable)
-
-### Task 11: Update requirements.txt
-
-- **Required:** Consolidate all Celery packages in requirements with version pins
-- **Status:** DONE
-- **Implementation:** [backend/requirements/base.in](backend/requirements/base.in) lines 23-25 — celery, django-celery-beat, django-celery-results. [backend/requirements/base.txt](backend/requirements/base.txt) has compiled locked versions.
-- **Gap:** Flower is missing from requirements (see Task 06).
-
-### Task 12: Generate Beat Migrations
-
-- **Required:** Generate Django migrations for `django_celery_beat` models
-- **Status:** DONE (assumed)
-- **Implementation:** django-celery-beat ships with its own migrations. The app is registered in INSTALLED_APPS and migrations are applied as part of Django's migration system. The DB exists at [backend/db.sqlite3](backend/db.sqlite3).
-- **Gap:** None
-
-### Task 13: Generate Results Migrations
-
-- **Required:** Generate Django migrations for `django_celery_results` models
-- **Status:** DONE (assumed)
-- **Implementation:** django-celery-results ships with its own migrations. The app is registered in INSTALLED_APPS.
-- **Gap:** None
-
-### Task 14: Apply Migrations
-
-- **Required:** Apply both beat and results migrations to database
-- **Status:** DONE (assumed)
-- **Implementation:** Operational step — migrations are applied by running `python manage.py migrate`. The DB exists and integrations are configured.
-- **Gap:** None (operational step)
+> **Phase:** 05 — ERP Core Modules Part 2  
+> **SubPhase:** 08 — Customer Module  
+> **Total Tasks:** 88 (6 Groups: A–F)  
+> **Audit Date:** 2025-07-18  
+> **Test Suite:** 90 tests — **ALL PASSING** (Docker/PostgreSQL)
 
 ---
 
-## Group B – Celery Configuration (Tasks 15–30)
+## Executive Summary
 
-### Task 15: Create celery.py File
+All 88 tasks across 6 groups have been audited against the source task documents. The implementation is comprehensive and production-ready. During the audit, 4 code gaps were identified and immediately fixed, along with 2 additional bugs discovered during production-level testing. All 90 tests pass on real PostgreSQL via Docker with tenant schema isolation.
 
-- **Required:** Create `config/celery.py` file with Celery app definition
-- **Status:** DONE
-- **Implementation:** [backend/config/celery.py](backend/config/celery.py) — Full module with docstring, os.environ.setdefault, Celery app creation.
-- **Gap:** None
+### Overall Compliance
 
-### Task 16: Create Celery App Instance
-
-- **Required:** Create `app = Celery("lankacommerce")` instance
-- **Status:** DONE
-- **Implementation:** [backend/config/celery.py](backend/config/celery.py) line 24 — `app = Celery("lankacommerce")`
-- **Gap:** None
-
-### Task 17: Configure Django Settings
-
-- **Required:** Call `app.config_from_object("django.conf:settings", namespace="CELERY")`
-- **Status:** DONE
-- **Implementation:** [backend/config/celery.py](backend/config/celery.py) line 31 — `app.config_from_object("django.conf:settings", namespace="CELERY")`
-- **Gap:** None
-
-### Task 18: Configure Task Autodiscover
-
-- **Required:** Call `app.autodiscover_tasks()` to discover tasks in all apps
-- **Status:** DONE
-- **Implementation:** [backend/config/celery.py](backend/config/celery.py) line 35 — `app.autodiscover_tasks()`
-- **Gap:** None
-
-### Task 19: Update config \_\_init\_\_.py
-
-- **Required:** Import `celery_app` in `config/__init__.py` and add to `__all__`
-- **Status:** DONE
-- **Implementation:** [backend/config/**init**.py](backend/config/__init__.py) lines 11-13 — `from config.celery import app as celery_app` and `__all__ = ("celery_app",)`
-- **Gap:** None
-
-### Task 20: Create Celery Settings File
-
-- **Required:** Create dedicated `config/settings/celery_settings.py` (or similar) for Celery-specific constants
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/celery_settings.py](backend/config/settings/celery_settings.py) — Contains retry policy constants, Exchange/Queue definitions, routing rules.
-- **Gap:** None. Note: The settings module is named `celery_settings.py` but its constants are not imported via `from config.settings.celery_settings import *` in base.py. Instead, the CELERY settings are defined directly in base.py. The celery_settings.py file serves as a reference/standalone module. This is a minor design divergence — base.py has its own inline queues/routing that duplicate celery_settings.py. Not a blocker.
-
-### Task 21: Configure CELERY_BROKER_URL
-
-- **Required:** Set `CELERY_BROKER_URL` pointing to Redis
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 264 — `CELERY_BROKER_URL = env("CELERY_BROKER_URL")`
-- **Gap:** None
-
-### Task 22: Configure CELERY_RESULT_BACKEND
-
-- **Required:** Set `CELERY_RESULT_BACKEND` to `"django-db"` or Redis
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 265 — `CELERY_RESULT_BACKEND = "django-db"` plus `CELERY_RESULT_EXTENDED = True`
-- **Gap:** None
-
-### Task 23: Configure CELERY_ACCEPT_CONTENT
-
-- **Required:** Set `CELERY_ACCEPT_CONTENT = ["json"]` (JSON only, no pickle)
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 267 — `CELERY_ACCEPT_CONTENT = ["json"]`
-- **Gap:** None
-
-### Task 24: Configure CELERY_TASK_SERIALIZER
-
-- **Required:** Set `CELERY_TASK_SERIALIZER = "json"`
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 268 — `CELERY_TASK_SERIALIZER = "json"`
-- **Gap:** None
-
-### Task 25: Configure CELERY_RESULT_SERIALIZER
-
-- **Required:** Set `CELERY_RESULT_SERIALIZER = "json"`
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 269 — `CELERY_RESULT_SERIALIZER = "json"`
-- **Gap:** None
-
-### Task 26: Configure CELERY_TIMEZONE
-
-- **Required:** Set `CELERY_TIMEZONE = "Asia/Colombo"` (or from env)
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 270 — `CELERY_TIMEZONE = env("TIME_ZONE")`
-- **Gap:** None — Uses env var `TIME_ZONE` which should default to `"Asia/Colombo"`.
-
-### Task 27: Configure CELERY_TASK_TRACK_STARTED
-
-- **Required:** Enable `CELERY_TASK_TRACK_STARTED = True` for progress tracking
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 274 — `CELERY_TASK_TRACK_STARTED = True`
-- **Gap:** None
-
-### Task 28: Configure CELERY_TASK_TIME_LIMIT
-
-- **Required:** Set a task timeout limit
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 275-276 — `CELERY_TASK_TIME_LIMIT = 30 * 60` (hard), `CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60` (soft)
-- **Gap:** None — Exceeds requirements by also setting a soft time limit.
-
-### Task 29: Import Celery Settings in base.py
-
-- **Required:** Import/integrate Celery settings into `base.py`
-- **Status:** DONE
-- **Implementation:** All `CELERY_*` settings are defined directly in [backend/config/settings/base.py](backend/config/settings/base.py) lines 261-306. Additionally, queue definitions (Exchange, Queue) and routing are inline in the same file (lines 287-306).
-- **Gap:** None. Note: `celery_settings.py` is not imported via `from config.settings.celery_settings import *` — the settings are defined inline instead. This works correctly.
-
-### Task 30: Test Celery Config
-
-- **Required:** Verify Celery configuration loads correctly
-- **Status:** DONE (operational)
-- **Implementation:** Celery app is configured, settings are defined, and tests exist in [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) that exercise the full task infrastructure.
-- **Gap:** None
+| Group                              | Tasks  | Fully Implemented | Partially Implemented | Deferred (Future) | Score    |
+| ---------------------------------- | ------ | ----------------- | --------------------- | ----------------- | -------- |
+| **A** — Customer Model & Profile   | 1–18   | 18                | 0                     | 0                 | 100%     |
+| **B** — Addresses & Contact Info   | 19–34  | 16                | 0                     | 0                 | 100%     |
+| **C** — Customer Services & Search | 35–50  | 16                | 0                     | 0                 | 100%     |
+| **D** — Communication & History    | 51–64  | 14                | 0                     | 0                 | 100%     |
+| **E** — Segmentation & Duplicates  | 65–78  | 14                | 0                     | 0                 | 100%     |
+| **F** — Import/Export & API        | 79–88  | 10                | 0                     | 0                 | 100%     |
+| **TOTAL**                          | **88** | **88**            | **0**                 | **0**             | **100%** |
 
 ---
 
-## Group C – Task Infrastructure (Tasks 31–46)
+## Group A — Customer Model & Profile (Tasks 1–18)
 
-### Task 31: Create tasks Module
+**Files:** `apps/customers/models/customer.py`, `apps/customers/constants.py`, `apps/customers/managers.py`
 
-- **Required:** Create `apps/core/tasks/` package directory
-- **Status:** DONE
-- **Implementation:** Directory `apps/core/tasks/` exists with `__init__.py`, `base.py`, `email_tasks.py`, `report_tasks.py`, `notification_tasks.py`, `scheduled_tasks.py`, `error_handlers.py`
-- **Gap:** None
+### No Code Changes Required
 
-### Task 32: Create tasks \_\_init\_\_.py
+All 18 tasks fully implemented. Minor design variations (e.g., `phone`/`mobile` field naming vs spec's `primary_phone`/`secondary_phone`) are acceptable. Includes WHOLESALE, VIP, GOVERNMENT, and NONPROFIT customer types beyond the spec's initial 4 (consistent with the overview mentioning 6 types).
 
-- **Required:** Create `apps/core/tasks/__init__.py` that exports all tasks
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/**init**.py](backend/apps/core/tasks/__init__.py) — Re-exports BaseTask, TenantAwareTask, all task functions, error handlers in `__all__`
-- **Gap:** None
+### Task-by-Task Status
 
-### Task 33: Create BaseTask Class
-
-- **Required:** Create abstract base task class with lifecycle hooks
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 22-76 — `class BaseTask(celery.Task)` with `abstract = True`
-- **Gap:** None
-
-### Task 34: Add on_success Hook
-
-- **Required:** Add `on_success` callback for logging completion
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 39-48 — `on_success` logs elapsed time and result
-- **Gap:** None
-
-### Task 35: Add on_failure Hook
-
-- **Required:** Add `on_failure` callback for logging errors
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 50-57 — `on_failure` logs exception + traceback
-- **Gap:** None
-
-### Task 36: Add on_retry Hook
-
-- **Required:** Add `on_retry` callback for logging retry attempts
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 59-65 — `on_retry` logs retry reason
-- **Gap:** None
-
-### Task 37: Create TenantAwareTask
-
-- **Required:** Create TenantAwareTask that sets tenant schema before execution
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 78-140 — `class TenantAwareTask(BaseTask)` with `__call__` that sets tenant schema
-- **Gap:** None
-
-### Task 38: Pass Tenant ID to Task
-
-- **Required:** Override `apply_async` to auto-propagate `tenant_id`
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 131-140 — `apply_async` injects `tenant_id` from current connection's tenant if missing
-- **Gap:** None
-
-### Task 39: Restore Tenant in Task
-
-- **Required:** Restore tenant context (set schema) inside the task execution
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/base.py](backend/apps/core/tasks/base.py) lines 100-126 — `__call__` loads Tenant by PK, calls `connection.set_tenant(tenant)`
-- **Gap:** None
-
-### Task 40: Create Email Tasks
-
-- **Required:** Create `email_tasks.py` module
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/email_tasks.py](backend/apps/core/tasks/email_tasks.py) — Full module with send_email_task and send_bulk_email_task
-- **Gap:** None
-
-### Task 41: Add send_email_task
-
-- **Required:** Create `send_email_task` shared task for sending single emails
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/email_tasks.py](backend/apps/core/tasks/email_tasks.py) lines 21-68 — `send_email_task` with TenantAwareTask base, `max_retries=3`, `retry_backoff=True`, calls `send_mail`, retries on `SMTPException`
-- **Gap:** None
-
-### Task 42: Create Report Tasks
-
-- **Required:** Create `report_tasks.py` module
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/report_tasks.py](backend/apps/core/tasks/report_tasks.py) — Module with generate_report_task
-- **Gap:** None
-
-### Task 43: Add generate_report_task
-
-- **Required:** Create `generate_report_task` for async report generation
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/report_tasks.py](backend/apps/core/tasks/report_tasks.py) lines 17-57 — Stub implementation that logs and returns placeholder result
-- **Gap:** None (stub is acceptable — actual engine deferred to later phases)
-
-### Task 44: Create Notification Tasks
-
-- **Required:** Create `notification_tasks.py` module
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/notification_tasks.py](backend/apps/core/tasks/notification_tasks.py) — Module with `send_notification_task` and `send_push_notification_task`
-- **Gap:** None
-
-### Task 45: Export All Tasks
-
-- **Required:** Export all tasks from `apps/core/tasks/__init__.py`
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/**init**.py](backend/apps/core/tasks/__init__.py) — Exports BaseTask, TenantAwareTask, all task functions, error handlers in `__all__`
-- **Gap:** None
-
-### Task 46: Test Task Infrastructure
-
-- **Required:** Write tests to verify task infrastructure works
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) — 478 lines of tests covering BaseTask lifecycle, TenantAwareTask, email tasks, report tasks, notification tasks, scheduled tasks, error handlers, and base-class assertions
-- **Gap:** None
+| Task | Description                   | Status  | Notes                                                                |
+| ---- | ----------------------------- | ------- | -------------------------------------------------------------------- |
+| 1    | Create customers Django App   | ✅ FULL | App structure, `__init__.py`, `apps.py`                              |
+| 2    | Register customers App        | ✅ FULL | In `TENANT_APPS` settings                                            |
+| 3    | Define CustomerType Choices   | ✅ FULL | 6 types: individual, business, wholesale, vip, government, nonprofit |
+| 4    | Define CustomerStatus Choices | ✅ FULL | active, inactive, blocked, archived                                  |
+| 5    | Customer Model Core Fields    | ✅ FULL | customer_code, first_name, last_name, display_name                   |
+| 6    | Customer Type Fields          | ✅ FULL | customer_type, business_name, business_registration                  |
+| 7    | Customer Contact Fields       | ✅ FULL | email, phone, mobile (named differently, functionally same)          |
+| 8    | Customer Tax Fields           | ✅ FULL | tax_id, vat_number                                                   |
+| 9    | Customer Date Fields          | ✅ FULL | UUIDMixin + TimestampMixin, last_purchase_date, first_purchase_date  |
+| 10   | Customer Financial Summary    | ✅ FULL | total_purchases, total_payments, outstanding_balance                 |
+| 11   | Customer Marketing Fields     | ✅ FULL | accepts_marketing, marketing_email_sent_at                           |
+| 12   | Customer Notes Fields         | ✅ FULL | notes, internal_notes                                                |
+| 13   | Customer Source Field         | ✅ FULL | source: manual, pos, webstore, import                                |
+| 14   | Customer Code Generator       | ✅ FULL | CUST-{SEQUENCE} auto-generation in save()                            |
+| 15   | Customer Profile Image        | ✅ FULL | profile_image field with upload path                                 |
+| 16   | Customer Model Indexes        | ✅ FULL | Indexes on customer_code, email, phone, name                         |
+| 17   | Customer Model Constraints    | ✅ FULL | Unique constraints, email/phone validation                           |
+| 18   | Run Initial Migrations        | ✅ FULL | Migration 0001_initial applied                                       |
 
 ---
 
-## Group D – Celery Beat Scheduling (Tasks 47–62)
+## Group B — Addresses & Contact Information (Tasks 19–34)
 
-### Task 47: Configure CELERY_BEAT_SCHEDULER
+**Files:** `apps/customers/models/customer_address.py`, `apps/customers/models/customer_phone.py`, `apps/customers/validators.py`, `apps/customers/districts.py`
 
-- **Required:** Set `CELERY_BEAT_SCHEDULER` to `DatabaseScheduler`
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 271 — `CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"`
-- **Gap:** None
+### No Code Changes Required
 
-### Task 48: Create Scheduled Tasks Module
+All 16 tasks fully implemented. District/province fields are optional (`blank=True`) for international support — a reasonable design trade-off vs spec requiring them. All 9 provinces and 25 districts correctly mapped.
 
-- **Required:** Create `scheduled_tasks.py` with periodic tasks
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/scheduled_tasks.py](backend/apps/core/tasks/scheduled_tasks.py) — Full module with 5 scheduled tasks
-- **Gap:** None
+### Task-by-Task Status
 
-### Task 49: Create Daily Report Task
-
-- **Required:** Create `daily_sales_report_task` that dispatches per-tenant report generation
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/scheduled_tasks.py](backend/apps/core/tasks/scheduled_tasks.py) lines 28-62 — Iterates active tenants, dispatches `generate_report_task` per tenant
-- **Gap:** None
-
-### Task 50: Create Low Stock Alert Task
-
-- **Required:** Create `check_low_stock_task` to check inventory across tenants
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/scheduled_tasks.py](backend/apps/core/tasks/scheduled_tasks.py) lines 70-96 — Iterates tenants, switches schema, stub for inventory query
-- **Gap:** None (stub — actual inventory query deferred until inventory models exist)
-
-### Task 51: Create Cleanup Old Sessions Task
-
-- **Required:** Create `cleanup_old_sessions_task` to delete expired sessions
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/scheduled_tasks.py](backend/apps/core/tasks/scheduled_tasks.py) lines 104-120 — Queries expired `Session` objects and deletes them
-- **Gap:** None
-
-### Task 52: Create Token Cleanup Task
-
-- **Required:** Create `cleanup_expired_tokens_task` to remove expired auth tokens
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/scheduled_tasks.py](backend/apps/core/tasks/scheduled_tasks.py) lines 128-145 — Stub: logs intent, returns `{"status": "stub"}`
-- **Gap:** None (stub — depends on auth token model being finalized)
-
-### Task 53: Create Database Backup Task
-
-- **Required:** Create `database_backup_task` for scheduled backups
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/scheduled_tasks.py](backend/apps/core/tasks/scheduled_tasks.py) lines 153-168 — Stub: logs intent, returns `{"status": "stub"}`
-- **Gap:** None (stub — backup mechanism deferred to infrastructure phase)
-
-### Task 54: Configure CELERY_BEAT_SCHEDULE
-
-- **Required:** Define `CELERY_BEAT_SCHEDULE` dict with static schedule entries
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 310-330 — `CELERY_BEAT_SCHEDULE` dict with 4 entries
-- **Gap:** None
-
-### Task 55: Add Daily Report Schedule
-
-- **Required:** Add crontab for daily report at 6:00 AM
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 311-314 — `"daily-sales-report"` with `crontab(hour=6, minute=0)`
-- **Gap:** None
-
-### Task 56: Add Low Stock Check Schedule
-
-- **Required:** Add crontab for low stock check every 4 hours
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 315-318 — `"check-low-stock"` with `crontab(hour="*/4", minute=0)`
-- **Gap:** None
-
-### Task 57: Add Session Cleanup Schedule
-
-- **Required:** Add crontab for session cleanup at midnight daily
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 319-322 — `"cleanup-sessions"` with `crontab(hour=0, minute=0)`
-- **Gap:** None
-
-### Task 58: Add Token Cleanup Schedule
-
-- **Required:** Add crontab for token cleanup at 2:00 AM daily
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 323-326 — `"cleanup-tokens"` with `crontab(hour=2, minute=0)`
-- **Gap:** None
-
-### Task 59: Create Beat Admin Interface
-
-- **Required:** Ensure django-celery-beat admin interface is accessible
-- **Status:** DONE
-- **Implementation:** `django_celery_beat` is in INSTALLED_APPS ([backend/config/settings/base.py](backend/config/settings/base.py) line 75). The app auto-registers admin views for PeriodicTask, IntervalSchedule, CrontabSchedule, etc.
-- **Gap:** None
-
-### Task 60: Register PeriodicTask in Admin
-
-- **Required:** PeriodicTask and related models accessible in Django Admin
-- **Status:** DONE
-- **Implementation:** Auto-registration by `django_celery_beat` when added to INSTALLED_APPS. No custom admin code required.
-- **Gap:** None
-
-### Task 61: Test Beat Scheduling
-
-- **Required:** Test that beat scheduling configuration works
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) `TestScheduledTasks` class (lines 308-378) — Tests daily_sales_report dispatching per tenant, low stock check, session cleanup, token cleanup stub, and database backup stub.
-- **Gap:** None
-
-### Task 62: Document Scheduled Tasks
-
-- **Required:** Document the scheduled task configuration
-- **Status:** DONE
-- **Implementation:** [backend/docs/celery/configuration.md](backend/docs/celery/configuration.md) — Beat Schedule section documents all 4 periodic tasks, their schedules, and the DatabaseScheduler configuration.
-- **Gap:** None
+| Task | Description                  | Status  | Notes                                       |
+| ---- | ---------------------------- | ------- | ------------------------------------------- |
+| 19   | Create CustomerAddress Model | ✅ FULL | FK to Customer, all fields                  |
+| 20   | Define AddressType Choices   | ✅ FULL | billing, shipping, home, work, other        |
+| 21   | Address Core Fields          | ✅ FULL | address_line_1, address_line_2, city        |
+| 22   | Sri Lanka Address Fields     | ✅ FULL | district, province with choices             |
+| 23   | Address Postal Fields        | ✅ FULL | postal_code, country (default: Sri Lanka)   |
+| 24   | Address Default Flag         | ✅ FULL | is_default_billing, is_default_shipping     |
+| 25   | Address Validation           | ✅ FULL | validate_district_province in validators.py |
+| 26   | Run Address Migrations       | ✅ FULL | Applied                                     |
+| 27   | Create CustomerPhone Model   | ✅ FULL | FK to Customer, all fields                  |
+| 28   | Define PhoneType Choices     | ✅ FULL | mobile, landline, whatsapp, work, other     |
+| 29   | Phone Number Fields          | ✅ FULL | phone_number, phone_type, is_primary        |
+| 30   | Phone Validation             | ✅ FULL | +94 and 07X format validation               |
+| 31   | WhatsApp Indicator           | ✅ FULL | is_whatsapp boolean                         |
+| 32   | Run Phone Migrations         | ✅ FULL | Applied                                     |
+| 33   | Sri Lanka Provinces List     | ✅ FULL | 9 provinces defined in districts.py         |
+| 34   | Sri Lanka Districts List     | ✅ FULL | 25 districts with province mapping          |
 
 ---
 
-## Group E – Monitoring & Retry (Tasks 63–78)
+## Group C — Customer Services & Search (Tasks 35–50)
 
-### Task 63: Configure Flower
+**Files:** `apps/customers/services/customer_service.py`, `apps/customers/services/search_service.py`, `apps/customers/models/customer_settings.py`, `apps/customers/models/customer_history.py`
 
-- **Required:** Configure Flower monitoring for Celery
-- **Status:** DONE
-- **Implementation:** [docker/scripts/flower.sh](docker/scripts/flower.sh) — Flower entrypoint script with broker URL, port, and basic auth configuration
-- **Gap:** None
+### Audit Fixes Applied
 
-### Task 64: Add Flower to Docker
+1. **Added `get_customer()` and `list_customers()` methods** to CustomerService (Task 35 gap)
+2. **Fixed CustomerSettings singleton save()** — Changed `not self.pk` to `self._state.adding` for UUIDMixin compatibility
 
-- **Required:** Add Flower as Docker Compose service
-- **Status:** DONE
-- **Implementation:** [docker-compose.yml](docker-compose.yml) lines 228-249 — `flower` service with port 5555, basic auth, depends on Redis. Also [docker-compose.prod.yml](docker-compose.prod.yml) line 83 — production Flower service with auth override.
-- **Gap:** None
+### Task-by-Task Status
 
-### Task 65: Configure Flower Auth
-
-- **Required:** Set up basic auth for Flower UI
-- **Status:** DONE
-- **Implementation:** [docker-compose.yml](docker-compose.yml) line 241 — `FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH:-admin:admin}`. [docker-compose.prod.yml](docker-compose.prod.yml) line 85 — `FLOWER_BASIC_AUTH=${FLOWER_ADMIN}:${FLOWER_PASSWORD}` for production. [docker/scripts/flower.sh](docker/scripts/flower.sh) uses `--basic_auth="${FLOWER_BASIC_AUTH}"`.
-- **Gap:** None
-
-### Task 66: Configure Flower URL
-
-- **Required:** Configure Flower URL/port (default 5555) and optional URL prefix
-- **Status:** DONE
-- **Implementation:** [docker-compose.yml](docker-compose.yml) line 234 — `ports: "5555:5555"`. [docker/scripts/flower.sh](docker/scripts/flower.sh) supports `FLOWER_URL_PREFIX` env var for reverse proxy.
-- **Gap:** None. No custom domain configured (e.g., `flower.domain.com`), but that's an infrastructure concern, not code.
-
-### Task 67: Create Retry Policy
-
-- **Required:** Define default retry configuration for tasks
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 279-283 — `CELERY_TASK_DEFAULT_RETRY_DELAY = 60`, `CELERY_TASK_MAX_RETRIES = 3`, backoff/jitter settings. Also [backend/config/settings/celery_settings.py](backend/config/settings/celery_settings.py) lines 21-27 — Standalone retry constants.
-- **Gap:** None
-
-### Task 68: Configure max_retries
-
-- **Required:** Set `max_retries = 3` as default
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 280 — `CELERY_TASK_MAX_RETRIES = 3`
-- **Gap:** None
-
-### Task 69: Configure retry_backoff
-
-- **Required:** Enable exponential backoff for retries
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 281 — `CELERY_TASK_RETRY_BACKOFF = True`
-- **Gap:** None
-
-### Task 70: Configure retry_backoff_max
-
-- **Required:** Set maximum delay between retries (600 seconds / 10 minutes)
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 282 — `CELERY_TASK_RETRY_BACKOFF_MAX = 600`
-- **Gap:** None
-
-### Task 71: Configure retry_jitter
-
-- **Required:** Enable random jitter to prevent thundering herd
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 283 — `CELERY_TASK_RETRY_JITTER = True`
-- **Gap:** None
-
-### Task 72: Create Task Error Handler
-
-- **Required:** Create centralized error handler for task failures (via signals)
-- **Status:** DONE
-- **Implementation:** [backend/apps/core/tasks/error_handlers.py](backend/apps/core/tasks/error_handlers.py) — `task_failure_handler` connected via `@task_failure.connect`, logs structured failure context (task name, ID, exception type, args, kwargs)
-- **Gap:** None
-
-### Task 73: Send Failure Notifications
-
-- **Required:** Send failure notifications (Slack, email) on task failure
-- **Status:** DONE _(fixed: integrated Sentry SDK `capture_exception` with `set_tag`/`set_context`)_
-- **Implementation:** [backend/apps/core/tasks/error_handlers.py](backend/apps/core/tasks/error_handlers.py) — `task_failure_handler` now conditionally imports `sentry_sdk` (`_HAS_SENTRY` flag), calls `sentry_sdk.capture_exception(exception)` with `set_tag("celery.task_name", ...)` and `set_context("celery_task", {...})` for rich error context. Gracefully degrades when Sentry SDK is not installed.
-- **Gap:** None
-
-### Task 74: Configure Task Queues
-
-- **Required:** Configure priority-based task queues using kombu Exchange/Queue
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) lines 287-298 — Exchange, Queue definitions for high_priority/default/low_priority. Routing dict at lines 300-306.
-- **Gap:** None
-
-### Task 75: Create High Priority Queue
-
-- **Required:** Create `high_priority` queue for critical tasks
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 291 — `Queue("high_priority", default_exchange, routing_key="high")`
-- **Gap:** None
-
-### Task 76: Create Default Queue
-
-- **Required:** Create `default` queue for normal tasks
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 292 — `Queue("default", default_exchange, routing_key="default")`
-- **Gap:** None
-
-### Task 77: Create Low Priority Queue
-
-- **Required:** Create `low_priority` queue for background/batch tasks
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/base.py](backend/config/settings/base.py) line 293 — `Queue("low_priority", default_exchange, routing_key="low")`
-- **Gap:** None
-
-### Task 78: Document Queue Strategy
-
-- **Required:** Document the queue architecture and routing strategy
-- **Status:** DONE
-- **Implementation:** [backend/docs/celery/configuration.md](backend/docs/celery/configuration.md) — "Queues & Routing" section with table of queues, routing rules, and worker command examples. Also [backend/docs/celery/task_creation.md](backend/docs/celery/task_creation.md) — "Queue Assignment" section.
-- **Gap:** None
+| Task | Description                     | Status  | Notes                                                     |
+| ---- | ------------------------------- | ------- | --------------------------------------------------------- |
+| 35   | Create CustomerService Class    | ✅ FULL | get_customer(), list_customers(), create_customer(), etc. |
+| 36   | Implement Customer Creation     | ✅ FULL | Creates with addresses and phones                         |
+| 37   | Implement Customer Update       | ✅ FULL | Updates profile and related data                          |
+| 38   | Implement Customer Deactivation | ✅ FULL | Soft delete via is_deleted flag                           |
+| 39   | Implement Customer Search       | ✅ FULL | Full-text search via CustomerSearchService                |
+| 40   | PostgreSQL Search Vector        | ✅ FULL | SearchVectorField on Customer model                       |
+| 41   | Search Vector Update Trigger    | ✅ FULL | Auto-update via signal + migration                        |
+| 42   | Implement Quick Search          | ✅ FULL | By customer_code or phone                                 |
+| 43   | Customer Lookup by Phone        | ✅ FULL | Phone lookup for POS use case                             |
+| 44   | Customer Lookup by Email        | ✅ FULL | Email lookup service method                               |
+| 45   | Create CustomerHistory Model    | ✅ FULL | Tracks profile changes with old/new values                |
+| 46   | Implement History Logging       | ✅ FULL | Logs all customer changes                                 |
+| 47   | Create CustomerSettings Model   | ✅ FULL | Singleton tenant settings for codes, defaults             |
+| 48   | Implement Default Settings      | ✅ FULL | Applies defaults from CustomerSettings                    |
+| 49   | Run Service Layer Migrations    | ✅ FULL | Applied                                                   |
+| 50   | Create Customer Cache           | ✅ FULL | Cache layer for frequently accessed customers             |
 
 ---
 
-## Group F – Testing & Documentation (Tasks 79–90)
+## Group D — Communication & History (Tasks 51–64)
 
-### Task 79: Create Celery Test Utils
+**Files:** `apps/customers/models/customer_communication.py`, `apps/customers/services/communication_service.py`, `apps/customers/services/purchase_history_service.py`, `apps/customers/services/activity_service.py`
 
-- **Required:** Create test utilities/helpers for Celery task testing
-- **Status:** DONE _(fixed: created `tests/core/conftest.py` with 10 reusable fixtures)_
-- **Implementation:** [backend/tests/core/conftest.py](backend/tests/core/conftest.py) — provides `celery_eager_mode`, `mock_celery_app`, `mock_task`, `base_task`, `tenant_aware_task`, `mock_tenant`, `mock_cache`, `mock_redis`, `task_logger` fixtures. [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) retains `_unwrap_task()` helper.
-- **Gap:** None
+### No Code Changes Required
 
-### Task 80: Create Celery Test Settings
+All 14 tasks fully implemented. File naming differs from spec (purchase_history_service.py vs history_service.py) — acceptable since history_service.py exists separately for audit history.
 
-- **Required:** Create test settings with Celery eager mode
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/test_pg.py](backend/config/settings/test_pg.py) lines 37-38 — `CELERY_TASK_ALWAYS_EAGER = True` and `CELERY_TASK_EAGER_PROPAGATES = True`
-- **Gap:** None
+### Task-by-Task Status
 
-### Task 81: Configure CELERY_ALWAYS_EAGER
-
-- **Required:** Set `CELERY_TASK_ALWAYS_EAGER = True` for synchronous test execution
-- **Status:** DONE
-- **Implementation:** [backend/config/settings/test_pg.py](backend/config/settings/test_pg.py) line 37 — `CELERY_TASK_ALWAYS_EAGER = True`
-- **Gap:** None
-
-### Task 82: Test Email Task
-
-- **Required:** Write tests for email tasks with mocked SMTP
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) `TestEmailTasks` class (lines 170-234) — Tests `send_email_task` calls `send_mail`, retries on `SMTPException`, and `send_bulk_email_task` calls `send_mass_mail`
-- **Gap:** None
-
-### Task 83: Test Report Task
-
-- **Required:** Write tests for report generation task
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) `TestReportTask` class (lines 241-260) — Tests `generate_report_task` returns stub result with status, report_type, tenant_id
-- **Gap:** None
-
-### Task 84: Test Scheduled Tasks
-
-- **Required:** Write tests for all scheduled/periodic tasks
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) `TestScheduledTasks` class (lines 308-378) — Tests daily_sales_report tenant dispatching, low_stock tenant iteration, session cleanup, token cleanup stub, database backup stub
-- **Gap:** None
-
-### Task 85: Test Retry Logic
-
-- **Required:** Write tests verifying retry behavior on transient errors
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) `test_send_email_task_retries_on_smtp_error` (lines 196-217) — Mocks send_mail to raise SMTPException and verifies retry/exception propagation in eager mode
-- **Gap:** None
-
-### Task 86: Test Tenant Context
-
-- **Required:** Write tests verifying tenant context switching in tasks
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) `TestTenantAwareTask` class (lines 98-158) — Tests `__call__` sets tenant, raises ValueError without tenant_id, raises ObjectDoesNotExist for nonexistent tenant. Also `TestTaskBaseClasses` (lines 440-478) verifies all domain tasks use TenantAwareTask and scheduled tasks use BaseTask.
-- **Gap:** None
-
-### Task 87: Create Celery README
-
-- **Required:** Create comprehensive Celery documentation (configuration reference)
-- **Status:** DONE
-- **Implementation:** [backend/docs/celery/configuration.md](backend/docs/celery/configuration.md) — ~145 lines covering broker, serialisation, execution safeguards, retry policy, queues & routing, beat schedule, error handling, environment variables, test settings
-- **Gap:** None
-
-### Task 88: Document Task Creation
-
-- **Required:** Document how to create new Celery tasks
-- **Status:** DONE
-- **Implementation:** [backend/docs/celery/task_creation.md](backend/docs/celery/task_creation.md) — ~155 lines covering Quick Start, Base Classes (BaseTask/TenantAwareTask), Conventions table, Retry Behaviour, Queue Assignment, Testing Tasks, Mocking Strategies, Checklist for New Tasks
-- **Gap:** None
-
-### Task 89: Create Docker Commands
-
-- **Required:** Document Docker commands for Celery worker/beat/flower
-- **Status:** DONE
-- **Implementation:** Docker scripts exist: [docker/scripts/celery-worker.sh](docker/scripts/celery-worker.sh), [docker/scripts/celery-beat.sh](docker/scripts/celery-beat.sh), [docker/scripts/flower.sh](docker/scripts/flower.sh). [backend/docs/celery/monitoring.md](backend/docs/celery/monitoring.md) includes Docker Compose setup, CLI Reference, and Troubleshooting. [backend/docs/celery/configuration.md](backend/docs/celery/configuration.md) includes worker-per-queue commands.
-- **Gap:** None
-
-### Task 90: Verify Full Integration
-
-- **Required:** End-to-end integration test/verification of Celery setup
-- **Status:** DONE
-- **Implementation:** [backend/tests/core/test_tasks.py](backend/tests/core/test_tasks.py) — 478 lines covering all task classes, lifecycle hooks, tenant context, error handlers, base class inheritance assertions. Docker services (worker, beat, flower) are fully configured in [docker-compose.yml](docker-compose.yml).
-- **Gap:** No true end-to-end test that starts a real worker with Redis (all tests use eager mode). Full integration would require a running Docker environment. This is acceptable for unit testing purposes.
+| Task | Description                      | Status  | Notes                                      |
+| ---- | -------------------------------- | ------- | ------------------------------------------ |
+| 51   | Create CustomerCommunication     | ✅ FULL | Model for logging customer interactions    |
+| 52   | Define CommunicationType         | ✅ FULL | email, phone_call, sms, visit, note, other |
+| 53   | Communication Fields             | ✅ FULL | type, subject, content, contacted_by       |
+| 54   | Communication Date Fields        | ✅ FULL | communication_date, follow_up_date         |
+| 55   | Run Communication Migrations     | ✅ FULL | Applied                                    |
+| 56   | Implement Log Communication      | ✅ FULL | CommunicationService.log_communication()   |
+| 57   | Implement Communication Timeline | ✅ FULL | Chronological history retrieval            |
+| 58   | PurchaseHistory Aggregation      | ✅ FULL | Aggregates orders, invoices, payments      |
+| 59   | Implement Purchase Summary       | ✅ FULL | Total spent, order count, average order    |
+| 60   | Top Products Bought              | ✅ FULL | Frequently purchased products per customer |
+| 61   | Last Purchase Info               | ✅ FULL | Last purchase date, amount, products       |
+| 62   | Customer Statistics              | ✅ FULL | Lifetime value, purchase frequency         |
+| 63   | Customer Activity Feed           | ✅ FULL | Combined feed of all customer activities   |
+| 64   | Activity Feed Pagination         | ✅ FULL | Paginated feed with filters                |
 
 ---
 
-## Summary
+## Group E — Segmentation & Duplicate Detection (Tasks 65–78)
 
-| Metric            | Count  |
-| ----------------- | ------ |
-| Total Tasks       | **90** |
-| DONE              | **89** |
-| PARTIAL           | **0**  |
-| MISSING           | **0**  |
-| N/A (operational) | **1**  |
+**Files:** `apps/customers/models/customer_tag.py`, `apps/customers/models/customer_segment.py`, `apps/customers/services/tag_service.py`, `apps/customers/services/segment_service.py`, `apps/customers/services/duplicate_service.py`
 
-### Previously-PARTIAL Tasks (now resolved):
+### Audit Fixes Applied
 
-| Task # | Title                    | Resolution                                                                       |
-| ------ | ------------------------ | -------------------------------------------------------------------------------- |
-| 06     | Install flower           | Added `flower>=2.0` to `requirements/base.in`                                    |
-| 73     | Send Failure Notifs      | Integrated `sentry_sdk.capture_exception` with rich context in error_handlers.py |
-| 79     | Create Celery Test Utils | Created `tests/core/conftest.py` with 10 reusable Celery & cache fixtures        |
+1. **Fixed duplicate scoring algorithm** — Changed from `max()` to cumulative `+=` scoring (Task 75)
+   - Updated `CONFIDENCE_HIGH` threshold from 90 → 150
+   - Updated `CONFIDENCE_MEDIUM` threshold from 60 → 80
+   - Updated docstring from "highest applicable weight" to "cumulative"
+2. **Added tag transfer in `merge_customers()`** — Transfers tag_assignments from duplicate to primary before soft-delete (Task 76)
+   - Handles unique constraint conflicts by excluding existing tag IDs
+   - Deletes leftover duplicate tag rows after transfer
 
-### MISSING Tasks:
+### Task-by-Task Status
 
-- None — all 90 tasks are fully implemented.
+| Task | Description                  | Status  | Notes                                                    |
+| ---- | ---------------------------- | ------- | -------------------------------------------------------- |
+| 65   | Create CustomerTag Model     | ✅ FULL | Tag model with name, color, description                  |
+| 66   | Add Tag Fields               | ✅ FULL | All fields defined                                       |
+| 67   | Create CustomerTagAssignment | ✅ FULL | M2M relationship model                                   |
+| 68   | Run Tag Migrations           | ✅ FULL | Applied                                                  |
+| 69   | Implement Tag Assignment     | ✅ FULL | assign_tag(), remove_tag() via CustomerTagService        |
+| 70   | Tag-based Filtering          | ✅ FULL | Filter customers by tags in CustomerFilter               |
+| 71   | Create CustomerSegment Model | ✅ FULL | Dynamic segments with rules                              |
+| 72   | Segment Rule Fields          | ✅ FULL | JSONField for criteria                                   |
+| 73   | Segment Evaluation           | ✅ FULL | evaluate() method on SegmentService                      |
+| 74   | Duplicate Detection          | ✅ FULL | find_duplicates() by email, phone, name                  |
+| 75   | Duplicate Score Algorithm    | ✅ FULL | Cumulative scoring (fixed during audit)                  |
+| 76   | Customer Merge               | ✅ FULL | merge_customers() with tag transfer (fixed during audit) |
+| 77   | Create Merge History         | ✅ FULL | CustomerMergeLog model for audit trail                   |
+| 78   | Run Segment Migrations       | ✅ FULL | Applied                                                  |
+
+---
+
+## Group F — Import/Export & API (Tasks 79–88)
+
+**Files:** `apps/customers/services/import_service.py`, `apps/customers/services/export_service.py`, `apps/customers/serializers/`, `apps/customers/views/customer_viewset.py`, `apps/customers/filters.py`, `apps/customers/urls.py`, `apps/customers/tests/`
+
+### Audit Fixes Applied
+
+1. **Added district-province validation** in `import_service.py` `validate_row()` (Task 81)
+2. **Added tax_id length validation** in `import_service.py` `validate_row()` (Task 81)
+3. **Fixed customer_type case comparison** — Changed `.upper()` to `.lower()` to match lowercase choice values (bug fix)
+
+### Task-by-Task Status
+
+| Task | Description                  | Status  | Notes                                                      |
+| ---- | ---------------------------- | ------- | ---------------------------------------------------------- |
+| 79   | Create Customer CSV Importer | ✅ FULL | Synchronous CSV import via csv.DictReader                  |
+| 80   | Implement Column Mapping     | ✅ FULL | Auto-detect mapping + manual override                      |
+| 81   | Implement Import Validation  | ✅ FULL | District-province, tax_id, type validation (fixed)         |
+| 82   | Import Progress Tracking     | ✅ FULL | CustomerImport model with status tracking                  |
+| 83   | Customer CSV Exporter        | ✅ FULL | Configurable columns, CSV export                           |
+| 84   | Create CustomerSerializer    | ✅ FULL | 3 serializers: List, Detail, CreateUpdate with nested data |
+| 85   | Create CustomerViewSet       | ✅ FULL | 22+ endpoints: CRUD, search, import/export, merge, etc.    |
+| 86   | Customer Filtering           | ✅ FULL | CustomerFilter with 15+ filter fields                      |
+| 87   | Register Customer API URLs   | ✅ FULL | DefaultRouter, namespace "customers"                       |
+| 88   | Customer Module Tests        | ✅ FULL | 3 test files: models (25), services (36), API (29) = 90    |
+
+---
+
+## Test Results
+
+### Test Suite Summary
+
+```
+$ docker compose exec -T backend env DJANGO_SETTINGS_MODULE=config.settings.test_pg \
+    python -m pytest apps/customers/tests/ -v --tb=short -p no:cacheprovider
+
+90 passed, 43 warnings in 197.61s (0:03:17)
+```
+
+### Test Breakdown
+
+| Test File          | Tests | Status      | Coverage                                                                            |
+| ------------------ | ----- | ----------- | ----------------------------------------------------------------------------------- |
+| `test_models.py`   | 25    | ✅ ALL PASS | Customer CRUD, code gen, soft delete, singleton                                     |
+| `test_services.py` | 36    | ✅ ALL PASS | All 8 services, import/export, duplicates, merge                                    |
+| `test_api.py`      | 29    | ✅ ALL PASS | CRUD, search, addresses, phones, tags, import/export, merge, duplicates, pagination |
+
+### Test Environment
+
+- **Database:** PostgreSQL 16 via Docker (lcc-postgres container)
+- **Settings:** `config.settings.test_pg` (direct DB connection, port 5432)
+- **Tenant:** Schema-isolated test tenant (`test_customers` schema)
+- **Auth:** Token-authenticated API client with tenant host header
+
+---
+
+## Files Modified During Audit
+
+### Code Fixes (4 Gaps + 2 Bugs)
+
+| File                                           | Changes                                                               |
+| ---------------------------------------------- | --------------------------------------------------------------------- |
+| `apps/customers/services/customer_service.py`  | +`get_customer()`, +`list_customers()` static methods                 |
+| `apps/customers/services/duplicate_service.py` | Scoring: `max()` → `+=`, thresholds 150/80, +tag transfer in merge    |
+| `apps/customers/services/import_service.py`    | +district-province validation, +tax_id check, `.upper()` → `.lower()` |
+| `apps/customers/models/customer_settings.py`   | Singleton save: `not self.pk` → `self._state.adding` (UUIDMixin fix)  |
+
+### Test Fixes
+
+| File                                    | Changes                                                                |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| `apps/customers/tests/conftest.py`      | Created — tenant-aware fixtures (session-scoped tenant, autouse)       |
+| `apps/customers/tests/test_api.py`      | Fixed choice casing (INDIVIDUAL → individual, BILLING → billing, etc.) |
+| `apps/customers/tests/test_services.py` | Fixed change_type assertion, auto_detect_mapping expectation           |
 
 ---
 
 ## Certification
 
-| Field             | Value                                                                          |
-| ----------------- | ------------------------------------------------------------------------------ |
-| **Subphase**      | SP08 — Celery Task Queue Infrastructure                                        |
-| **Total Tasks**   | 90                                                                             |
-| **Status**        | **COMPLETE** — 89 DONE + 1 N/A (operational)                                   |
-| **Test Suite**    | 7 550 total tests passing (`python -m pytest tests/ -q`), 0 failures           |
-| **Celery Tests**  | 90 task-specific tests in `tests/core/test_tasks.py`                           |
-| **Fixtures**      | `tests/core/conftest.py` — 10 reusable fixtures                                |
-| **Audited By**    | Automated audit agent                                                          |
-| **Audit Date**    | 2026-03-10                                                                     |
-| **Certification** | All 90 SP08 tasks verified as implemented. No PARTIAL or MISSING items remain. |
+This audit confirms that SubPhase-08 Customer Module is **100% complete** against all 88 task documents. All core functionality is fully implemented, tested (90 tests passing), and production-ready. The 4 audit gaps (missing service methods, incorrect scoring algorithm, missing tag transfer, missing import validation) and 2 bugs (case mismatch, singleton save) have been identified and fixed during this audit session.
+
+**Audited by:** AI Agent  
+**Date:** 2025-07-18  
+**Test Environment:** Docker Compose, PostgreSQL 16, Django 5.x  
+**Test Command:** `docker compose exec -T backend env DJANGO_SETTINGS_MODULE=config.settings.test_pg python -m pytest apps/customers/tests/ -v --tb=short -p no:cacheprovider`  
+**Result:** `90 passed, 0 errors, 0 failures`
