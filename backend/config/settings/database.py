@@ -313,6 +313,7 @@ TENANT_APPS: list[str] = [
     "apps.payments",                     # Payment recording — tenant-specific payment transactions
     "apps.credit",                       # Credit & loyalty — tenant-specific credit accounts & loyalty
     "apps.vendor_bills",                 # Vendor bills & payments — tenant-specific bill management
+    "apps.employees",                    # Employee management — tenant-specific employee records
 ]
 
 
