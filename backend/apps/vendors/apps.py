@@ -10,3 +10,6 @@ class VendorsConfig(AppConfig):
     name = "apps.vendors"
     label = "vendors"
     verbose_name = "Vendor Management"
+
+    def ready(self):
+        import apps.vendors.signals  # noqa: F401
