@@ -298,6 +298,7 @@ TENANT_APPS: list[str] = [
     "apps.attributes",                   # Product attributes — tenant-specific attribute definitions
     "apps.inventory",                    # Stock & warehouse — tenant-specific stock levels
     "apps.vendors",                      # Supplier management — tenant-specific vendors
+    "apps.purchases",                    # Purchase orders — tenant-specific procurement
     "apps.sales",                        # Orders, invoicing, POS — tenant-specific transactions
     "apps.customers",                    # Customer CRM — tenant-specific customer records
     "apps.orders",                       # Order management — tenant-specific order records
@@ -310,6 +311,8 @@ TENANT_APPS: list[str] = [
     "apps.quotes",                       # Quote management — tenant-specific quotations
     "apps.invoices",                     # Invoice system — tenant-specific invoices & credit/debit notes
     "apps.payments",                     # Payment recording — tenant-specific payment transactions
+    "apps.credit",                       # Credit & loyalty — tenant-specific credit accounts & loyalty
+    "apps.vendor_bills",                 # Vendor bills & payments — tenant-specific bill management
 ]
 
 

@@ -1,6 +1,6 @@
 # Session Status - LankaCommerce Cloud POS
 
-> **Last Updated:** Session 25 — Phase-05 SP08 Customer Module AUDITED (88/88 tasks, 6 groups A-F, 8 migrations, 90 tests ALL PASSING, 4 audit gaps + 2 bugs fixed)
+> **Last Updated:** Session 30 — Phase-05 SP12 Vendor Bills & Payments COMPLETE (90/90 tasks, 40 tests ALL PASSING, 7 models, 8 services)
 > **Purpose:** Complete handoff document for the next chat session. This file contains ALL context needed to continue work without the previous chat's memory.
 
 ---
@@ -43,12 +43,16 @@ Phase-05_ERP-Core-Modules-Part2/SubPhase-05_Order-Management (ALL 92 tasks compl
 Phase-05_ERP-Core-Modules-Part2/SubPhase-06_Invoice-System (ALL 90 tasks complete, AUDITED, 56 tests, ~60 gaps fixed)
 Phase-05_ERP-Core-Modules-Part2/SubPhase-07_Payment-Recording (ALL 86 tasks complete, AUDITED, 69 tests, 114 migration ops, 6 groups A-F)
 Phase-05_ERP-Core-Modules-Part2/SubPhase-08_Customer-Module (ALL 88 tasks complete, AUDITED, 90 tests, 4 gaps + 2 bugs fixed, 6 groups A-F)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-09_Customer-Credit-Loyalty (ALL 90 tasks complete, AUDITED, 44 tests, 16 gaps fixed, 6 groups A-F)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-10_Vendor-Module (ALL 86 tasks complete, AUDITED, 84 tests, 15 gaps fixed, 6 groups A-F)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-11_Purchase-Orders (ALL 92 tasks complete, DEEP AUDITED, 38 tests, 7 migrations, 43 gaps fixed, 6 groups A-F)
+Phase-05_ERP-Core-Modules-Part2/SubPhase-12_Vendor-Bills-Payments (ALL 90 tasks complete, AUDITED, 40 tests, 7 models, 8 services, 6 groups A-F)
 ```
 
 ### Next Document to Implement
 
 ```
-Document-Series/Phase-05_ERP-Core-Modules-Part2/SubPhase-09_*
+Document-Series/Phase-06_ERP-Advanced-Modules
 ```
 
 ---
@@ -112,67 +116,102 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 
 ## Test Results (Docker PostgreSQL)
 
-| Test Scope             | Passed | Failed | Notes                                             |
-| ---------------------- | ------ | ------ | ------------------------------------------------- | --- | ------------------ | --- | --- | ------------------------------------------------------ |
-| **Full suite**         | 10089  | 0      | All tests passing (0 errors)                      |
-| **Products tests**     | 1175   | 0      | SP01-SP05 (base+variants+bundles+BOM)             |
-| **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79)          |
-| **Users tests**        | 298    | 0      | 71 API + 227 model tests                          |
-| **Core tests (total)** | 5828   | 0      | All core/ tests combined                          |
-| **Tenant tests**       | 2608   | 0      | All 40 previously failing fixed                   |
-| **Celery tests**       | 25     | 0      | Task infrastructure tests                         |
-| **Exception tests**    | 155    | 0      | Exception/handler/logging tests                   |
-| **Cache tests**        | 107    | 0      | Caching layer tests (audited)                     |
-| **Storage tests**      | 181    | 0      | File storage tests (SP10, audited)                |
-| **API Docs tests**     | 154    | 0      | SP11 drf-spectacular tests                        |
-| **Pagination tests**   | 73     | 0      | SP12 Group A                                      |
-| **Filter tests**       | 100    | 0      | SP12 Group B                                      |
-| **Validator tests**    | 200    | 0      | SP12 Group C                                      |
-| **DateTime tests**     | 122    | 0      | SP12 Group D                                      |
-| **Sri Lanka tests**    | 293    | 0      | SP12 Group E                                      |
-| **Integration tests**  | 61     | 0      | SP12 Group F cross-module                         |
-| **Pricing mock tests** | 141    | 0      | SP06 models+API+integration (6 groups)            |
-| **Pricing prod tests** | 53     | 0      | SP06 real PostgreSQL via django-tenants           |
-| **Media unit tests**   | 183    | 0      | SP07 DB-free unit tests (7 test files)            |
-| **Media prod tests**   | 29     | 0      | SP07 real PostgreSQL integration tests            |
-| **Warehouse tests**    | 220    | 0      | SP08 143 unit + 77 integration (PostgreSQL)       |
-| **Quote tests**        | 118    | 0      | SP04 models+services+views+pdf+email (PostgreSQL) |
-| **Order tests**        | 55     | 0      | SP05 models+services+API (PostgreSQL)             |
-| **Invoice tests**      | 56     | 0      | SP06 models+services+API+PDF (PostgreSQL)         |
-| **Payment tests**      | 69     | 0      | SP07 models+services+API (PostgreSQL)             |     | **Customer tests** | 90  | 0   | SP08 models+services+API (PostgreSQL, tenant-isolated) |
+| Test Scope             | Passed | Failed | Notes                                                  |
+| ---------------------- | ------ | ------ | ------------------------------------------------------ | --- | ------------------ | --- | --- | ------------------------------------------------------ |
+| **Full suite**         | 10089  | 0      | All tests passing (0 errors)                           |
+| **Products tests**     | 1175   | 0      | SP01-SP05 (base+variants+bundles+BOM)                  |
+| **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79)               |
+| **Users tests**        | 298    | 0      | 71 API + 227 model tests                               |
+| **Core tests (total)** | 5828   | 0      | All core/ tests combined                               |
+| **Tenant tests**       | 2608   | 0      | All 40 previously failing fixed                        |
+| **Celery tests**       | 25     | 0      | Task infrastructure tests                              |
+| **Exception tests**    | 155    | 0      | Exception/handler/logging tests                        |
+| **Cache tests**        | 107    | 0      | Caching layer tests (audited)                          |
+| **Storage tests**      | 181    | 0      | File storage tests (SP10, audited)                     |
+| **API Docs tests**     | 154    | 0      | SP11 drf-spectacular tests                             |
+| **Pagination tests**   | 73     | 0      | SP12 Group A                                           |
+| **Filter tests**       | 100    | 0      | SP12 Group B                                           |
+| **Validator tests**    | 200    | 0      | SP12 Group C                                           |
+| **DateTime tests**     | 122    | 0      | SP12 Group D                                           |
+| **Sri Lanka tests**    | 293    | 0      | SP12 Group E                                           |
+| **Integration tests**  | 61     | 0      | SP12 Group F cross-module                              |
+| **Pricing mock tests** | 141    | 0      | SP06 models+API+integration (6 groups)                 |
+| **Pricing prod tests** | 53     | 0      | SP06 real PostgreSQL via django-tenants                |
+| **Media unit tests**   | 183    | 0      | SP07 DB-free unit tests (7 test files)                 |
+| **Media prod tests**   | 29     | 0      | SP07 real PostgreSQL integration tests                 |
+| **Warehouse tests**    | 220    | 0      | SP08 143 unit + 77 integration (PostgreSQL)            |
+| **Quote tests**        | 118    | 0      | SP04 models+services+views+pdf+email (PostgreSQL)      |
+| **Order tests**        | 55     | 0      | SP05 models+services+API (PostgreSQL)                  |
+| **Invoice tests**      | 56     | 0      | SP06 models+services+API+PDF (PostgreSQL)              |
+| **Payment tests**      | 69     | 0      | SP07 models+services+API (PostgreSQL)                  |     | **Customer tests** | 90  | 0   | SP08 models+services+API (PostgreSQL, tenant-isolated) |
+| **Vendor tests**       | 84     | 0      | SP10 models+services+API (PostgreSQL, tenant-isolated) |
+| **Purchase tests**     | 38     | 0      | SP11 models+services+API (PostgreSQL, tenant-isolated) |
 
 ---
 
-## What Was Completed This Session (Session 25)
+## What Was Completed This Session (Session 29)
 
-### SP08: Customer Module DEEP AUDIT — Phase 05
+### SP11: Purchase Orders DEEP AUDIT — Phase 05
 
-**Phase-05_ERP-Core-Modules-Part2/SubPhase-08_Customer-Module**
+**Phase-05_ERP-Core-Modules-Part2/SubPhase-11_Purchase-Orders**
 
-Deep audit of all 88 tasks across 6 groups (A–F). 4 code gaps identified and fixed. 2 additional bugs discovered and fixed during production testing. All 90 tests passing on Docker PostgreSQL with tenant schema isolation.
+Comprehensive deep audit of all 92 tasks across 6 groups (A–F). **43 implementation gaps** found and fixed. Migration 0007 generated and applied. All 38 tests passing on Docker PostgreSQL (241.67s).
 
-**Audit Gaps Fixed:**
+**Groups A & B:** Already at 100% — no changes needed.
 
-1. **customer_service.py** — Added missing `get_customer()` and `list_customers()` static methods (Task 35)
-2. **duplicate_service.py** — Fixed scoring algorithm: `max()` → cumulative `+=`, updated thresholds (HIGH=150, MEDIUM=80) (Task 75)
-3. **duplicate_service.py** — Added tag_assignments transfer in `merge_customers()` before soft-delete (Task 76)
-4. **import_service.py** — Added district-province validation and tax_id length check in `validate_row()` (Task 81)
+**Group C Fixes (12 gaps):**
 
-**Bugs Fixed During Testing:** 5. **import_service.py** — Fixed `.upper()` → `.lower()` for customer_type case comparison (VALID_TYPES uses lowercase) 6. **customer_settings.py** — Fixed singleton save: `not self.pk` → `self._state.adding` (UUIDMixin always has pk)
+- Added custom exceptions (PONotEditableError, InvalidStatusTransitionError, POValidationError)
+- Added vendor is_active validation, line item CRUD methods, close_po(), full approval workflow
+- Expanded POSettings: tenant FK (fixed to tenants.Tenant), 10+ new config fields, get_for_tenant()
+- Added data_snapshot JSONField to POHistory
+- Added PO_STATUS_PENDING_APPROVAL, urgency levels, consolidation cancellation
 
-**Test Infrastructure:**
+**Group D Fixes (14 gaps):**
 
-- Created `tests/conftest.py` with tenant-aware fixtures (session-scoped tenant, autouse context)
-- Fixed test_api.py choice values: INDIVIDUAL → individual, BILLING → billing, MOBILE → mobile
-- Fixed test_services.py assertions: change_type casing, auto_detect_mapping expectations
+- GoodsReceipt: +status field, delivery_time, driver_name, vehicle_number, inspection fields, FK→PROTECT
+- GRNLineItem: +line_number, quality_notes, requires_followup, warehouse/location FKs, quantity_accepted property
+- ReceivingService: +add_to_stock(), get_back_orders(), public methods, auto_close integration
+- All 3 Celery tasks: @shared_task(bind=True) with retry, logging, error handling
 
-**Audit Report:** `SP08_AUDIT_REPORT.md` — comprehensive task-by-task audit with 100% compliance
+**Group E Fixes (12 gaps):**
+
+- POTemplate: renamed name→template_name, +12 fields (page_size, font sizes, show flags, etc.)
+- PDF Generator: complete rewrite with header, vendor/ship-to, line items, totals, terms, signatures
+- Email Service: +send_acknowledgment_reminder(), send_delivery_reminder(), HTML templates, POHistory logging
+- Created 4 email templates (po_send.html/txt, acknowledgment_reminder.html, delivery_reminder.html)
+
+**Group F Fixes (5 gaps):**
+
+- Added POUpdateSerializer for PATCH/PUT operations
+- POViewSet: +approve, reject, history, download_pdf actions
+- GRNViewSet: changed to ReadOnlyModelViewSet + complete/cancel actions
+- Fixed admin template_name reference
+
+**Migration 0007:** 40+ field additions, FK protection changes, field renames — applied successfully.
+
+**Critical Bugs Fixed:**
+
+1. POSettings.tenant FK referenced "platform.Tenant" → fixed to "tenants.Tenant"
+2. email_service.py used 'change_description' → fixed to 'description'
+3. POUpdateSerializer.update() used \*\*kwargs → fixed to pass dict
+4. Tests used old field names and exception types → all updated
+
+**Audit Report:** SP11_AUDIT_REPORT.md (comprehensive, with certification)
 
 ---
 
-## What Was Completed Last Session (Session 24)
+## What Was Completed Last Session (Session 28)
 
-### SP08: Customer Module (ALL 88 Tasks) — Phase 05
+### SP10: Vendor Module DEEP AUDIT — Phase 05
+
+**Phase-05_ERP-Core-Modules-Part2/SubPhase-10_Vendor-Module**
+
+Deep audit of all 86 tasks across 6 groups (A–F). 15 code gaps identified and fixed. All 84 tests passing.
+
+---
+
+## What Was Completed Session 26
 
 **Phase-05_ERP-Core-Modules-Part2/SubPhase-08_Customer-Module**
 
