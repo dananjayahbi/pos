@@ -227,20 +227,24 @@ class Employee(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
         help_text="Current employment status.",
     )
 
-    # ── Department & Designation (string for now, FK in SP02) ──────
-    department = models.CharField(
-        max_length=100,
+    # ── Department & Designation ──────────────────────────────────
+    department = models.ForeignKey(
+        "organization.Department",
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        default="",
+        related_name="employees",
         verbose_name="Department",
-        help_text="Department name (will be FK in SubPhase-02).",
+        help_text="Primary department assignment.",
     )
-    designation = models.CharField(
-        max_length=100,
+    designation = models.ForeignKey(
+        "organization.Designation",
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
-        default="",
+        related_name="employees",
         verbose_name="Designation",
-        help_text="Job title/designation (will be FK in SubPhase-02).",
+        help_text="Employee's job designation/position.",
     )
 
     # ── Manager (Self-referential FK) ───────────────────────────────

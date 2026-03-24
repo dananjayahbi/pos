@@ -38,8 +38,8 @@ def track_employment_changes(sender, instance, **kwargs):
             employee=instance,
             effective_date=today,
             change_type=CHANGE_TYPE_TRANSFER,
-            from_department=old_instance.department,
-            to_department=instance.department,
+            from_department=str(old_instance.department) if old_instance.department else "",
+            to_department=str(instance.department) if instance.department else "",
         )
 
     # Track designation change (with promotion/demotion detection)
@@ -50,8 +50,8 @@ def track_employment_changes(sender, instance, **kwargs):
             employee=instance,
             effective_date=today,
             change_type=CHANGE_TYPE_ROLE_CHANGE,
-            from_designation=old_instance.designation,
-            to_designation=instance.designation,
+            from_designation=str(old_instance.designation) if old_instance.designation else "",
+            to_designation=str(instance.designation) if instance.designation else "",
         )
 
     # Track manager change
@@ -93,8 +93,8 @@ def create_hire_history(sender, instance, created, **kwargs):
         employee=instance,
         effective_date=instance.hire_date or date.today(),
         change_type=CHANGE_TYPE_HIRE,
-        to_department=instance.department,
-        to_designation=instance.designation,
+        to_department=str(instance.department) if instance.department else "",
+        to_designation=str(instance.designation) if instance.designation else "",
         to_manager=instance.manager,
         notes="Initial hire.",
     )

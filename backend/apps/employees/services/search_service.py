@@ -33,8 +33,8 @@ class EmployeeSearchService:
             | Q(nic_number__icontains=query)
             | Q(email__icontains=query)
             | Q(mobile__icontains=query)
-            | Q(department__icontains=query)
-            | Q(designation__icontains=query)
+            | Q(department__name__icontains=query)
+            | Q(designation__title__icontains=query)
         )
 
     @classmethod
@@ -51,7 +51,7 @@ class EmployeeSearchService:
         """Filter employees by department."""
         if not department:
             return queryset
-        return queryset.filter(department__icontains=department)
+        return queryset.filter(department__name__icontains=department)
 
     @classmethod
     def filter_by_employment_type(cls, queryset, employment_type):
