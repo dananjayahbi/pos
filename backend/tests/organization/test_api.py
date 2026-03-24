@@ -91,7 +91,9 @@ class TestDepartmentAPI:
             HTTP_HOST=TENANT_DOMAIN,
         )
         assert response.status_code == status.HTTP_200_OK
-        names = [p["name"] for p in response.data]
+        assert "path" in response.data
+        assert "path_string" in response.data
+        names = [p["name"] for p in response.data["path"]]
         assert "Engineering" in names
 
     def test_stats_action(self, auth_client, department):

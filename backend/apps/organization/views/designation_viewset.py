@@ -101,3 +101,19 @@ class DesignationViewSet(ModelViewSet):
             )
 
         return Response(hierarchy)
+
+    @action(detail=True, methods=["post"], url_path="activate")
+    def activate_designation(self, request, pk=None):
+        """Re-activate this designation."""
+        designation = self.get_object()
+        designation = DesignationService.activate(designation)
+        serializer = self.get_serializer(designation)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"], url_path="deactivate")
+    def deactivate_designation(self, request, pk=None):
+        """Deactivate this designation."""
+        designation = self.get_object()
+        designation = DesignationService.deactivate(designation)
+        serializer = self.get_serializer(designation)
+        return Response(serializer.data)

@@ -143,3 +143,17 @@ class DesignationService:
             )
 
         return qs.order_by("title")
+
+    @classmethod
+    def get_employees(cls, designation):
+        """Return active employees with this designation."""
+        return designation.employees.filter(is_deleted=False)
+
+    @classmethod
+    def get_by_level(cls, level):
+        """Return all active designations at a given level."""
+        from apps.organization.models import Designation
+
+        return Designation.objects.filter(
+            level=level, is_deleted=False, status=DESIGNATION_STATUS_ACTIVE,
+        )

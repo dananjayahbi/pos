@@ -176,3 +176,13 @@ class DepartmentService:
             )
 
         return qs.order_by("name")
+
+    @classmethod
+    def get_children(cls, department):
+        """Return direct children of a department."""
+        return department.get_children().filter(is_deleted=False)
+
+    @classmethod
+    def get_employees(cls, department):
+        """Return active employees in a department."""
+        return department.employees.filter(is_deleted=False)

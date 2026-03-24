@@ -142,6 +142,7 @@ class Department(UUIDMixin, TimestampMixin, SoftDeleteMixin, MPTTModel):
             models.Index(fields=["parent"], name="idx_dept_parent"),
             models.Index(fields=["manager"], name="idx_dept_manager"),
             models.Index(fields=["cost_center"], name="idx_dept_cost_center"),
+            models.Index(fields=["status", "parent"], name="idx_dept_status_parent"),
         ]
 
     def __str__(self):

@@ -128,9 +128,14 @@ class OrgChartService:
         else:
             tree = cls.get_department_tree()
 
+        from apps.employees.models import Employee
+        from apps.organization.models import Department
+
         return {
             "type": chart_type,
             "generated_at": timezone.now().isoformat(),
+            "total_departments": Department.objects.filter(is_deleted=False).count(),
+            "total_employees": Employee.objects.filter(is_deleted=False).count(),
             "tree": tree,
         }
 
@@ -138,11 +143,19 @@ class OrgChartService:
 
     @classmethod
     def get_employee_count(cls, department_id):
-        """Count active (non-deleted) employees in a department."""
+        """Count active (non-deleted) employees in a department and all descendants."""
+        from apps.employees.models import Employee
         from apps.organization.models import Department
 
         dept = Department.objects.get(pk=department_id, is_deleted=False)
-        return dept.employees.filter(is_deleted=False).count()
+        descendant_ids = (
+            dept.get_descendants(include_self=True)
+            .filter(is_deleted=False)
+            .values_list("pk", flat=True)
+        )
+        return Employee.objects.filter(
+            department_id__in=descendant_ids, is_deleted=False,
+        ).count()
 
     @classmethod
     def get_total_budget(cls, department_id):
@@ -228,8 +241,12 @@ class OrgChartService:
                 "code": d.code,
                 "level": d.level,
                 "parent_id": str(d.parent_id) if d.parent_id else None,
+                "indent": "  " * d.level,
+                "has_children": not d.is_leaf_node(),
+                "employee_count": d.employees.filter(is_deleted=False).count(),
+                "manager_name": d.manager.full_name if d.manager else None,
             }
-            for d in qs.order_by("tree_id", "lft")
+            for d in qs.select_related("manager").order_by("tree_id", "lft")
         ]
 
     @classmethod
@@ -239,10 +256,17 @@ class OrgChartService:
 
         dept = Department.objects.get(pk=department_id, is_deleted=False)
         ancestors = dept.get_ancestors(include_self=True).filter(is_deleted=False)
-        return [
-            {"id": str(a.pk), "name": a.name, "code": a.code}
+        path = [
+            {
+                "id": str(a.pk),
+                "name": a.name,
+                "code": a.code,
+                "level": a.level,
+            }
             for a in ancestors
         ]
+        path_string = " > ".join(item["name"] for item in path)
+        return {"path": path, "path_string": path_string}
 
     @classmethod
     def get_subtree(cls, department_id):
@@ -282,6 +306,7 @@ class OrgChartService:
                     "designation": (
                         current.designation.title if current.designation else None
                     ),
+                    "level_in_chain": len(chain),
                 }
             )
             if current.manager_id:

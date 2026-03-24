@@ -286,10 +286,13 @@ class TestOrgChartService:
     def test_get_path_to_root(self, child_department):
         from apps.organization.services.orgchart_service import OrgChartService
 
-        path = OrgChartService.get_path_to_root(child_department.pk)
-        names = [p["name"] for p in path]
+        result = OrgChartService.get_path_to_root(child_department.pk)
+        assert "path" in result
+        assert "path_string" in result
+        names = [p["name"] for p in result["path"]]
         assert "Engineering" in names
         assert "Backend" in names
+        assert "Engineering" in result["path_string"]
 
     def test_get_subtree(self, department, child_department):
         from apps.organization.services.orgchart_service import OrgChartService

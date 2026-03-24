@@ -140,6 +140,7 @@ class Designation(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
             models.Index(fields=["title"], name="idx_desig_title"),
             models.Index(fields=["department"], name="idx_desig_dept"),
             models.Index(fields=["is_manager"], name="idx_desig_manager"),
+            models.Index(fields=["department", "status"], name="idx_desig_dept_status"),
         ]
 
     def __str__(self):

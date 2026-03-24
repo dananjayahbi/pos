@@ -146,3 +146,19 @@ class DepartmentViewSet(ModelViewSet):
             )
 
         return Response(DepartmentSerializer(result).data)
+
+    @action(detail=True, methods=["post"], url_path="archive")
+    def archive_department(self, request, pk=None):
+        """Archive this department."""
+        department = self.get_object()
+        department = DepartmentService.archive(department)
+        serializer = self.get_serializer(department)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"], url_path="activate")
+    def activate_department(self, request, pk=None):
+        """Re-activate this department."""
+        department = self.get_object()
+        department = DepartmentService.activate(department)
+        serializer = self.get_serializer(department)
+        return Response(serializer.data)
