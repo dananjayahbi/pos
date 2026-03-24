@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import models
 
 from apps.core.mixins import TimestampMixin, UUIDMixin
-from apps.employees.constants import CHANGE_TYPE_CHOICES
+from apps.employees.constants import CHANGE_REASON_CHOICES, CHANGE_TYPE_CHOICES
 
 
 class EmploymentHistory(UUIDMixin, TimestampMixin, models.Model):
@@ -32,10 +32,24 @@ class EmploymentHistory(UUIDMixin, TimestampMixin, models.Model):
         help_text="Date when the change became effective.",
     )
     change_type = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=CHANGE_TYPE_CHOICES,
         verbose_name="Change Type",
         help_text="Type of employment change.",
+    )
+    change_reason = models.CharField(
+        max_length=30,
+        choices=CHANGE_REASON_CHOICES,
+        blank=True,
+        default="",
+        verbose_name="Change Reason",
+        help_text="Reason for this change.",
+    )
+    change_reason_detail = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Change Reason Detail",
+        help_text="Detailed explanation for this change.",
     )
 
     # ── Department Change ───────────────────────────────────────────
@@ -122,6 +136,7 @@ class EmploymentHistory(UUIDMixin, TimestampMixin, models.Model):
         verbose_name = "Employment History"
         verbose_name_plural = "Employment Histories"
         ordering = ["-effective_date"]
+        unique_together = [["employee", "effective_date", "change_type"]]
         indexes = [
             models.Index(
                 fields=["employee", "effective_date"],
@@ -139,3 +154,22 @@ class EmploymentHistory(UUIDMixin, TimestampMixin, models.Model):
             f"{self.get_change_type_display()} - "
             f"{self.effective_date}"
         )
+
+    @property
+    def salary_change_amount(self):
+        """Return the salary change amount (new - previous)."""
+        if self.previous_salary is not None and self.new_salary is not None:
+            return self.new_salary - self.previous_salary
+        return None
+
+    @property
+    def salary_change_percentage(self):
+        """Return the salary change as a percentage."""
+        if (
+            self.previous_salary is not None
+            and self.new_salary is not None
+            and self.previous_salary > 0
+        ):
+            change = self.new_salary - self.previous_salary
+            return round((change / self.previous_salary) * 100, 2)
+        return None

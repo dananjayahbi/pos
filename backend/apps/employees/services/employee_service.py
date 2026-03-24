@@ -17,6 +17,7 @@ from apps.employees.constants import (
     EMPLOYEE_STATUS_INACTIVE,
     EMPLOYEE_STATUS_RESIGNED,
     EMPLOYEE_STATUS_TERMINATED,
+    VALID_STATUS_TRANSITIONS,
 )
 
 logger = logging.getLogger(__name__)
@@ -35,8 +36,53 @@ class EmployeeValidationError(Exception):
     pass
 
 
+class InvalidStatusTransitionError(Exception):
+    """Raised when an invalid status transition is attempted."""
+    pass
+
+
 class EmployeeService:
     """Service class for employee lifecycle management."""
+
+    # ── Status Transition Validation ──────────────────────────────────
+
+    @classmethod
+    def _validate_status_transition(cls, current_status, new_status):
+        """
+        Validate that a status transition is allowed.
+
+        Raises:
+            InvalidStatusTransitionError if the transition is not valid.
+        """
+        allowed = VALID_STATUS_TRANSITIONS.get(current_status, [])
+        if new_status not in allowed:
+            raise InvalidStatusTransitionError(
+                f"Cannot transition from '{current_status}' to '{new_status}'. "
+                f"Allowed transitions: {allowed}"
+            )
+
+    @classmethod
+    def _validate_employee_data(cls, data):
+        """Validate employee data before creation/update."""
+        first_name = data.get("first_name", "").strip()
+        last_name = data.get("last_name", "").strip()
+
+        if not first_name:
+            raise EmployeeValidationError("First name is required.")
+        if not last_name:
+            raise EmployeeValidationError("Last name is required.")
+
+    @classmethod
+    def _create_history_entry(cls, employee, change_type, **kwargs):
+        """Create an employment history entry."""
+        from apps.employees.models.employment_history import EmploymentHistory
+
+        return EmploymentHistory.objects.create(
+            employee=employee,
+            effective_date=kwargs.pop("effective_date", timezone.now().date()),
+            change_type=change_type,
+            **kwargs,
+        )
 
     # ── Employee Creation ─────────────────────────────────────────────
 
@@ -120,8 +166,10 @@ class EmployeeService:
         except Employee.DoesNotExist:
             raise EmployeeNotFoundError(f"Employee {employee_id} not found.")
 
+        cls._validate_status_transition(employee.status, EMPLOYEE_STATUS_ACTIVE)
         employee.status = EMPLOYEE_STATUS_ACTIVE
-        employee.save(update_fields=["status", "updated_on"])
+        employee.is_active = True
+        employee.save(update_fields=["status", "is_active", "updated_on"])
 
         logger.info("Employee %s activated by %s", employee.employee_id, user)
         return employee
@@ -137,8 +185,10 @@ class EmployeeService:
         except Employee.DoesNotExist:
             raise EmployeeNotFoundError(f"Employee {employee_id} not found.")
 
+        cls._validate_status_transition(employee.status, EMPLOYEE_STATUS_INACTIVE)
         employee.status = EMPLOYEE_STATUS_INACTIVE
-        employee.save(update_fields=["status", "updated_on"])
+        employee.is_active = False
+        employee.save(update_fields=["status", "is_active", "updated_on"])
 
         logger.info("Employee %s deactivated by %s: %s", employee.employee_id, user, reason)
         return employee
@@ -154,11 +204,13 @@ class EmployeeService:
         except Employee.DoesNotExist:
             raise EmployeeNotFoundError(f"Employee {employee_id} not found.")
 
+        cls._validate_status_transition(employee.status, EMPLOYEE_STATUS_TERMINATED)
         employee.status = EMPLOYEE_STATUS_TERMINATED
+        employee.is_active = False
         employee.termination_date = termination_date or timezone.now().date()
         employee.termination_reason = reason
         employee.save(update_fields=[
-            "status", "termination_date", "termination_reason", "updated_on",
+            "status", "is_active", "termination_date", "termination_reason", "updated_on",
         ])
 
         logger.info("Employee %s terminated by %s", employee.employee_id, user)
@@ -175,13 +227,15 @@ class EmployeeService:
         except Employee.DoesNotExist:
             raise EmployeeNotFoundError(f"Employee {employee_id} not found.")
 
+        cls._validate_status_transition(employee.status, EMPLOYEE_STATUS_RESIGNED)
         employee.status = EMPLOYEE_STATUS_RESIGNED
+        employee.is_active = False
         employee.resignation_date = resignation_date or timezone.now().date()
         employee.resignation_reason = reason
         if notice_period is not None:
             employee.notice_period = notice_period
         employee.save(update_fields=[
-            "status", "resignation_date", "resignation_reason",
+            "status", "is_active", "resignation_date", "resignation_reason",
             "notice_period", "updated_on",
         ])
 

@@ -64,11 +64,25 @@ class EmployeeFamily(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
         help_text="Family member's phone number.",
     )
 
+    # ── Notes ───────────────────────────────────────────────────────
+    notes = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Notes",
+        help_text="Additional notes about this family member.",
+    )
+
     class Meta:
         db_table = "employees_family"
         verbose_name = "Family Member"
         verbose_name_plural = "Family Members"
-        ordering = ["employee", "name"]
+        ordering = ["employee", "relationship"]
+        indexes = [
+            models.Index(
+                fields=["employee", "is_dependent"],
+                name="idx_emp_family_dependent",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.name} ({self.get_relationship_display()})"

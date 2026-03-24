@@ -18,6 +18,12 @@ class EmployeeBankAccount(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Mod
 
     # Bank identification
     bank_name = models.CharField(max_length=255)
+    bank_code = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        help_text="Bank code (e.g., CBSL bank code)",
+    )
     branch_name = models.CharField(max_length=255, blank=True, default="")
     account_number = models.CharField(max_length=50)
     account_holder_name = models.CharField(max_length=255, blank=True, default="")
@@ -25,6 +31,30 @@ class EmployeeBankAccount(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Mod
     # Bank codes
     swift_code = models.CharField(max_length=11, blank=True, default="", help_text="SWIFT/BIC code")
     branch_code = models.CharField(max_length=20, blank=True, default="", help_text="Bank branch code")
+
+    # International banking
+    iban = models.CharField(
+        max_length=34,
+        blank=True,
+        default="",
+        help_text="International Bank Account Number",
+    )
+    routing_number = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        help_text="Bank routing number",
+    )
+    is_international = models.BooleanField(
+        default=False,
+        help_text="Whether this is an international bank account",
+    )
+    currency = models.CharField(
+        max_length=3,
+        blank=True,
+        default="LKR",
+        help_text="Account currency (ISO 4217 code)",
+    )
 
     # Account type
     account_type = models.CharField(
@@ -61,6 +91,19 @@ class EmployeeBankAccount(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Mod
 
     def __str__(self):
         return f"{self.employee} - {self.bank_name} ({'Primary' if self.is_primary else 'Secondary'})"
+
+    def get_masked_account_number(self):
+        """Return account number with all but last 4 digits masked."""
+        if not self.account_number or len(self.account_number) <= 4:
+            return self.account_number
+        return "*" * (len(self.account_number) - 4) + self.account_number[-4:]
+
+    def validate_account_number(self):
+        """Basic account number validation."""
+        if not self.account_number:
+            return False
+        cleaned = self.account_number.strip()
+        return len(cleaned) >= 4 and cleaned.replace("-", "").replace(" ", "").isalnum()
 
     def save(self, *args, **kwargs):
         # Ensure only one primary account per employee

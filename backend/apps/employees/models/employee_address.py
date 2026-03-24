@@ -85,6 +85,14 @@ class EmployeeAddress(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
         help_text="Whether this is the primary address.",
     )
 
+    # ── Notes ───────────────────────────────────────────────────────
+    notes = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Notes",
+        help_text="Additional notes about this address.",
+    )
+
     class Meta:
         db_table = "employees_address"
         verbose_name = "Employee Address"

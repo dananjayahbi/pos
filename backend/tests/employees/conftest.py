@@ -10,7 +10,7 @@ TenantModel = get_tenant_model()
 DomainModel = get_tenant_domain_model()
 
 SCHEMA_NAME = "test_employees"
-TENANT_DOMAIN = "employees.testserver"
+TENANT_DOMAIN = "testserver"
 
 
 @pytest.fixture(scope="session")

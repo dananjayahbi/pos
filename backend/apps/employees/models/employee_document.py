@@ -57,6 +57,17 @@ class EmployeeDocument(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model)
         related_name="uploaded_employee_documents",
     )
 
+    # Verification
+    is_verified = models.BooleanField(default=False, help_text="Whether the document has been verified")
+    verified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="verified_employee_documents",
+    )
+    verified_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         db_table = "employees_document"
         verbose_name = "Employee Document"
