@@ -336,6 +336,21 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.inventory.alerts.tasks.alert_resolution.cleanup_old_monitoring_logs",
         "schedule": crontab(hour=3, minute=0),  # Daily at 3 AM
     },
+    # ── SP04 Leave Management Accrual Tasks ─────────────────────
+    "year-end-leave-accrual": {
+        "task": "apps.leave.tasks.accrual_tasks.year_end_accrual",
+        "schedule": crontab(month_of_year=12, day_of_month=31, hour=23, minute=59),
+    },
+    "daily-leave-expiry-check": {
+        "task": "apps.leave.tasks.accrual_tasks.daily_leave_expiry_check",
+        "schedule": crontab(hour=0, minute=30),
+    },
+    # ── SP06 Payroll Period Auto-Creation ────────────────────────
+    "auto-create-payroll-periods": {
+        "task": "payroll.auto_create_payroll_periods",
+        "schedule": crontab(hour=2, minute=30),  # Daily at 2:30 AM
+        "options": {"expires": 3600},
+    },
 }
 
 

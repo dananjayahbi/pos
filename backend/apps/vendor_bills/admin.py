@@ -49,7 +49,7 @@ class BillLineItemAdmin(admin.ModelAdmin):
 
 @admin.register(MatchingResult)
 class MatchingResultAdmin(admin.ModelAdmin):
-    list_display = ["vendor_bill", "bill_line_item", "match_status", "is_within_tolerance"]
+    list_display = ["vendor_bill", "bill_line", "match_status", "is_within_tolerance"]
     list_filter = ["match_status", "is_within_tolerance"]
 
 

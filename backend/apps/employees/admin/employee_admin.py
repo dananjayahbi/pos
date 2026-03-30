@@ -15,6 +15,7 @@ from apps.employees.models import (
 
 class EmploymentHistoryInline(admin.TabularInline):
     model = EmploymentHistory
+    fk_name = "employee"
     extra = 0
     readonly_fields = ["effective_date", "change_type", "from_department", "to_department"]
     fields = ["effective_date", "change_type", "from_department", "to_department", "notes"]

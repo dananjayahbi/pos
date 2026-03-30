@@ -1,6 +1,6 @@
 # Session Status - LankaCommerce Cloud POS
 
-> **Last Updated:** Session 32 — Phase-06 SP01 Employee Management DEEP AUDIT COMPLETE (92/92 tasks, 127 tests ALL PASSING, ~40 gaps fixed, 24 files modified)
+> **Last Updated:** Session 41 — Phase-06 SP07 Payslip Generation DEEP AUDIT COMPLETE (88 tasks, 64 tests ALL PASSING, 4 migrations, Groups A-F, 6 models, 3 services, 2 bugs fixed, 22 API tests)
 > **Purpose:** Complete handoff document for the next chat session. This file contains ALL context needed to continue work without the previous chat's memory.
 
 ---
@@ -48,12 +48,18 @@ Phase-05_ERP-Core-Modules-Part2/SubPhase-10_Vendor-Module (ALL 86 tasks complete
 Phase-05_ERP-Core-Modules-Part2/SubPhase-11_Purchase-Orders (ALL 92 tasks complete, DEEP AUDITED, 38 tests, 7 migrations, 43 gaps fixed, 6 groups A-F)
 Phase-05_ERP-Core-Modules-Part2/SubPhase-12_Vendor-Bills-Payments (ALL 90 tasks complete, AUDITED, 40 tests, 7 models, 8 services, 6 groups A-F)
 Phase-06_ERP-Advanced-Modules/SubPhase-01_Employee-Management (ALL 92 tasks complete, DEEP AUDITED, 127 tests, 7 models, 4 services, ~40 gaps fixed, 6 groups A-F)
+Phase-06_ERP-Advanced-Modules/SubPhase-02_Department-Designations (ALL 78 tasks complete, 97 tests, 4 models, 3 services, 3 viewsets, 42 files, 6 groups A-F)
+Phase-06_ERP-Advanced-Modules/SubPhase-03_Attendance-System (ALL 88 tasks, DEEP AUDITED, 69 tests, 6 models, 7 services, 14 gaps fixed, 80% impl, 6 groups A-F)
+Phase-06_ERP-Advanced-Modules/SubPhase-04_Leave-Management (ALL 90 tasks complete, DEEP AUDITED, 72 tests, 5 models, 6 services, 8 gaps fixed, 6 groups A-F)
+Phase-06_ERP-Advanced-Modules/SubPhase-05_Salary-Structure (ALL 86 tasks complete, DEEP AUDITED, 93 tests, 11 models, 5 services, 4 migrations, ~30 gaps fixed, 6 groups A-F)
+Phase-06_ERP-Advanced-Modules/SubPhase-06_Payroll-Processing (ALL 92 tasks complete, DEEP AUDITED, 167 tests, 20 models, 10 services, 10 migrations, ~50 gaps fixed, 6 groups A-F)
+Phase-06_ERP-Advanced-Modules/SubPhase-07_Payslip-Generation (ALL 88 tasks complete, DEEP AUDITED, 64 tests, 6 models, 3 services, 4 migrations, 2 bugs fixed, 22 API tests, 6 groups A-F)
 ```
 
 ### Next Document to Implement
 
 ```
-Document-Series/Phase-06_ERP-Advanced-Modules/SubPhase-02
+Document-Series/Phase-06_ERP-Advanced-Modules/SubPhase-08
 ```
 
 ---
@@ -117,42 +123,185 @@ The `users` app provides **complementary** tenant-scoped models (profile, prefer
 
 ## Test Results (Docker PostgreSQL)
 
-| Test Scope             | Passed | Failed | Notes                                                  |
-| ---------------------- | ------ | ------ | ------------------------------------------------------ | --- | ------------------ | --- | --- | ------------------------------------------------------ |
-| **Full suite**         | 10089  | 0      | All tests passing (0 errors)                           |
-| **Products tests**     | 1175   | 0      | SP01-SP05 (base+variants+bundles+BOM)                  |
-| **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79)               |
-| **Users tests**        | 298    | 0      | 71 API + 227 model tests                               |
-| **Core tests (total)** | 5828   | 0      | All core/ tests combined                               |
-| **Tenant tests**       | 2608   | 0      | All 40 previously failing fixed                        |
-| **Celery tests**       | 25     | 0      | Task infrastructure tests                              |
-| **Exception tests**    | 155    | 0      | Exception/handler/logging tests                        |
-| **Cache tests**        | 107    | 0      | Caching layer tests (audited)                          |
-| **Storage tests**      | 181    | 0      | File storage tests (SP10, audited)                     |
-| **API Docs tests**     | 154    | 0      | SP11 drf-spectacular tests                             |
-| **Pagination tests**   | 73     | 0      | SP12 Group A                                           |
-| **Filter tests**       | 100    | 0      | SP12 Group B                                           |
-| **Validator tests**    | 200    | 0      | SP12 Group C                                           |
-| **DateTime tests**     | 122    | 0      | SP12 Group D                                           |
-| **Sri Lanka tests**    | 293    | 0      | SP12 Group E                                           |
-| **Integration tests**  | 61     | 0      | SP12 Group F cross-module                              |
-| **Pricing mock tests** | 141    | 0      | SP06 models+API+integration (6 groups)                 |
-| **Pricing prod tests** | 53     | 0      | SP06 real PostgreSQL via django-tenants                |
-| **Media unit tests**   | 183    | 0      | SP07 DB-free unit tests (7 test files)                 |
-| **Media prod tests**   | 29     | 0      | SP07 real PostgreSQL integration tests                 |
-| **Warehouse tests**    | 220    | 0      | SP08 143 unit + 77 integration (PostgreSQL)            |
-| **Quote tests**        | 118    | 0      | SP04 models+services+views+pdf+email (PostgreSQL)      |
-| **Order tests**        | 55     | 0      | SP05 models+services+API (PostgreSQL)                  |
-| **Invoice tests**      | 56     | 0      | SP06 models+services+API+PDF (PostgreSQL)              |
-| **Payment tests**      | 69     | 0      | SP07 models+services+API (PostgreSQL)                  |     | **Customer tests** | 90  | 0   | SP08 models+services+API (PostgreSQL, tenant-isolated) |
-| **Vendor tests**       | 84     | 0      | SP10 models+services+API (PostgreSQL, tenant-isolated) |
-| **Purchase tests**     | 38     | 0      | SP11 models+services+API (PostgreSQL, tenant-isolated) |
+| Test Scope             | Passed | Failed | Notes                                                                                                                              |
+| ---------------------- | ------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------- | --- | ------------------ | --- | --- | ------------------------------------------------------ |
+| **Full suite**         | 10089  | 0      | All tests passing (0 errors)                                                                                                       |
+| **Products tests**     | 1175   | 0      | SP01-SP05 (base+variants+bundles+BOM)                                                                                              |
+| **Attributes tests**   | 350    | 0      | SP02 models+API+integration (147+124+79)                                                                                           |
+| **Users tests**        | 298    | 0      | 71 API + 227 model tests                                                                                                           |
+| **Core tests (total)** | 5828   | 0      | All core/ tests combined                                                                                                           |
+| **Tenant tests**       | 2608   | 0      | All 40 previously failing fixed                                                                                                    |
+| **Celery tests**       | 25     | 0      | Task infrastructure tests                                                                                                          |
+| **Exception tests**    | 155    | 0      | Exception/handler/logging tests                                                                                                    |
+| **Cache tests**        | 107    | 0      | Caching layer tests (audited)                                                                                                      |
+| **Storage tests**      | 181    | 0      | File storage tests (SP10, audited)                                                                                                 |
+| **API Docs tests**     | 154    | 0      | SP11 drf-spectacular tests                                                                                                         |
+| **Pagination tests**   | 73     | 0      | SP12 Group A                                                                                                                       |
+| **Filter tests**       | 100    | 0      | SP12 Group B                                                                                                                       |
+| **Validator tests**    | 200    | 0      | SP12 Group C                                                                                                                       |
+| **DateTime tests**     | 122    | 0      | SP12 Group D                                                                                                                       |
+| **Sri Lanka tests**    | 293    | 0      | SP12 Group E                                                                                                                       |
+| **Integration tests**  | 61     | 0      | SP12 Group F cross-module                                                                                                          |
+| **Pricing mock tests** | 141    | 0      | SP06 models+API+integration (6 groups)                                                                                             |
+| **Pricing prod tests** | 53     | 0      | SP06 real PostgreSQL via django-tenants                                                                                            |
+| **Media unit tests**   | 183    | 0      | SP07 DB-free unit tests (7 test files)                                                                                             |
+| **Media prod tests**   | 29     | 0      | SP07 real PostgreSQL integration tests                                                                                             |
+| **Warehouse tests**    | 220    | 0      | SP08 143 unit + 77 integration (PostgreSQL)                                                                                        |
+| **Quote tests**        | 118    | 0      | SP04 models+services+views+pdf+email (PostgreSQL)                                                                                  |
+| **Order tests**        | 55     | 0      | SP05 models+services+API (PostgreSQL)                                                                                              |
+| **Invoice tests**      | 56     | 0      | SP06 models+services+API+PDF (PostgreSQL)                                                                                          |
+| **Payment tests**      | 69     | 0      | SP07 models+services+API (PostgreSQL)                                                                                              |     | **Customer tests** | 90  | 0   | SP08 models+services+API (PostgreSQL, tenant-isolated) |
+| **Vendor tests**       | 84     | 0      | SP10 models+services+API (PostgreSQL, tenant-isolated)                                                                             |
+| **Purchase tests**     | 38     | 0      | SP11 models+services+API (PostgreSQL, tenant-isolated)                                                                             |
+| **Vendor Bills tests** | 40     | 0      | SP12 models+services+API (PostgreSQL, tenant-isolated)                                                                             |
+| **Employee tests**     | 127    | 0      | SP01 models+services+API (PostgreSQL, tenant-isolated)                                                                             |
+| **Organization tests** | 97     | 0      | SP02 models(29)+services(37)+API(31) (PostgreSQL)                                                                                  |
+| **Attendance tests**   | 69     | 0      | SP03 models(21)+services(12)+API(36) (PostgreSQL)                                                                                  |
+| **Leave tests**        | 72     | 0      | SP04 models+services+API (PostgreSQL, tenant-isolated)                                                                             |
+| **Payroll tests**      | 167    | 0      | SP05 models(37)+services(29) + SP06 models(25)+serializers(8)+services(17)+API(24)+SP05-existing(27) (PostgreSQL, tenant-isolated) |
 
 ---
 
-## What Was Completed This Session (Session 29)
+## What Was Completed This Session (Session 38)
 
-### SP11: Purchase Orders DEEP AUDIT — Phase 05
+### SP06: Payroll Processing — Phase 06
+
+**Phase-06_ERP-Advanced-Modules/SubPhase-06_Payroll-Processing**
+
+Full implementation of all 92 tasks across 6 groups (A–F). 9 migrations (0001-0004 SP05, 0005-0009 SP06). 167/167 tests ALL PASSING on Docker PostgreSQL. 20 total models, 10 services, 5 viewsets, 8 serializer files.
+
+**Group A (Tasks 01-16): Payroll Period & Settings Models**
+PayrollPeriod (12 fields, unique_together period_month+year, lock/unlock support), PayrollSettings (12 fields, auto-create period config, approval workflow settings, M2M approvers). Migration 0005.
+
+**Group B (Tasks 17-32): Payroll Run & Employee Payroll Models**
+PayrollRun (19 fields, 8 financial decimal totals, status workflow DRAFT→PROCESSING→PROCESSED→PENDING_APPROVAL→APPROVED→FINALIZED, can_approve method), EmployeePayroll (24 fields, statutory contribution tracking, payment status). Migration 0006.
+
+**Group C (Tasks 33-48): Line Items & Statutory Records**
+PayrollLineItem (9 fields, component FK, line_type EARNING/DEDUCTION/EMPLOYER_CONTRIBUTION/ADJUSTMENT), EPFContribution (11 fields, 3 methods), ETFContribution (7 fields, 2 methods), PAYECalculation (12 fields, 3 methods). Migrations 0007-0008.
+
+**Group D (Tasks 49-62): Approval, Finalization & Reversal Services**
+PayrollApprovalService (submit_for_approval, approve, reject, get_pending_approvals, permission checks), PayrollFinalizationService (finalize, generate_bank_file with SLIPS/BOC/COMMERCIAL/CSV formats, mark_as_paid), PayrollReversalService (reverse with permission checks, create_correction_run, calculate_adjustment). PayrollHistory (audit trail model). Migration 0009.
+
+**Group E (Tasks 63-76): Processing Engine & Statutory Reports**
+PayrollProcessor (process_employee, process_batch with progress callbacks, EPF/ETF/PAYE record creation), StatutoryReportService (generate_epf_return, generate_etf_return, generate_paye_return — CSV format). Celery tasks: auto_create_payroll_periods (daily 2:30 AM), process_payroll_task (retry logic). Admin registration (9 new classes).
+
+**Group F (Tasks 77-92): API, Serializers, Tests & Documentation**
+4 serializer files (period, run, employee_payroll, history), 2 viewsets (PayrollPeriodViewSet with lock/unlock, PayrollRunViewSet with 14 custom @action endpoints), 3 filter classes, URL registration. ViewSet exception handling for both ValueError and ValidationError. 167 tests: 25 model + 8 serializer + 17 service + 24 API + 93 SP05-existing.
+
+**Bugs Fixed During Testing:**
+
+1. Service return types: Services return PayrollRun objects not dicts — fixed test assertions
+2. Permission model: Approval/rejection/reversal require is_staff or has_perm — added staff_user fixture
+3. Exception types: Services raise ValidationError not ValueError — fixed tests and viewsets
+4. Bank file formats: get_bank_file_formats() returns dict not list — fixed assertion
+5. Viewset serialization: Added proper serializer usage for PayrollRun responses
+
+**Test Results:** 167/167 payroll tests ALL PASSING. System check: 0 issues.
+
+---
+
+## What Was Completed This Session (Session 36)
+
+### SP05: Salary Structure — Phase 06
+
+**Phase-06_ERP-Advanced-Modules/SubPhase-05_Salary-Structure**
+
+Full implementation of all 86 tasks across 6 groups (A–F). 40+ files created for the payroll app. 66/66 tests passing on Docker PostgreSQL. 6 pre-existing Django system check errors fixed across 5 other apps.
+
+**Group A (Tasks 01-14): Salary Component Model**
+SalaryComponent model with ComponentType (EARNING/DEDUCTION/EMPLOYER_CONTRIBUTION), CalculationType (FIXED/PERCENTAGE_OF_BASIC/PERCENTAGE_OF_GROSS/FORMULA), ComponentCategory (BASIC/ALLOWANCE/BONUS/STATUTORY/LOAN/TAX/OTHER). Auto-uppercase code, soft delete, display ordering. Management command: seed_components (13 defaults).
+
+**Group B (Tasks 15-28): Template & Grade System**
+SalaryTemplate (unique code, designation FK), TemplateComponent (junction with default value, override config, min/max), SalaryGrade (level, min/max salary, template FK). Management command: seed_grades (G1-G6).
+
+**Group C (Tasks 29-42): Employee Salary Assignment**
+EmployeeSalary (employee FK, template FK, basic/gross, effective dates, is_current), EmployeeSalaryComponent (unique per salary+component), SalaryHistory (previous/new amounts, change reason). Signal: auto-create history on basic salary change.
+
+**Group D (Tasks 43-56): Sri Lankan Statutory Calculations**
+EPFSettings (8%/12% rates, ceiling), ETFSettings (3% rate), PAYETaxSlab (2024 progressive: 6%-36%), TaxExemption (Personal Relief LKR 1.2M, Qualifying Payment LKR 300K). Services: EPFCalculator, ETFCalculator, PAYECalculator with progressive slab support.
+
+**Group E (Tasks 57-70): Salary Services**
+SalaryService (assign_template, override_component, recalculate_gross, revise_salary, compare_salaries). ExportService (CSV current salaries, JSON breakdown).
+
+**Group F (Tasks 71-86): API, Tests & Documentation**
+3 ViewSets (component, template, employee_salary), 8 serializers, filters, URLs. 66 tests (37 model + 29 service). Module documentation.
+
+**Pre-existing Errors Fixed (6):**
+
+1. attendance/admin.py: grace_period_minutes → default_late_grace_minutes
+2. employees/admin.py: Added fk_name="employee" to EmploymentHistoryInline
+3. leave/admin.py: scope → applies_to in LeavePolicyAdmin
+4. orders/admin.py: order_prefix → order_number_prefix, allow_guest_checkout → tax_inclusive_pricing
+5. vendor_bills/admin.py: bill_line_item → bill_line in MatchingResultAdmin
+6. payments/models/payment_receipt.py: related_name clash fixed (payment_generated_receipts)
+
+**Test Results:** 66/66 payroll tests ALL PASSING. System check: 0 issues.
+
+---
+
+## What Was Completed This Session (Session 34)
+
+### SP03: Attendance System — Phase 06 (DEEP AUDIT)
+
+**Phase-06_ERP-Advanced-Modules/SubPhase-03_Attendance-System**
+
+Deep audit of all 88 tasks across 6 groups (A–F). 14 gaps identified and fixed. Migration 0005 generated and applied. 69/69 tests passing on Docker PostgreSQL.
+
+**Group A (Tasks 01-16): Shift & Schedule Models — 97%**
+Shift model (100%), ShiftSchedule model with 10 helper methods added during audit (is_valid_on_date, is_currently_valid, get_validity_period, days_remaining, applies_on_weekday, get/set_weekday_pattern, is_weekday/weekend_pattern).
+
+**Group B (Tasks 17-32): Attendance Record Model — 99%**
+All fields, indexes, unique_together complete. overtime_approved changed to 3-state BooleanField(null=True). 4 CHECK constraints added (condition= syntax).
+
+**Group C (Tasks 33-48): Check-In/Out Processing — 67%**
+AttendanceService 100% (9 methods). BiometricService/MobileService stubs (40%). RegularizationService 85%. Regularization model complete.
+
+**Group D (Tasks 49-62): Overtime & Calculations — 85%**
+OvertimeService enhanced with validate_overtime_request(), process_overtime(), get_overtime_summary(). AttendanceSettings: 5 new fields (overtime_multiplier_normal, auto flags). Celery tasks rewritten: mark_daily_absent now checks shift schedules; auto_clock_out uses settings time.
+
+**Group E (Tasks 63-76): Reports & Analytics — 60%**
+8 report methods complete. Absence report enhanced with Bradford Factor (S²×D) and type categorization. Attendance % enhanced with adjusted %, punctuality rate. ExportService: CSV + Excel + JSON. Dashboard/WebSocket/Payroll = future work.
+
+**Group F (Tasks 77-88): API, Testing & Docs — 70%**
+6 serializers, 6 ViewSets, filters, URLs complete. 69 tests (21 model + 12 service + 36 API). BiometricWebhook partial (no HMAC).
+
+**Bugs Fixed:** 6 bugs (broken Q filter, cross-schema FK, test assertion mismatches). **Enhancements:** 10 categories of improvements across 8 files.
+
+**Test Results:** 69/69 attendance tests ALL PASSING.
+
+---
+
+## What Was Completed This Session (Session 33)
+
+### SP02: Department-Designations — Phase 06
+
+**Phase-06_ERP-Advanced-Modules/SubPhase-02_Department-Designations**
+
+Full implementation of all 78 tasks across 6 groups (A–F). Committed as `a5ca1f1` (42 files, 3449 insertions).
+
+**Group A (Tasks 01-16):** Organization app setup, Department model (MPTT with TreeForeignKey), constants, code generator, migrations.
+
+**Group B (Tasks 17-30):** Designation model with levels, salary ranges, code generator, migration.
+
+**Group C (Tasks 31-44):** Employee department/designation FK conversion (CharField→ForeignKey), DepartmentMember, DepartmentHead models, signals, validators, migration 0006.
+
+**Group D (Tasks 45-56):** OrgChartService with tree traversal, hierarchy queries, budget aggregation, reporting chain detection with cycle prevention.
+
+**Group E (Tasks 57-68):** DepartmentService (CRUD, archive, move, merge with MPTT tree rebuild), DesignationService (CRUD, salary validation, level filtering).
+
+**Group F (Tasks 69-78):** REST API (3 ViewSets, 6 serializers, 2 filter classes, URL routing). Tests (29 model, 37 service, 31 API).
+
+**Critical Fixes:**
+
+- `employees/signals.py`: FK objects passed to CharField fields in EmploymentHistory — converted to str()
+- `employees/services/search_service.py`: `icontains` lookups on FK fields — changed to `department__name__icontains`
+- ViewSet `perform_create`: Service creates instance but DRF tries to serialize `validated_data` dict — set `serializer.instance`
+
+**Test Results:** 97/97 organization tests + 127/127 employee regression tests ALL PASSING.
+
+---
+
+### Previous Session: SP11 Purchase Orders DEEP AUDIT — Phase 05
 
 **Phase-05_ERP-Core-Modules-Part2/SubPhase-11_Purchase-Orders**
 

@@ -70,5 +70,5 @@ class OrderReturnAdmin(admin.ModelAdmin):
 
 @admin.register(OrderSettings)
 class OrderSettingsAdmin(admin.ModelAdmin):
-    list_display = ("id", "order_prefix", "default_currency", "allow_guest_checkout")
+    list_display = ("id", "order_number_prefix", "default_currency", "tax_inclusive_pricing")
     readonly_fields = ("id", "created_on", "updated_on")

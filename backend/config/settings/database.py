@@ -315,6 +315,10 @@ TENANT_APPS: list[str] = [
     "apps.vendor_bills",                 # Vendor bills & payments — tenant-specific bill management
     "apps.employees",                    # Employee management — tenant-specific employee records
     "apps.organization",                 # Organization structure — departments & designations
+    "apps.attendance",                   # Attendance tracking — shifts, schedules, clock in/out
+    "apps.leave",                        # Leave management — leave types, policies, applications
+    "apps.payroll",                      # Payroll — salary components, templates, EPF/ETF/PAYE
+    "apps.payslip",                      # Payslip generation — PDF payslips, distribution, tracking
 ]
 
 

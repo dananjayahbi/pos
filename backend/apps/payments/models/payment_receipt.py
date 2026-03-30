@@ -67,7 +67,7 @@ class PaymentReceipt(UUIDMixin, TimestampMixin, SoftDeleteMixin, models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="generated_receipts",
+        related_name="payment_generated_receipts",
     )
 
     notes = models.TextField(blank=True, default="")
