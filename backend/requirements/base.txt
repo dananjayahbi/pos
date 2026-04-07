@@ -84,6 +84,8 @@ djangorestframework-simplejwt==5.5.1
     # via -r requirements/base.in
 drf-spectacular==0.29.0
     # via -r requirements/base.in
+flower==2.0.1
+    # via -r requirements/base.in
 hiredis==3.3.0
     # via -r requirements/base.in
 inflection==0.5.1
