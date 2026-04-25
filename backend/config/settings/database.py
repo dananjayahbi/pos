@@ -19,7 +19,6 @@ because connection details differ per environment.
 
 from config.env import env  # Centralized env loader
 
-
 # ════════════════════════════════════════════════════════════════════════
 # TENANT MODEL SETTINGS
 # ════════════════════════════════════════════════════════════════════════
@@ -247,6 +246,7 @@ SHARED_APPS: list[str] = [
     "apps.tenants",                      # Tenant & Domain models (must be in public schema)
     "apps.core",                         # Core utilities, base models, shared helpers
     "apps.users",                        # User profiles & management (shared user registry)
+    "apps.authentication",               # JWT auth endpoints (login, logout, refresh)
     "apps.platform",                     # Platform services (plans, settings, flags, audit, billing)
     # ── Third-Party Infrastructure (tenant-agnostic) ────────────────
     "rest_framework",                    # DRF — API framework (config is global)
@@ -319,6 +319,8 @@ TENANT_APPS: list[str] = [
     "apps.leave",                        # Leave management — leave types, policies, applications
     "apps.payroll",                      # Payroll — salary components, templates, EPF/ETF/PAYE
     "apps.payslip",                      # Payslip generation — PDF payslips, distribution, tracking
+    "apps.dashboard",                    # Dashboard & KPIs — business performance metrics & alerts
+    "apps.analytics",                    # Analytics & Reports — business intelligence and reporting
 ]
 
 

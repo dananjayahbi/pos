@@ -5,12 +5,14 @@
 // Export components as they are created.
 // ================================================================
 
-// export { Logo } from './Logo'
-// export { Avatar } from './Avatar'
-// export { LoadingSpinner } from './LoadingSpinner'
+export { SidePanel, SidePanelSection, type SidePanelProps, type SidePanelSectionProps } from './side-panel';
+export { CommandPalette, type CommandPaletteProps } from './command-palette';
+export { OptimizedImage, ImageSkeleton, ImageFallback, type OptimizedImageProps } from './OptimizedImage';
+export { LoadingSpinner, type LoadingSpinnerProps } from './LoadingSpinner';
+export { PageTransition } from './PageTransition';
+export { BaseSkeleton, ProductSkeleton, GridSkeleton, ContentSkeleton, type BaseSkeletonProps } from './Skeleton';
 // export { EmptyState } from './EmptyState'
 // export { ErrorBoundary } from './ErrorBoundary'
-// export { Skeleton } from './Skeleton'
 // export { ConfirmDialog } from './ConfirmDialog'
 // export { Toast } from './Toast'
 // export { ThemeToggle } from './ThemeToggle'

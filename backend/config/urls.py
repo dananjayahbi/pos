@@ -23,8 +23,8 @@ urlpatterns = [
     path("api/v1/users/", include("apps.users.api.urls", namespace="users")),
     path("api/v1/", include("apps.products.api.urls", namespace="products")),
     path("api/v1/", include("apps.attributes.urls", namespace="attributes")),
-    # path("api/v1/auth/", include("apps.authentication.urls")),
     # path("api/v1/tenants/", include("apps.tenants.urls")),
+    path("api/v1/auth/", include("apps.authentication.urls", namespace="authentication")),
     path("api/v1/warehouse/", include("apps.inventory.warehouses.api.urls", namespace="warehouse")),
     path("api/v1/stock/", include("apps.inventory.stock.api.urls", namespace="stock")),
     path("api/v1/alerts/", include("apps.inventory.alerts.urls", namespace="alerts")),
@@ -43,6 +43,10 @@ urlpatterns = [
     path("api/v1/leave/", include("apps.leave.urls", namespace="leave")),
     path("api/v1/payroll/", include("apps.payroll.urls", namespace="payroll")),
     path("api/v1/payslips/", include("apps.payslip.urls", namespace="payslip")),
+    path("api/v1/accounting/", include("apps.accounting.urls", namespace="accounting")),
+    path("api/v1/dashboard/", include("apps.dashboard.urls", namespace="dashboard")),
+    path("api/v1/analytics/", include("apps.analytics.api.urls", namespace="analytics")),
+    path("api/v1/store/", include("apps.webstore.api.urls", namespace="store")),
 
     # ──────────────────────────────────────────────
     # API Documentation — drf-spectacular (SP11)

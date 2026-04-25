@@ -1,25 +1,66 @@
 """Fixtures for employees module tests."""
 
-import pytest
 from datetime import date
+
+import pytest
 from django.contrib.auth import get_user_model
 from django.db import connection
-from django_tenants.utils import get_tenant_model, get_tenant_domain_model
+from django_tenants.utils import get_tenant_domain_model, get_tenant_model
 
 TenantModel = get_tenant_model()
 DomainModel = get_tenant_domain_model()
 
 SCHEMA_NAME = "test_employees"
-TENANT_DOMAIN = "testserver"
+TENANT_DOMAIN = "employees.testserver"
 
 
 @pytest.fixture(scope="session")
 def setup_test_tenant(django_db_setup, django_db_blocker):
     """Create and destroy a test tenant for employees tests."""
     with django_db_blocker.unblock():
-        if TenantModel.objects.filter(schema_name=SCHEMA_NAME).exists():
-            t = TenantModel.objects.get(schema_name=SCHEMA_NAME)
-            t.delete(force_drop=True)
+        with connection.cursor() as cur:
+            cur.execute(
+                "SELECT nspname FROM pg_catalog.pg_namespace "
+                "WHERE nspname = %s",
+                [SCHEMA_NAME],
+            )
+            schema_exists = cur.fetchone() is not None
+
+        if schema_exists:
+            try:
+                tenant = TenantModel.objects.get(schema_name=SCHEMA_NAME)
+                DomainModel.objects.get_or_create(
+                    domain=TENANT_DOMAIN,
+                    defaults={"tenant": tenant, "is_primary": True},
+                )
+                connection.set_tenant(tenant)
+                yield tenant
+                connection.set_schema_to_public()
+                return
+            except TenantModel.DoesNotExist:
+                with connection.cursor() as cur:
+                    cur.execute(
+                        "DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA_NAME
+                    )
+
+        with connection.cursor() as cur:
+            cur.execute(
+                "DELETE FROM %s WHERE tenant_id IN "
+                "(SELECT id FROM %s WHERE schema_name = %%s)"
+                % (DomainModel._meta.db_table, TenantModel._meta.db_table),
+                [SCHEMA_NAME],
+            )
+            cur.execute(
+                "DELETE FROM tenants_tenantsettings WHERE tenant_id IN "
+                "(SELECT id FROM %s WHERE schema_name = %%s)"
+                % TenantModel._meta.db_table,
+                [SCHEMA_NAME],
+            )
+            cur.execute(
+                "DELETE FROM %s WHERE schema_name = %%s"
+                % TenantModel._meta.db_table,
+                [SCHEMA_NAME],
+            )
 
         tenant = TenantModel(
             schema_name=SCHEMA_NAME,
@@ -38,24 +79,6 @@ def setup_test_tenant(django_db_setup, django_db_blocker):
         yield tenant
 
         connection.set_schema_to_public()
-        with connection.cursor() as cur:
-            cur.execute(
-                "DROP SCHEMA IF EXISTS %s CASCADE" % SCHEMA_NAME
-            )
-            cur.execute(
-                "DELETE FROM %s WHERE tenant_id = %%s"
-                % DomainModel._meta.db_table,
-                [tenant.pk],
-            )
-            cur.execute(
-                "DELETE FROM tenants_tenantsettings WHERE tenant_id = %s",
-                [tenant.pk],
-            )
-            cur.execute(
-                "DELETE FROM %s WHERE id = %%s"
-                % TenantModel._meta.db_table,
-                [tenant.pk],
-            )
 
 
 @pytest.fixture
