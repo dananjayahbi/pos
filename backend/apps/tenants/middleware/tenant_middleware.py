@@ -78,17 +78,12 @@ class LCCTenantMiddleware(TenantMainMiddleware):
         """
         Process the request through the tenant middleware chain.
 
-        This method conforms to Django's new-style (callable) middleware
-        interface. It delegates immediately to TenantMainMiddleware.__call__
-        which internally:
-            1. Calls self.process_request(request) — tenant resolution.
-            2. Calls self.get_response(request) — downstream processing.
-            3. Calls self.process_response(request, response) if defined.
-            4. Returns the HttpResponse.
+        For paths listed in PUBLIC_SCHEMA_PATHS, tenant resolution is
+        skipped and the public schema is activated directly, then the
+        request is passed straight to get_response.
 
-        Because TenantMainMiddleware extends MiddlewareMixin, the
-        process_request/process_response hooks are invoked automatically
-        inside __call__ via MiddlewareMixin's implementation.
+        For all other paths, delegates to TenantMainMiddleware.__call__
+        for the normal hostname → Domain → Tenant → schema activation flow.
 
         Args:
             request: The incoming Django HttpRequest object.
@@ -96,6 +91,21 @@ class LCCTenantMiddleware(TenantMainMiddleware):
         Returns:
             HttpResponse: The response produced by the downstream handler.
         """
+        from django.conf import settings
+        from django.db import connection
+
+        public_paths = getattr(settings, "PUBLIC_SCHEMA_PATHS", [])
+        if any(request.path_info.startswith(p) for p in public_paths):
+            from django_tenants.utils import get_public_schema_name
+            connection.set_schema_to_public()
+            request.tenant = getattr(connection, "tenant", None)
+            request.schema_name = get_public_schema_name()
+            logger.debug(
+                "LCCTenantMiddleware: public-schema bypass for path='%s'",
+                request.path_info,
+            )
+            return self.get_response(request)
+
         return super().__call__(request)
 
     # ── Request Attribute Injection (Tasks 06-07) ─────────────────────
@@ -122,6 +132,9 @@ class LCCTenantMiddleware(TenantMainMiddleware):
             Http404: If no matching Domain is found and
                 SHOW_PUBLIC_IF_NO_TENANT_FOUND is False.
         """
+        # Bypass tenant resolution for public-schema paths is handled in
+        # __call__ before this method is invoked for non-public paths.
+
         # Parent resolves hostname → Domain → Tenant and activates schema.
         # After this call, django.db.connection.schema_name is set to the
         # tenant's schema name and connection.tenant holds the Tenant instance.
