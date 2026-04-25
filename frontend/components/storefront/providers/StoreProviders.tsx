@@ -4,6 +4,7 @@ import React, { type ReactNode, type FC } from 'react';
 import ThemeProvider from './ThemeProvider';
 import AuthProvider from './AuthProvider';
 import CartProvider from './CartProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
 
 export interface StoreProvidersProps {
   children: ReactNode;
@@ -19,11 +20,13 @@ export interface StoreProvidersProps {
  */
 const StoreProviders: FC<StoreProvidersProps> = ({ children, initialTheme = 'light' }) => {
   return (
-    <ThemeProvider defaultTheme={initialTheme}>
-      <AuthProvider>
-        <CartProvider>{children}</CartProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <QueryProvider>
+      <ThemeProvider defaultTheme={initialTheme}>
+        <AuthProvider>
+          <CartProvider>{children}</CartProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryProvider>
   );
 };
 

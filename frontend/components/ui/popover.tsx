@@ -7,7 +7,11 @@ import { cn } from '@/lib/utils';
 
 const Popover = PopoverPrimitive.Root;
 
-const PopoverTrigger = PopoverPrimitive.Trigger;
+const PopoverTrigger = PopoverPrimitive.Trigger as React.ForwardRefExoticComponent<
+  PopoverPrimitive.PopoverTriggerProps & {
+    children?: React.ReactNode;
+  } & React.RefAttributes<HTMLButtonElement>
+>;
 
 const PopoverAnchor = PopoverPrimitive.Anchor;
 

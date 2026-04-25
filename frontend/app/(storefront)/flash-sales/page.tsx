@@ -3,6 +3,7 @@
 import { Zap } from 'lucide-react';
 import { useFlashSales } from '@/hooks/marketing/useFlashSale';
 import { FlashSaleBanner } from '@/components/marketing/flash-sales/FlashSaleBanner';
+import type { FlashSaleListItem } from '@/types/marketing/flash-sale.types';
 
 export default function FlashSalesPage() {
   const { data: sales, isLoading, error } = useFlashSales();
@@ -41,7 +42,7 @@ export default function FlashSalesPage() {
 
       {sales && sales.length > 0 && (
         <div className="space-y-6">
-          {sales.map((sale) => (
+          {sales.map((sale: FlashSaleListItem) => (
             <FlashSaleBanner key={sale.id} sale={sale} />
           ))}
         </div>

@@ -9,7 +9,11 @@ const TooltipProvider = TooltipPrimitive.Provider;
 
 const Tooltip = TooltipPrimitive.Root;
 
-const TooltipTrigger = TooltipPrimitive.Trigger;
+const TooltipTrigger = TooltipPrimitive.Trigger as React.ForwardRefExoticComponent<
+  TooltipPrimitive.TooltipTriggerProps & {
+    children?: React.ReactNode;
+  } & React.RefAttributes<HTMLButtonElement>
+>;
 
 const TooltipContent = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Content>,
