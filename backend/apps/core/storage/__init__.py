@@ -134,6 +134,7 @@ from apps.core.storage.paths import (
     document_path,
     avatar_path,
     tenant_upload_path,
+    make_tenant_upload_to,
 )
 from apps.core.storage.s3 import generate_signed_url, generate_bulk_signed_urls
 from apps.core.storage.images import ImageProcessor
@@ -166,6 +167,7 @@ __all__ = [
     "document_path",
     "avatar_path",
     "tenant_upload_path",
+    "make_tenant_upload_to",
     # S3 utilities
     "generate_signed_url",
     "generate_bulk_signed_urls",

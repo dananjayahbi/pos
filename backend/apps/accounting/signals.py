@@ -39,7 +39,9 @@ def _register_signal(model_path, task_func):
         @receiver(post_save, sender=model, weak=False)
         def handler(sender, instance, created, **kwargs):
             if _should_generate_entry(instance):
-                task_func.delay(str(instance.pk))
+                from django.db import connection as db_connection
+                schema = getattr(db_connection, "schema_name", "public")
+                task_func.delay(schema, str(instance.pk))
 
         logger.debug("Registered auto-entry signal for %s", model_path)
     except (LookupError, ImportError, ValueError):

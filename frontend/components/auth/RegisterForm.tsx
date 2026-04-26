@@ -12,6 +12,7 @@ import {
   adminUserSchema,
   contactInfoSchema,
   planSelectionSchema,
+  slugSchema,
   type RegistrationFormData,
 } from '@/lib/validations/register';
 import { Button } from '@/components/ui/button';
@@ -30,15 +31,17 @@ import { BusinessInfoStep } from './register/BusinessInfoStep';
 import { AdminUserStep } from './register/AdminUserStep';
 import { ContactInfoStep } from './register/ContactInfoStep';
 import { PlanSelectionStep } from './register/PlanSelectionStep';
-import apiClient from '@/services/api/apiClient';
+import { SlugStep } from './register/SlugStep';
+import { registerTenant } from '@/services/api/registration';
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 5;
 
 const stepSchemas = [
   businessInfoSchema,
   adminUserSchema,
   contactInfoSchema,
   planSelectionSchema,
+  slugSchema,
 ] as const;
 
 const stepFields: (keyof RegistrationFormData)[][] = [
@@ -46,6 +49,7 @@ const stepFields: (keyof RegistrationFormData)[][] = [
   ['firstName', 'lastName', 'email', 'password', 'confirmPassword'],
   ['phone', 'address', 'timezone'],
   ['plan'],
+  ['slug'],
 ];
 
 export interface RegisterFormProps {
@@ -73,6 +77,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       address: { street: '', city: '', postalCode: '' },
       timezone: 'Asia/Colombo',
       plan: undefined,
+      slug: '',
       acceptTerms: false as unknown as true,
     },
     mode: 'onBlur',
@@ -102,38 +107,25 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     setError(null);
 
     try {
-      const payload = {
-        tenant: {
-          businessName: data.businessName,
-          businessType: data.businessType,
-          registrationNumber: data.registrationNumber || undefined,
-        },
-        adminUser: {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          password: data.password,
-        },
-        contact: {
-          phone: data.phone,
-          address: data.address,
-          timezone: data.timezone,
-        },
-        subscription: {
-          plan: data.plan,
-        },
-        terms: {
-          accepted: true,
-          acceptedAt: new Date().toISOString(),
-        },
-      };
-
-      await apiClient.post('/auth/register', payload);
+      const result = await registerTenant({
+        email: data.email,
+        password: data.password,
+        contact_name: `${data.firstName} ${data.lastName}`,
+        slug: data.slug,
+        business_name: data.businessName,
+        business_type: data.businessType,
+        industry: data.businessType, // maps businessType to industry for now
+        contact_phone: data.phone,
+        city: data.address?.city,
+        province: undefined,
+      });
 
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+        router.push(
+          `/register/success?subdomain=${encodeURIComponent(result.subdomain_url)}&email=${encodeURIComponent(data.email)}`
+        );
       }
     } catch (err: unknown) {
       const errorObj = err as {
@@ -178,9 +170,11 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         {currentStep === 1 && <BusinessInfoStep form={form} disabled={isLoading} />}
         {currentStep === 2 && <AdminUserStep form={form} disabled={isLoading} />}
         {currentStep === 3 && <ContactInfoStep form={form} disabled={isLoading} />}
-        {currentStep === 4 && (
+        {currentStep === 4 && <PlanSelectionStep form={form} disabled={isLoading} />}
+
+        {currentStep === 5 && (
           <>
-            <PlanSelectionStep form={form} disabled={isLoading} />
+            <SlugStep form={form} disabled={isLoading} />
             <FormField
               control={form.control}
               name="acceptTerms"

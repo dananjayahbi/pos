@@ -27,6 +27,15 @@ export default function LoginPage() {
           Create account
         </Link>
       </p>
+      <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
+        Platform administrator?{' '}
+        <Link
+          href="/platform/login"
+          className="font-medium text-gray-500 transition-colors hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-300"
+        >
+          Sign in here
+        </Link>
+      </p>
     </AuthCard>
   );
 }

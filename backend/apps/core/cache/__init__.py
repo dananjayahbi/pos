@@ -28,7 +28,23 @@ from apps.core.cache.utils import (
     make_cache_key,
 )
 
+
+def tenant_cache_key(key: str, key_prefix: str, version: int) -> str:
+    """
+    Django cache KEY_FUNCTION that prefixes every key with the current tenant schema.
+
+    Format: {schema_name}:{key_prefix}:{version}:{key}
+    Referenced by CACHES["default"]["KEY_FUNCTION"] = "apps.core.cache.tenant_cache_key"
+    """
+    from django.db import connection  # local import to avoid circular
+    schema_name = getattr(connection, "schema_name", "public")
+    if key_prefix:
+        return f"{schema_name}:{key_prefix}:{version}:{key}"
+    return f"{schema_name}:{version}:{key}"
+
+
 __all__ = [
+    "tenant_cache_key",
     "CACHE_TTL_SHORT",
     "CACHE_TTL_MEDIUM",
     "CACHE_TTL_LONG",

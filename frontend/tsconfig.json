@@ -14,7 +14,11 @@
     "noImplicitReturns": true,
     /* ── Target & Library ───────────────────────────────────── */
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     /* ── Module ─────────────────────────────────────────────── */
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -37,16 +41,36 @@
     /* ── Path Aliases ───────────────────────────────────────── */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/components/*": ["./components/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/hooks/*": ["./hooks/*"],
-      "@/store/*": ["./stores/*"],
-      "@/stores/*": ["./stores/*"],
-      "@/types/*": ["./types/*"],
-      "@/services/*": ["./services/*"],
-      "@/constants/*": ["./constants/*"],
-      "@/styles/*": ["./styles/*"]
+      "@/*": [
+        "./*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/store/*": [
+        "./stores/*"
+      ],
+      "@/stores/*": [
+        "./stores/*"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/services/*": [
+        "./services/*"
+      ],
+      "@/constants/*": [
+        "./constants/*"
+      ],
+      "@/styles/*": [
+        "./styles/*"
+      ]
     },
     /* ── Next.js Plugin ─────────────────────────────────────── */
     "plugins": [
@@ -62,5 +86,11 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", ".next", "out", "dist", "coverage"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "coverage"
+  ]
 }

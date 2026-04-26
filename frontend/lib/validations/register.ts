@@ -17,29 +17,31 @@ export const businessInfoSchema = z.object({
 // ── Step 2: Admin User ────────────────────────────────────────
 
 export const adminUserBaseSchema = z.object({
-    firstName: z
-      .string()
-      .min(2, 'First name must be at least 2 characters')
-      .max(50, 'First name must be at most 50 characters'),
-    lastName: z
-      .string()
-      .min(2, 'Last name must be at least 2 characters')
-      .max(50, 'Last name must be at most 50 characters'),
-    email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  });
+  firstName: z
+    .string()
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name must be at most 50 characters'),
+  lastName: z
+    .string()
+    .min(2, 'Last name must be at least 2 characters')
+    .max(50, 'Last name must be at most 50 characters'),
+  email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+});
 
-export const adminUserSchema = adminUserBaseSchema
-  .refine((data) => data.password === data.confirmPassword, {
+export const adminUserSchema = adminUserBaseSchema.refine(
+  (data) => data.password === data.confirmPassword,
+  {
     message: 'Passwords do not match',
     path: ['confirmPassword'],
-  });
+  }
+);
 
 // ── Step 3: Contact Info ──────────────────────────────────────
 
@@ -73,6 +75,19 @@ export const planSelectionSchema = z.object({
   }),
 });
 
+// ── Step 5 (new): Subdomain Slug ─────────────────────────────
+
+export const slugSchema = z.object({
+  slug: z
+    .string()
+    .min(3, 'Slug must be at least 3 characters')
+    .max(32, 'Slug must be at most 32 characters')
+    .regex(
+      /^[a-z0-9][a-z0-9\-]{1,30}[a-z0-9]$/,
+      'Use 3-32 lowercase letters, digits, or hyphens. Cannot start or end with a hyphen.'
+    ),
+});
+
 // ── Terms Acceptance ──────────────────────────────────────────
 
 export const termsSchema = z.object({
@@ -87,6 +102,7 @@ export const registrationSchema = businessInfoSchema
   .merge(adminUserBaseSchema)
   .merge(contactInfoSchema)
   .merge(planSelectionSchema)
+  .merge(slugSchema)
   .merge(termsSchema)
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -98,5 +114,6 @@ export const registrationSchema = businessInfoSchema
 export type BusinessInfoData = z.infer<typeof businessInfoSchema>;
 export type AdminUserData = z.infer<typeof adminUserSchema>;
 export type ContactInfoData = z.infer<typeof contactInfoSchema>;
+export type SlugData = z.infer<typeof slugSchema>;
 export type PlanSelectionData = z.infer<typeof planSelectionSchema>;
 export type RegistrationFormData = z.infer<typeof registrationSchema>;

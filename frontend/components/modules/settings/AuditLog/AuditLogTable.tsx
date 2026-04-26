@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -109,9 +109,7 @@ interface AuditLogTableProps {
 }
 
 export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'timestamp', desc: true },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'timestamp', desc: true }]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const columns = useMemo<ColumnDef<AuditLogEntry>[]>(
@@ -143,7 +141,10 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
         accessorKey: 'timestamp',
         header: 'Time',
         cell: ({ row }) => (
-          <span className="text-sm text-muted-foreground" title={new Date(row.original.timestamp).toLocaleString('en-LK')}>
+          <span
+            className="text-sm text-muted-foreground"
+            title={new Date(row.original.timestamp).toLocaleString('en-LK')}
+          >
             {getRelativeTime(row.original.timestamp)}
           </span>
         ),
@@ -151,9 +152,7 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
       {
         accessorKey: 'userName',
         header: 'User',
-        cell: ({ row }) => (
-          <span className="text-sm font-medium">{row.original.userName}</span>
-        ),
+        cell: ({ row }) => <span className="text-sm font-medium">{row.original.userName}</span>,
       },
       {
         accessorKey: 'action',
@@ -163,17 +162,13 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
       {
         accessorKey: 'entity',
         header: 'Entity',
-        cell: ({ row }) => (
-          <span className="text-sm">{row.original.entity}</span>
-        ),
+        cell: ({ row }) => <span className="text-sm">{row.original.entity}</span>,
       },
       {
         accessorKey: 'details',
         header: 'Details',
         cell: ({ row }) => (
-          <span className="text-sm text-muted-foreground line-clamp-1">
-            {row.original.details}
-          </span>
+          <span className="text-sm text-muted-foreground line-clamp-1">{row.original.details}</span>
         ),
       },
       {
@@ -205,10 +200,7 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
     return (
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
-          />
+          <div key={i} className="h-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
         ))}
       </div>
     );
@@ -225,10 +217,7 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -237,19 +226,16 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <>
-                  <TableRow key={row.id}>
+                <React.Fragment key={row.id}>
+                  <TableRow>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
                   {expanded[row.original.id] && (
-                    <TableRow key={`${row.id}-expanded`}>
+                    <TableRow>
                       <TableCell colSpan={columns.length} className="bg-muted/50 p-4">
                         <div className="space-y-2 text-sm">
                           <p>
@@ -259,37 +245,28 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
                           {row.original.entityId && (
                             <p>
                               <span className="font-medium">Entity ID: </span>
-                              <span className="font-mono">
-                                {row.original.entityId}
-                              </span>
+                              <span className="font-mono">{row.original.entityId}</span>
                             </p>
                           )}
                           {row.original.ipAddress && (
                             <p>
                               <span className="font-medium">IP Address: </span>
-                              <span className="font-mono">
-                                {row.original.ipAddress}
-                              </span>
+                              <span className="font-mono">{row.original.ipAddress}</span>
                             </p>
                           )}
                           <p>
                             <span className="font-medium">Full Timestamp: </span>
-                            {new Date(row.original.timestamp).toLocaleString(
-                              'en-LK'
-                            )}
+                            {new Date(row.original.timestamp).toLocaleString('en-LK')}
                           </p>
                         </div>
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No audit log entries found.
                 </TableCell>
               </TableRow>
@@ -308,8 +285,7 @@ export function AuditLogTable({ entries, isLoading }: AuditLogTableProps) {
             Previous
           </Button>
           <span className="text-sm text-muted-foreground">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
           </span>
           <Button
             variant="outline"

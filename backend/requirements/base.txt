@@ -47,6 +47,8 @@ cron-descriptor==2.0.6
     # via django-celery-beat
 dj-database-url==3.1.0
     # via -r requirements/base.in
+dnspython==2.6.1
+    # via -r requirements/base.in
 django==5.2.11
     # via
     #   -r requirements/base.in

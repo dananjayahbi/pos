@@ -50,6 +50,35 @@ def tenant_upload_path(instance, filename: str, subfolder: str = "uploads") -> s
     return os.path.join(prefix, subfolder, _unique_filename(filename))
 
 
+def make_tenant_upload_to(subdirectory: str):
+    """
+    Factory that returns an ``upload_to`` callable scoped to a tenant subdirectory.
+
+    Usage::
+
+        class Product(models.Model):
+            image = models.ImageField(upload_to=make_tenant_upload_to("products"))
+
+    The generated path format is::
+
+        {schema_name}/{subdirectory}/{uuid}.{ext}
+
+    For example: shop123/products/a1b2c3d4e5f6.jpg
+
+    Args:
+        subdirectory: The sub-folder name within the tenant directory.
+
+    Returns:
+        A two-argument callable suitable for ``ImageField(upload_to=...)``.
+    """
+    def upload_path(instance, filename: str) -> str:
+        schema_name = _get_tenant_prefix()
+        return os.path.join(schema_name, subdirectory, _unique_filename(filename))
+
+    upload_path.__name__ = f"upload_to_{subdirectory}"
+    return upload_path
+
+
 def product_path(instance, filename: str) -> str:
     """
     Generate upload path for product images.

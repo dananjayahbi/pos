@@ -39,8 +39,8 @@ fi
 
 # Create superuser if not exists (development)
 if [ "$CREATE_SUPERUSER" = "true" ]; then
-    echo "👤 Creating superuser if not exists..."
-    python manage.py createsuperuser --noinput 2>/dev/null || true
+    echo "👤 Creating platform superuser if not exists..."
+    python manage.py create_superuser || true
 fi
 
 echo "✅ Initialization complete!"

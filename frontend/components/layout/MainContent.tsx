@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import { PageTransition } from './PageTransition';
+import { TrialBanner } from './TrialBanner';
 
 /**
  * MainContent — Scrollable content container for dashboard pages.
@@ -23,11 +24,11 @@ export function MainContent({ children, className, noPadding }: MainContentProps
       tabIndex={-1}
       className={cn(
         'relative flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 focus:outline-none dark:bg-gray-900',
-        !noPadding && 'p-4 md:p-6 lg:p-8 xl:p-10',
         className
       )}
     >
-      <div className="mx-auto max-w-screen-2xl">
+      <TrialBanner />
+      <div className={cn('mx-auto max-w-screen-2xl', !noPadding && 'p-4 md:p-6 lg:p-8 xl:p-10')}>
         <PageTransition>{children}</PageTransition>
       </div>
     </main>

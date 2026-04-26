@@ -317,4 +317,7 @@ backend/media/public/*
 # -------------------------------------------------
 # Document Series (development reference)
 # -------------------------------------------------
+/error-reporting/
+/audit-reports/
 /Document-Series/
+/fix-plans/

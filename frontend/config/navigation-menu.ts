@@ -27,6 +27,8 @@ import {
   Warehouse,
   ScrollText,
   Plug,
+  BookOpen,
+  User,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────
@@ -264,6 +266,19 @@ export const navigationMenuItems: MenuItem[] = [
         icon: Sliders,
         path: '/settings',
       },
+      {
+        id: 'settings-profile',
+        label: 'My Profile',
+        icon: User,
+        path: '/settings/profile',
+      },
     ],
+  },
+  {
+    id: 'documentation',
+    label: 'Documentation',
+    icon: BookOpen,
+    path: '/documentation',
+    divider: true,
   },
 ];

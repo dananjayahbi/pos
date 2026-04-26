@@ -82,13 +82,15 @@ const nextConfig = {
   // ── Server External Packages (moved from experimental) ───────
   serverExternalPackages: ['bcryptjs', 'sharp'],
 
-  // ── Typed Routes (moved from experimental) ────────────────────
-  typedRoutes: true,
-
   // ── Experimental ──────────────────────────────────────────────
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'app.lankacommerce.cloud'],
+      allowedOrigins: [
+        'localhost:3000',
+        'localhost:3001',
+        'localhost:3002',
+        'app.lankacommerce.cloud',
+      ],
       bodySizeLimit: '2mb',
     },
   },

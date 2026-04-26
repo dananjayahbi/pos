@@ -25,9 +25,20 @@ Base behaviour (inherited from TenantMainMiddleware):
 
 import logging
 
+from django.http import JsonResponse
+from django.utils import timezone
 from django_tenants.middleware.main import TenantMainMiddleware
 
 logger = logging.getLogger(__name__)
+
+# Paths that are always allowed even for suspended/expired tenants
+_ALWAYS_ALLOWED_PATHS = {
+    "/api/v1/auth/login/",
+    "/api/v1/auth/refresh/",
+    "/health/",
+    "/api/v1/tenants/register/",
+    "/api/v1/tenants/check-slug/",
+}
 
 
 class LCCTenantMiddleware(TenantMainMiddleware):
@@ -106,7 +117,54 @@ class LCCTenantMiddleware(TenantMainMiddleware):
             )
             return self.get_response(request)
 
-        return super().__call__(request)
+        response = super().__call__(request)
+        denied = getattr(request, "_tenant_access_denied", None)
+        if denied is not None:
+            return denied
+        return response
+
+    def _check_tenant_access(self, request) -> "JsonResponse | None":
+        """
+        Returns a JsonResponse 403 error if the tenant should be blocked.
+        Returns None if access is allowed.
+        """
+        if request.path_info in _ALWAYS_ALLOWED_PATHS:
+            return None
+
+        tenant = getattr(request, "tenant", None)
+        if tenant is None:
+            return None  # public schema request, allow
+
+        # Block suspended or archived tenants
+        if getattr(tenant, "status", "active") in ("suspended", "archived"):
+            return JsonResponse(
+                {
+                    "error": "tenant_suspended",
+                    "detail": (
+                        "Your account has been suspended. "
+                        "Please contact support for assistance."
+                    ),
+                },
+                status=403,
+            )
+
+        # Block expired trials
+        if getattr(tenant, "on_trial", False):
+            paid_until = getattr(tenant, "paid_until", None)
+            if paid_until is not None and paid_until < timezone.now().date():
+                return JsonResponse(
+                    {
+                        "error": "trial_expired",
+                        "detail": (
+                            f"Your 7-day free trial expired on {paid_until}. "
+                            "Please upgrade to a paid plan to continue."
+                        ),
+                        "upgrade_url": "/settings/billing",
+                    },
+                    status=403,
+                )
+
+        return None
 
     # ── Request Attribute Injection (Tasks 06-07) ─────────────────────
 
@@ -159,3 +217,8 @@ class LCCTenantMiddleware(TenantMainMiddleware):
                 "LCCTenantMiddleware: no tenant resolved for host='%s'",
                 request.get_host(),
             )
+
+        # Enforce trial/status access control
+        denied = self._check_tenant_access(request)
+        if denied is not None:
+            request._tenant_access_denied = denied

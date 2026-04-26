@@ -34,6 +34,9 @@ CACHES = {
         "TIMEOUT": 300,  # 5 minutes
         "KEY_PREFIX": "lcc",
         "VERSION": 1,
+        # Prefix every key with the current tenant schema to prevent
+        # cross-tenant cache poisoning.  Format: {schema}:lcc:{version}:{key}
+        "KEY_FUNCTION": "apps.core.cache.tenant_cache_key",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "SOCKET_CONNECT_TIMEOUT": REDIS_SOCKET_CONNECT_TIMEOUT,

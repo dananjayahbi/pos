@@ -211,6 +211,8 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/hour",
         "user": "1000/hour",
+        "slug_check": "30/minute",
+        "registration": "5/hour",
     },
     "DATETIME_FORMAT": "%Y-%m-%dT%H:%M:%S%z",
 }
@@ -363,6 +365,15 @@ CELERY_BEAT_SCHEDULE = {
     "check-kpi-alerts": {
         "task": "apps.dashboard.tasks.check_kpi_alerts",
         "schedule": crontab(minute="*/30"),  # Every 30 minutes
+    },
+    # ── P4-31 Trial Lifecycle Tasks ──────────────────────────────
+    "send-trial-reminders": {
+        "task": "tenants.send_trial_reminders",
+        "schedule": crontab(hour=0, minute=0),  # midnight daily
+    },
+    "suspend-expired-trials": {
+        "task": "tenants.suspend_expired_trials",
+        "schedule": crontab(hour=0, minute=5),  # 00:05 daily
     },
 }
 
@@ -635,8 +646,10 @@ TENANT_HEADER_PATHS: list[str] = [
 
 PUBLIC_SCHEMA_PATHS: list[str] = [
     "/api/v1/auth/",
+    "/api/v1/platform/",   # Platform admin API — always uses public schema
     "/api/v1/register/",
     "/api/v1/plans/",
+    "/admin/",             # Django admin — public schema
     "/health/",
     "/metrics/",
 ]

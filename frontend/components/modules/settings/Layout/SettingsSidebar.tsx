@@ -2,7 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Settings, Building2, Users, Shield, Link2, Key, CreditCard, FileText } from 'lucide-react';
+import {
+  Settings,
+  Building2,
+  Users,
+  Shield,
+  Link2,
+  Key,
+  CreditCard,
+  FileText,
+  Globe,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -23,6 +33,8 @@ const systemItems: NavItem[] = [
   { label: 'API Keys', href: '/settings/api-keys', icon: Key },
   { label: 'Billing & Plans', href: '/settings/billing', icon: CreditCard },
   { label: 'Audit Log', href: '/settings/audit-log', icon: FileText },
+  { label: 'Custom Domains', href: '/settings/domains', icon: Globe },
+  { label: 'Subscription', href: '/settings/subscription', icon: CreditCard },
 ];
 
 interface SettingsSidebarProps {
